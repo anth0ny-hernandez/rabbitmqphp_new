@@ -5,6 +5,8 @@ require_once('rabbitMQLib.inc');
 require_once('dbProcessor.php');
 
 function requestProcessor($request) {
+    echo "received request".PHP_EOL;
+    var_dump($request);
     if (!isset($request['type'])) {
         return "ERROR: unsupported message type";
     }
