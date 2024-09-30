@@ -12,3 +12,4 @@
 
     <input type = "button" id="submit_login_form" value="SUBMIT"/>
 </form>
+</html>
