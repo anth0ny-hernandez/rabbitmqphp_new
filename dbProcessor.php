@@ -81,8 +81,8 @@ function doLogout($username) {
     }
 
     // Invalidate session token
-    $updateQuery = $db->prepare("UPDATE users SET session_token=NULL WHERE username=:username");
-    $updateQuery->bind_param(":username", $username);
+    $updateQuery = $db->prepare("UPDATE users SET session_token=NULL WHERE username=?");
+    $updateQuery->bind_param("s", $username);
     $updateQuery->execute();
 
     if ($updateQuery->affected_rows > 0) {
@@ -102,8 +102,8 @@ function validateSession($sessionToken) {
     }
 
     // Check if the session token exists
-    $query = $db->prepare("SELECT * FROM users WHERE session_token=:session_token");
-    $query->bind_param(":session_token", $sessionToken);
+    $query = $db->prepare("SELECT * FROM users WHERE session_token=?");
+    $query->bind_param("s", $sessionToken);
     $query->execute();
     $result = $query->get_result();
 
