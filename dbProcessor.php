@@ -2,7 +2,7 @@
 // Database functions for registration, login, and session management
 
 function doRegister($username, $password) {
-    // Connect to the old MySQL database
+    // Connect to  MySQL database. Using free server. 
     $db = new mysqli('sql5.freesqldatabase.com', 'sql5733576', 'He5tHy2YhB', 'sql5733576', 3306);
 
     // Check if the connection was successful
@@ -21,7 +21,10 @@ function doRegister($username, $password) {
         return "User already exists";
     }
 
-    // If username doesn't exist, hash the password and insert the new user
+    // If username doesn't exist, hash the password for security and insert the new user
+    //Password hashing resource: 
+    //https://stackoverflow.com/questions/30279321/how-to-use-phps-password-hash-to-hash-and-verify-passwords
+    
     $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
     $insertQuery = $db->prepare("INSERT INTO users (username, password) VALUES (?, ?)");
     $insertQuery->bind_param("ss", $username, $hashedPassword);
@@ -34,7 +37,7 @@ function doRegister($username, $password) {
 }
 
 function doLogin($username, $password) {
-    // Connect to the old MySQL database
+    // Connect to the free MySQL database
     $db = new mysqli('sql5.freesqldatabase.com', 'sql5733576', 'He5tHy2YhB', 'sql5733576', 3306);
 
     // Check if the connection was successful
@@ -69,7 +72,7 @@ function doLogin($username, $password) {
 }
 
 function doLogout($username) {
-    // Connect to the old MySQL database
+    // Connect to the MySQL database
     $db = new mysqli('sql5.freesqldatabase.com', 'sql5733576', 'He5tHy2YhB', 'sql5733576', 3306);
 
     // Check if the connection was successful
@@ -78,8 +81,8 @@ function doLogout($username) {
     }
 
     // Invalidate session token
-    $updateQuery = $db->prepare("UPDATE users SET session_token=NULL WHERE username=?");
-    $updateQuery->bind_param("s", $username);
+    $updateQuery = $db->prepare("UPDATE users SET session_token=NULL WHERE username=:username");
+    $updateQuery->bind_param(":username", $username);
     $updateQuery->execute();
 
     if ($updateQuery->affected_rows > 0) {
@@ -90,7 +93,7 @@ function doLogout($username) {
 }
 
 function validateSession($sessionToken) {
-    // Connect to the old MySQL database
+    // Connect to the MySQL database
     $db = new mysqli('sql5.freesqldatabase.com', 'sql5733576', 'He5tHy2YhB', 'sql5733576', 3306);
 
     // Check if the connection was successful
@@ -99,8 +102,8 @@ function validateSession($sessionToken) {
     }
 
     // Check if the session token exists
-    $query = $db->prepare("SELECT * FROM users WHERE session_token=?");
-    $query->bind_param("s", $sessionToken);
+    $query = $db->prepare("SELECT * FROM users WHERE session_token=:session_token");
+    $query->bind_param(":session_token", $sessionToken);
     $query->execute();
     $result = $query->get_result();
 
