@@ -55,12 +55,14 @@ function doLogin($username, $password) {
         return "User does not exist";
     }
 
-    $row = $result->fetch_assoc();
+    $row = $result->fetch_all();
 
     // Verify the password
     if (password_verify($password, $row['password'])) {
         // Generate session token and store it in the database
-        $sessionToken = bin2hex(random_bytes(16));
+        // Source for alphanumeric string generation: https://stackoverflow.com/questions/1846202/how-to-generate-a-random-unique-alphanumeric-string
+        $bytes = random_bytes(20);
+        $sessionToken = (bin2hex(bytes));
         $updateQuery = $db->prepare("UPDATE users SET session_token=? WHERE username=?");
         $updateQuery->bind_param("ss", $sessionToken, $username);
         $updateQuery->execute();
