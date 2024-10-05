@@ -6,6 +6,7 @@ require_once('rabbitMQLib.inc');
 require_once('login.php.inc');
 require_once('dbProcessor.php');
 
+
 // function doLogin($username,$password)
 // {
 //     // lookup username in databas
@@ -30,13 +31,18 @@ function requestProcessor($request)
     //   return doLogin($request['username'],$request['password']);
     // case "validate_session":
     //   return doValidate($request['sessionId']);
-
+      
     case "register":
         return doRegister($request['username'], $request['password']);
 
     case "login":
         return doLogin($request['username'], $request['password']);
+
+    case "logout":
+        return doLogout($request['username']);
   }
+
+    
   return array("returnCode" => '0', 'message'=>"Server received request and processed");
 }
 

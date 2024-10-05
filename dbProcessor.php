@@ -3,7 +3,7 @@
 
 function doRegister($username, $password) {
     // Connect to  MySQL database. Using free server. 
-    $db = new mysqli('sql5.freesqldatabase.com', 'sql5733576', 'He5tHy2YhB', 'sql5733576', 3306);
+    $db = new mysqli('127.0.0.1', "testUser", '12345', 'testdb');
 
     // Check if the connection was successful
     if ($db->connect_error) {
@@ -38,7 +38,7 @@ function doRegister($username, $password) {
 
 function doLogin($username, $password) {
     // Connect to the free MySQL database
-    $db = new mysqli('sql5.freesqldatabase.com', 'sql5733576', 'He5tHy2YhB', 'sql5733576', 3306);
+    $db = new mysqli('127.0.0.1', "testUser", '12345', 'testdb');
 
     // Check if the connection was successful
     if ($db->connect_error) {
@@ -55,14 +55,15 @@ function doLogin($username, $password) {
         return "User does not exist";
     }
 
-    $row = $result->fetch_all();
+    $row = $result->fetch_assoc();
 
     // Verify the password
     if (password_verify($password, $row['password'])) {
         // Generate session token and store it in the database
         // Source for alphanumeric string generation: https://stackoverflow.com/questions/1846202/how-to-generate-a-random-unique-alphanumeric-string
         $bytes = random_bytes(20);
-        $sessionToken = (bin2hex(bytes));
+        $sessionToken = (bin2hex($bytes));
+
         $updateQuery = $db->prepare("UPDATE users SET session_token=? WHERE username=?");
         $updateQuery->bind_param("ss", $sessionToken, $username);
         $updateQuery->execute();
@@ -71,11 +72,13 @@ function doLogin($username, $password) {
     } else {
         return "Invalid password";
     }
+
+   // if(sleep()
 }
 
 function doLogout($username) {
     // Connect to the MySQL database
-    $db = new mysqli('sql5.freesqldatabase.com', 'sql5733576', 'He5tHy2YhB', 'sql5733576', 3306);
+    $db = new mysqli('127.0.0.1', "testUser", '12345', 'testdb');
 
     // Check if the connection was successful
     if ($db->connect_error) {
@@ -96,7 +99,7 @@ function doLogout($username) {
 
 function validateSession($sessionToken) {
     // Connect to the MySQL database
-    $db = new mysqli('sql5.freesqldatabase.com', 'sql5733576', 'He5tHy2YhB', 'sql5733576', 3306);
+    $db = new mysqli('127.0.0.1', "testUser", '12345', 'testdb');
 
     // Check if the connection was successful
     if ($db->connect_error) {

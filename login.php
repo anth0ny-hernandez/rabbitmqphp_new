@@ -10,6 +10,7 @@
     <label> Password: </label>
     <input type = "text" name = "password" id = "password"/>
 
-    <input type = "button" id="submit_login_form" value="SUBMIT"/>
-</form>
+    <button type="submit">Login</button>
+    </form>
+
 </html>
