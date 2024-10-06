@@ -3,7 +3,7 @@
 
 function doRegister($username, $password) {
     // Connect to  MySQL database. Using free server. 
-    $db = new mysqli('172.22.241.239', "testUser", '12345', 'testdb');
+    $db = new mysqli('127.0.0.1', "testUser", '12345', 'testdb');
 
     // Check if the connection was successful
     if ($db->connect_error) {
@@ -37,6 +37,7 @@ function doRegister($username, $password) {
 }
 
 function doLogin($username, $password) {
+   
     // Connect to the free MySQL database
     $db = new mysqli('127.0.0.1', "testUser", '12345', 'testdb');
 
@@ -44,6 +45,8 @@ function doLogin($username, $password) {
     if ($db->connect_error) {
         return "Connection failed: " . $db->connect_error;
     }
+
+
 
     // Query database for the username
     $query = $db->prepare("SELECT * FROM users WHERE username=?");
@@ -73,7 +76,7 @@ function doLogin($username, $password) {
         return "Invalid password";
     }
 
-   // if(sleep()
+   
 }
 
 function doLogout($username) {

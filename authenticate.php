@@ -1,9 +1,10 @@
-
 <?php
 require_once('login.php.inc');
 require_once('path.inc');
 require_once('get_host_info.inc');
-
+require_once('rabbitMQLib.inc');
+include('webpages/Homepage.html');
+include('logout.php'); 
 $client = new rabbitMQClient("testRabbitMQ.ini","testServer");
 
 $username = filter_input(INPUT_POST,'username');
@@ -13,12 +14,14 @@ $request = array();
 $request['type'] = "login";
 $request['username'] = $username; 
 $request['password'] = $password;
-$response = $client->send_request($request);
+$response = $client->publish($request);
 
 echo "received request".PHP_EOL;
 print_r($response);
 echo $response;
 return $response;
+
+
 
 
 // function doLogin($username, $password){
@@ -34,3 +37,7 @@ return $response;
 //     $thepassword = $statement->get_result();
 // }
 // ?>
+
+<?php 
+
+?>
