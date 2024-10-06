@@ -3,7 +3,7 @@
 
 function doRegister($username, $password) {
     // Connect to  MySQL database. Using free server. 
-    $db = new mysqli('127.0.0.1', "testUser", '12345', 'testdb');
+    $db = new mysqli('172.22.241.239', "testUser", '12345', 'testdb');
 
     // Check if the connection was successful
     if ($db->connect_error) {
