@@ -6,7 +6,8 @@ private $logindb;
 
 public function __construct()
 {
-	$this->logindb = new mysqli("127.0.0.1","root","12345","login");
+	$this->logindb = new mysqli('sql5.freesqldatabase.com', 'sql5736071', 'DCVCqclHF3', 'sql5736071', 3306);
+;
 
 	if ($this->logindb->connect_errno != 0)
 	{
