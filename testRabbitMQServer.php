@@ -5,18 +5,21 @@ require_once('rabbitMQLib.inc');
 require_once('dbProcessor.php');
 
 function requestProcessor($request) {
-    echo "received request".PHP_EOL;
-    var_dump($request);
+    echo "Received Request".PHP_EOL;
+
     if (!isset($request['type'])) {
-        return "ERROR: unsupported message type";
+        return array("status" => "fail", "message" => "ERROR: Unsupported message type");
     }
 
     switch ($request['type']) {
+        case "login":
+            return doLogin($request['username'], $request['password']);
         case "register":
             return doRegister($request['username'], $request['password']);
-        // Add more case handlers (login, logout, etc.) as needed
+        // Add cases for other actions, e.g. "logout" or "validate_session"
     }
-    return array("returnCode" => '0', 'message'=>"Server received request and processed");
+
+    return array("status" => "fail", "message" => "Server received request and processed");
 }
 
 $server = new rabbitMQServer("testRabbitMQ.ini", "testServer");
