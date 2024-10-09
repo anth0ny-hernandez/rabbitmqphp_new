@@ -147,6 +147,7 @@ class rabbitMQClient
 	private $routing_key = '*';
 	private $response_queue = array();
 	private $exchange_type = "topic";
+	public $auto_delete;
 
 	function __construct($machine, $server = "rabbitMQ")
 	{
@@ -184,7 +185,7 @@ class rabbitMQClient
 			$payload = "[empty response]";
 		}
 		$this->response_queue[$uid] = $payload;
-		return false;
+		return true;
 	}
 
 	function send_request($message)
