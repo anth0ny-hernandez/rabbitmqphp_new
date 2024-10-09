@@ -83,7 +83,8 @@ function doLogin($username, $password) {
 function doLogout($username) {
     // Connect to the MySQL database
     // $db = new mysqli('sql5.freesqldatabase.com', 'sql5736071', 'DCVCqclHF3', 'sql5736071', 3306);
-    $db = new mysqli('localhost', 'testUser', '12345', 'testdb');
+    // $db = new mysqli('localhost', 'testUser', '12345', 'testdb');
+    $db = new mysqli('172.22.241.239', 'alvee-jalal', 'password', 'testdb');
 
     // Check if the connection was successful
     if ($db->connect_error) {
@@ -105,7 +106,8 @@ function doLogout($username) {
 function validateSession($sessionToken) {
     // Connect to the MySQL database
     // $db = new mysqli('sql5.freesqldatabase.com', 'sql5736071', 'DCVCqclHF3', 'sql5736071', 3306);
-    $db = new mysqli('localhost', 'testUser', '12345', 'testdb');
+    // $db = new mysqli('localhost', 'testUser', '12345', 'testdb');
+    $db = new mysqli('172.22.241.239', 'alvee-jalal', 'password', 'testdb');
 
     // Check if the connection was successful
     if ($db->connect_error) {
