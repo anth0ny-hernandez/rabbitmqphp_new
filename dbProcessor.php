@@ -3,8 +3,8 @@
 
 function doRegister($username, $password) {
     // Connect to  MySQL database. Using free server. 
-    $db = new mysqli('sql5.freesqldatabase.com', 'sql5736071', 'DCVCqclHF3', 'sql5736071', 3306);
-
+    //$db = new mysqli('sql5.freesqldatabase.com', 'sql5736071', 'DCVCqclHF3', 'sql5736071', 3306);
+    $db = new mysqli('172.22.241.239', 'alvee-jalal', 'password', 'testdb');
     // Check if the connection was successful
     if ($db->connect_error) {
         return "Connection failed: " . $db->connect_error;
@@ -39,7 +39,8 @@ function doRegister($username, $password) {
 function doLogin($username, $password) {
    
     // Connect to the free MySQL database
-    $db = new mysqli('sql5.freesqldatabase.com', 'sql5736071', 'DCVCqclHF3', 'sql5736071', 3306);
+    // $db = new mysqli('sql5.freesqldatabase.com', 'sql5736071', 'DCVCqclHF3', 'sql5736071', 3306);
+    $db = new mysqli('172.22.241.239', 'alvee-jalal', 'password', 'testdb');
 
     // Check if the connection was successful
     if ($db->connect_error) {
@@ -81,7 +82,8 @@ function doLogin($username, $password) {
 
 function doLogout($username) {
     // Connect to the MySQL database
-    $db = new mysqli('sql5.freesqldatabase.com', 'sql5736071', 'DCVCqclHF3', 'sql5736071', 3306);
+    // $db = new mysqli('sql5.freesqldatabase.com', 'sql5736071', 'DCVCqclHF3', 'sql5736071', 3306);
+    $db = new mysqli('localhost', 'testUser', '12345', 'testdb');
 
     // Check if the connection was successful
     if ($db->connect_error) {
@@ -102,7 +104,8 @@ function doLogout($username) {
 
 function validateSession($sessionToken) {
     // Connect to the MySQL database
-    $db = new mysqli('sql5.freesqldatabase.com', 'sql5736071', 'DCVCqclHF3', 'sql5736071', 3306);
+    // $db = new mysqli('sql5.freesqldatabase.com', 'sql5736071', 'DCVCqclHF3', 'sql5736071', 3306);
+    $db = new mysqli('localhost', 'testUser', '12345', 'testdb');
 
     // Check if the connection was successful
     if ($db->connect_error) {
