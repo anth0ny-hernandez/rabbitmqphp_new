@@ -6,7 +6,7 @@ require_once('dbProcessor.php');
 
 function requestProcessor($request) {
     echo "Received Request".PHP_EOL;
-
+    var_dump($request);
     if (!isset($request['type'])) {
         return array("status" => "fail", "message" => "ERROR: Unsupported message type");
     }

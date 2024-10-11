@@ -1,5 +1,5 @@
 <?php
-
+ob_start(); 
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
@@ -37,16 +37,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['register'])) {
         echo "Username and password are required";
     } else {
         // Send the registration request to RabbitMQ
-        $result = sendRegisterRequest($username, $password);
+       $response = sendRegisterRequest($username, $password);
 
-        // If registration is successful, redirect to login page
-        if ($result['status'] == 'success') {
-            // No output before this point, ensure redirection
-            header("Location: login.php");
-            exit();
-        } else {
-            echo $result['message'];
-        }
+// Check if $response is an array before accessing its elements
+if (is_array($response) && isset($response['status']) && $response['status'] == 'success') {
+    ob_clean();  // Clears the output buffer, just in case
+    header("Location: login.php");
+    exit();
+} else {
+    // Handle the case where $response is not an array or doesn't have the expected structure
+    error_log("Registration failed or unexpected response: " . print_r($response, true));
+    echo "Registration failed.";
+}
+
     }
 }
 ?>
