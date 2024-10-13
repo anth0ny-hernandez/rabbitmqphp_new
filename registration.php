@@ -15,19 +15,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $request['username'] = $username;
     $request['password'] = $password;
 
-    // Debugging: Log that we are about to send the request
-    echo "Sending registration request to RabbitMQ...<br>";
-
     // Send the registration request via RabbitMQ
     $response = $client->send_request($request);
 
-    // Check if a response is received
-    if ($response === false) {
-        echo "Error: No response received from the RabbitMQ server.";
+    // If the registration is successful, redirect to login page
+    if ($response == "User $username registered successfully") {
+        header("Location: login.php");
+        exit();  // Always call exit after header to stop further execution
     } else {
-        // Debugging: Print the response received from the RabbitMQ server
-        echo "Registration response: ";
-        print_r($response);
+        echo "Registration failed: " . $response;
     }
 }
 ?>
