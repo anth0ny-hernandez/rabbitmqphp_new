@@ -15,20 +15,31 @@ if ($conn->connect_error) {
 
 function doRegister($username, $password) {
     global $conn;
+    
+    // Debugging: Log that registration is being processed
+    echo "Processing registration for $username...\n";
+    
     // Hash the password
     $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
     
     // Insert into the database
     $sql = "INSERT INTO accounts (username, password) VALUES ('$username', '$hashedPassword')";
     if ($conn->query($sql) === TRUE) {
+        echo "User $username registered successfully.\n";  // Debugging
         return "User $username registered successfully";
     } else {
+        // Log and return the error
+        error_log("Error in registration: " . $conn->error);
+        echo "Error: " . $conn->error . "\n";
         return "Error: " . $conn->error;
     }
 }
 
 function doLogin($username, $password) {
     global $conn;
+    
+    // Debugging: Log that login is being processed
+    echo "Processing login for $username...\n";
     
     // Query to check for the user
     $sql = "SELECT password FROM accounts WHERE username = '$username'";
@@ -37,16 +48,20 @@ function doLogin($username, $password) {
     if ($result->num_rows > 0) {
         $row = $result->fetch_assoc();
         if (password_verify($password, $row['password'])) {
+            echo "Login successful for user: $username\n";  // Debugging
             return "Login successful for user: $username";
         } else {
+            echo "Incorrect password for user: $username\n";  // Debugging
             return "Incorrect password for user: $username";
         }
     } else {
+        echo "User $username not found\n";  // Debugging
         return "User $username not found";
     }
 }
 
 function requestProcessor($request) {
+    // Debugging: Log the received request
     echo "Received request: ";
     var_dump($request);
 
@@ -56,9 +71,13 @@ function requestProcessor($request) {
 
     switch ($request['type']) {
         case "login":
-            return doLogin($request['username'], $request['password']);
+            $response = doLogin($request['username'], $request['password']);
+            echo "Login response: $response\n";  // Debugging
+            return $response;
         case "register":
-            return doRegister($request['username'], $request['password']);
+            $response = doRegister($request['username'], $request['password']);
+            echo "Register response: $response\n";  // Debugging
+            return $response;
         default:
             return "ERROR: unsupported message type";
     }

@@ -15,11 +15,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $request['username'] = $username;
     $request['password'] = $password;
 
+    // Debugging: Log that we are about to send the request
+    echo "Sending registration request to RabbitMQ...<br>";
+
     // Send the registration request via RabbitMQ
     $response = $client->send_request($request);
 
-    echo "Registration response: ";
-    print_r($response);
+    // Check if a response is received
+    if ($response === false) {
+        echo "Error: No response received from the RabbitMQ server.";
+    } else {
+        // Debugging: Print the response received from the RabbitMQ server
+        echo "Registration response: ";
+        print_r($response);
+    }
 }
 ?>
 
