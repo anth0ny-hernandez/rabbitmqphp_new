@@ -19,15 +19,21 @@ function doRegister($username,$password)
   $db = new mysqli('127.0.0.1', "testUser", '12345', 'testdb');
 
 
-      $query = "INSERT INTO testusers(username, password) values(?,?)";
-      $statement = $db->prepare($query);
-      $statement->bind_param('ss', $username, $password);
-      $statement->execute();
+  $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+  $insertQuery = $db->prepare("INSERT INTO testusers (username, password) VALUES (?, ?)");
+  $insertQuery->bind_param("ss", $username, $hashedPassword);
+
+  if ($insertQuery->execute()) {
+      return "Registration successful";
+  } else {
+      return "Error: " . $db->error;
+  }
   
-      $result = $statement->get_result();
+      $result = $insertQuery->get_result();
 
       return $result;
 }
+
 function requestProcessor($request)
 {
   echo "received request".PHP_EOL;
