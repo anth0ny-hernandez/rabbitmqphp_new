@@ -231,17 +231,34 @@ function send_request($message)
         // Initialize response tracking
         $this->response_queue[$uid] = "waiting";
 
-        // Process response with a timeout for consume
-        $callback_queue->consume(array($this, 'process_response'), AMQP_AUTOACK, array('timeout' => 10)); // 10 seconds timeout
+        // Set a timeout (in seconds) for waiting for a response
+        $startTime = time();
+        $timeout = 10;  // Timeout of 10 seconds
+
+        // Consume messages from the callback queue
+        $callback_queue->consume(function ($envelope, $queue) use ($uid) {
+            $body = $envelope->getBody();
+            $response = json_decode($body, true);
+            if (isset($response['correlation_id']) && $response['correlation_id'] === $uid) {
+                $this->response_queue[$uid] = $response['body'];
+                $queue->ack($envelope->getDeliveryTag());
+                return false;  // Exit the consume loop
+            }
+        }, AMQP_AUTOACK, 'consumer_tag_' . $uid);  // Providing a valid string for the consumer tag
+
+        // Wait for the response or timeout
+        while ($this->response_queue[$uid] === "waiting") {
+            if (time() - $startTime >= $timeout) {
+                return "ERROR: No response received within the timeout period";
+            }
+            // Pause execution to allow other processes to run
+            usleep(100000);  // Sleep for 100ms
+        }
 
         // Retrieve the response
-        if (isset($this->response_queue[$uid])) {
-            $response = $this->response_queue[$uid];
-            unset($this->response_queue[$uid]);
-            return $response;
-        } else {
-            return "ERROR: No response received within the timeout period";
-        }
+        $response = $this->response_queue[$uid];
+        unset($this->response_queue[$uid]);
+        return $response;
 
     } catch (Exception $e) {
         // Enhanced error handling
