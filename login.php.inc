@@ -31,12 +31,12 @@ public function validateLogin($username,$password)
 		if (password_verify($pw, $row['password'])) {
 			// Generate session token and store it in the database
 			// Source for alphanumeric string generation: https://stackoverflow.com/questions/1846202/how-to-generate-a-random-unique-alphanumeric-string
-			// $bytes = random_bytes(20);
-			// $sessionToken = (bin2hex($bytes));
+			$bytes = random_bytes(20);
+			$sessionToken = (bin2hex($bytes));
 	
-			// $updateQuery = $logindb->prepare("UPDATE users SET session_token=? WHERE username=?");
-			// $updateQuery->bind_param("ss", $sessionToken, $username);
-			// $updateQuery->execute();
+			$updateQuery = $logindb->prepare("UPDATE users SET session_token=? WHERE username=?");
+			$updateQuery->bind_param("ss", $sessionToken, $username);
+			$updateQuery->execute();
 	
  			echo "passwords match for $username".PHP_EOL;
 			return 1;// password match
