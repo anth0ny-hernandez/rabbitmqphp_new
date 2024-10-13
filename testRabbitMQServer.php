@@ -61,7 +61,6 @@ function doLogin($username, $password) {
 }
 
 function requestProcessor($request) {
-    // Debugging: Log the received request
     echo "Received request: ";
     var_dump($request);
 
@@ -71,13 +70,13 @@ function requestProcessor($request) {
 
     switch ($request['type']) {
         case "login":
-            $response = doLogin($request['username'], $request['password']);
-            echo "Login response: $response\n";  // Debugging
-            return $response;
+            $result = doLogin($request['username'], $request['password']);
+            echo "Sending response for login: $result\n";  // Debugging output
+            return $result;
         case "register":
-            $response = doRegister($request['username'], $request['password']);
-            echo "Register response: $response\n";  // Debugging
-            return $response;
+            $result = doRegister($request['username'], $request['password']);
+            echo "Sending response for registration: $result\n";  // Debugging output
+            return $result;
         default:
             return "ERROR: unsupported message type";
     }
