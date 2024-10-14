@@ -20,7 +20,7 @@ function doRegister($username,$password)
 
 
   $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-  $insertQuery = $db->prepare("INSERT INTO testusers (username, password) VALUES (?, ?)");
+  $insertQuery = $db->prepare("INSERT INTO users (username, password) VALUES (?, ?)");
   $insertQuery->bind_param("ss", $username, $hashedPassword);
 
   if ($insertQuery->execute()) {
@@ -62,4 +62,3 @@ $server->process_requests('requestProcessor');
 echo "testRabbitMQServer END".PHP_EOL;
 exit();
 ?>
-

@@ -20,7 +20,7 @@ public function validateLogin($username,$password)
 {
 	$un = $this->logindb->real_escape_string($username);
 	$pw = $this->logindb->real_escape_string($password);
-	$statement = "select * from testusers where username = '$un'";
+	$statement = "select * from users where username = '$un'";
 	$response = $this->logindb->query($statement);
 
 	while ($row = $response->fetch_assoc())
@@ -33,14 +33,13 @@ public function validateLogin($username,$password)
 			// Source for alphanumeric string generation: https://stackoverflow.com/questions/1846202/how-to-generate-a-random-unique-alphanumeric-string
 			$bytes = random_bytes(20);
 			$sessionToken = (bin2hex($bytes));
-	
-			$updateQuery = $logindb->prepare("UPDATE users SET session_token=? WHERE username=?");
+			$updateQuery = $this->logindb->prepare("UPDATE users SET session_token=? WHERE username=?");
 			$updateQuery->bind_param("ss", $sessionToken, $username);
 			$updateQuery->execute();
-	
+			// setcookie('session_token', $sessionToken, time() + 3600, "/");
  			echo "passwords match for $username".PHP_EOL;
 			return 1;// password match
-
+			
 } else {
 		echo "Invalid password for $username".PHP_EOL;
 			return "Invalid password";
