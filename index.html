@@ -1,0 +1,66 @@
+<?php
+session_start();
+
+// Check if the user is logged in and whether the session has expired
+$timeout_duration = 20; // In seconds
+
+// Check if a user is logged in and has a session token
+if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
+    $current_time = time(); // Current epoch time
+
+    // Check if the user has been inactive for longer than the timeout duration
+    if (isset($_SESSION['last_activity']) && ($current_time - $_SESSION['last_activity']) > $timeout_duration) {
+        // Inactivity timeout, log the user out
+        session_unset();
+        session_destroy();
+        header("Location: index.php"); // Redirect to homepage after logout
+        exit();
+    } else {
+        // Update last activity timestamp
+        $_SESSION['last_activity'] = $current_time;
+    }
+}
+
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        h1 {
+            font-size: 48px;
+            font-weight: bold;
+        }
+        .button {
+            padding: 10px 20px;
+            font-size: 18px;
+            cursor: pointer;
+            margin: 10px;
+        }
+    </style>
+</head>
+<body>
+    <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true): ?>
+        <!-- Show welcome message and logout button if the user is logged in -->
+        <h1>Welcome!</h1>
+        <form action="logout.php" method="POST">
+            <button type="submit" class="button">Logout</button>
+        </form>
+    <?php else: ?>
+        <!-- Show login and register buttons if the user is not logged in -->
+        <h1>Welcome to Our Site</h1>
+        <a href="login.php"><button class="button">Login</button></a>
+        <a href="register.php"><button class="button">Register</button></a>
+    <?php endif; ?>
+</body>
+</html>
+
