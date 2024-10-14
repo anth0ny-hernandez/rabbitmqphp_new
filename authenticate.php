@@ -4,6 +4,7 @@ require_once('path.inc');
 require_once('get_host_info.inc');
 require_once('rabbitMQLib.inc');
 $db = new mysqli('127.0.0.1', "testUser", '12345', 'testdb');
+// $db = new mysqli('172.22.241.239', "alvee-jalal", 'password', 'testdb');
 $client = new rabbitMQClient("testRabbitMQ.ini","testServer");
 
 $username = filter_input(INPUT_POST,'username');

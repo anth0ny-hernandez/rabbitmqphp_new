@@ -1,5 +1,6 @@
 #!/usr/bin/php
 <?php
+ob_start();
 require_once('path.inc');
 require_once('get_host_info.inc');
 require_once('rabbitMQLib.inc');
@@ -16,7 +17,8 @@ function doLogin($username,$password)
 
 function doRegister($username,$password)
 {
-  $db = new mysqli('127.0.0.1', "testUser", '12345', 'testdb');
+ //$db = new mysqli('127.0.0.1', "testUser", '12345', 'testdb');
+ $db = new mysqli('172.22.241.239', "alvee-jalal", 'password', 'testdb');
 
 
   $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
@@ -53,7 +55,8 @@ function requestProcessor($request)
   }
   return array("returnCode" => '0', 'message'=>"Server received request and processed");
 }
-
+ob_end_flush();
+ob_implicit_flush(true);
 echo "testRabbitMQServer BEGIN".PHP_EOL;
 
 $server = new rabbitMQServer("testRabbitMQ.ini","testServer");
