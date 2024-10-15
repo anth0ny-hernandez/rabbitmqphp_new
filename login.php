@@ -42,6 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $stmt->execute([$session_token, $session_expires, $username]);
 
         // Set the session token cookie (expire in 30 seconds)
+        //Source for setting cookie: https://www.w3schools.com/php/func_network_setcookie.asp
         setcookie('session_token', $session_token, $session_expires, "/");
 
         // Redirect to the homepage

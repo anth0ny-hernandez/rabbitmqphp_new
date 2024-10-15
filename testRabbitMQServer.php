@@ -20,6 +20,7 @@ function doRegister($username, $password) {
     echo "Processing registration for $username...\n";
     
     // Hash the password
+    //Source for password hashing:     //https://stackoverflow.com/questions/30279321/how-to-use-phps-password-hash-to-hash-and-verify-passwords
     $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
     
     // Insert into the database
@@ -47,6 +48,7 @@ function doLogin($username, $password) {
     
     if ($result->num_rows > 0) {
         $row = $result->fetch_assoc();
+        //source for authenticating password: https://www.php.net/manual/en/function.password-verify.php
         if (password_verify($password, $row['password'])) {
             echo "Login successful for user: $username\n";  // Debugging
             return "Login successful for user: $username";

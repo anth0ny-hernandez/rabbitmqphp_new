@@ -6,6 +6,8 @@ $dbUser = 'sql5737763';
 $dbPassword = 'xSGbpGyEpv';
 
 try {
+    //connect to db. throw exception if connection fails for error handling. 
+    //Source: https://stackoverflow.com/questions/49959415/what-does-setattributepdoattr-errmode-pdoerrmode-exception-do-more-exactl
     $db = new PDO("mysql:host=$dbHost;dbname=$dbName", $dbUser, $dbPassword);
     $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch (PDOException $e) {
@@ -101,6 +103,8 @@ if (isset($_COOKIE['session_token'])) {
             let warningTime = timeRemaining - 5;
 
             // Warn the user before logout
+            //set an alert window after a set time
+            //source for alert timeout window: https://stackoverflow.com/questions/1962861/javascript-alert-box-with-timer
             if (warningTime > 0) {
                 setTimeout(function() {
                     alert("You will be logged out in 5 seconds due to inactivity.");
