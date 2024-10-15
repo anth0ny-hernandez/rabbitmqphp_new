@@ -3,10 +3,10 @@
 require_once('rabbitMQLib.inc');
 
 // Database connection details
-$dbHost = 'sql5.freesqldatabase.com';
-$dbName = 'sql5737763';
-$dbUser = 'sql5737763';
-$dbPassword = 'xSGbpGyEpv';
+$dbHost = '172.22.53.55';
+$dbName = 'testdb';
+$dbUser = 'alvee-jalal';
+$dbPassword = 'password';
 
 $conn = new mysqli($dbHost, $dbUser, $dbPassword, $dbName);
 if ($conn->connect_error) {

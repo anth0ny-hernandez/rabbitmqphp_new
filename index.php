@@ -1,9 +1,9 @@
 <?php
 // Database connection (updated with new credentials)
-$dbHost = 'sql5.freesqldatabase.com';
-$dbName = 'sql5737763';
-$dbUser = 'sql5737763';
-$dbPassword = 'xSGbpGyEpv';
+$dbHost = '172.22.53.55';
+$dbName = 'testdb';
+$dbUser = 'alvee-jalal';
+$dbPassword = 'password';
 
 try {
     //connect to db. throw exception if connection fails for error handling. 
