@@ -1,8 +1,7 @@
 <?php
-session_start(); // Use standard PHP session handling
 require_once('rabbitMQLib.inc');
 
-// Database connection
+// Database connection (updated with new credentials)
 $dbHost = 'sql5.freesqldatabase.com';
 $dbName = 'sql5737763';
 $dbUser = 'sql5737763';
@@ -42,9 +41,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $stmt = $db->prepare("UPDATE accounts SET session_token = ?, session_expires = ? WHERE username = ?");
         $stmt->execute([$session_token, $session_expires, $username]);
 
-        // Store session token and user info in the PHP session
-        $_SESSION['session_token'] = $session_token;
-        $_SESSION['username'] = $username;
+        // Set the session token cookie (expire in 30 seconds)
+        setcookie('session_token', $session_token, $session_expires, "/");
 
         // Redirect to the homepage
         header("Location: index.php");

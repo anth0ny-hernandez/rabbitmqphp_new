@@ -1,6 +1,4 @@
 <?php
-session_start();
-
 // Database connection (updated with new credentials)
 $dbHost = 'sql5.freesqldatabase.com';
 $dbName = 'sql5737763';
@@ -18,14 +16,13 @@ $is_logged_in = false;
 $username = null;
 $time_remaining = 0;
 
-// Check if the user is logged in
-if (isset($_SESSION['session_token']) && isset($_SESSION['username'])) {
-    $session_token = $_SESSION['session_token'];
-    $username = $_SESSION['username'];
+// Check if the session token cookie is set
+if (isset($_COOKIE['session_token'])) {
+    $session_token = $_COOKIE['session_token'];
 
     // Query the database to verify the session token and check expiration
-    $stmt = $db->prepare("SELECT session_expires FROM accounts WHERE username = ? AND session_token = ?");
-    $stmt->execute([$username, $session_token]);
+    $stmt = $db->prepare("SELECT username, session_expires FROM accounts WHERE session_token = ?");
+    $stmt->execute([$session_token]);
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($row) {
@@ -33,23 +30,25 @@ if (isset($_SESSION['session_token']) && isset($_SESSION['username'])) {
 
         // Check if the session has expired
         if ($row['session_expires'] < $current_time) {
-            // Session has expired, log out the user
-            session_unset();
-            session_destroy();
+            // Session has expired, log out the user by clearing the cookie
+            setcookie('session_token', '', time() - 3600, "/"); // Remove session token cookie
         } else {
             // Session is still active, extend the session expiration time
             $new_expires = $current_time + 30;
-            $stmt = $db->prepare("UPDATE accounts SET session_expires = ? WHERE username = ?");
-            $stmt->execute([$new_expires, $username]);
+            $stmt = $db->prepare("UPDATE accounts SET session_expires = ? WHERE session_token = ?");
+            $stmt->execute([$new_expires, $session_token]);
 
-            // Store the new session expiration in JavaScript
+            // Extend the expiration time of the cookie
+            setcookie('session_token', $session_token, $new_expires, "/");
+
+            // Store the session details
             $time_remaining = $new_expires - $current_time;
+            $username = $row['username'];
             $is_logged_in = true;
         }
     } else {
-        // Invalid session token, log out and clear session data
-        session_unset();
-        session_destroy();
+        // Invalid session token, clear the cookie
+        setcookie('session_token', '', time() - 3600, "/");
     }
 }
 ?>

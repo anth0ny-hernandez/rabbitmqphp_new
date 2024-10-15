@@ -1,7 +1,5 @@
 <?php
-session_start(); // Use standard PHP session handling
-
-// Database connection
+// Database connection (updated with new credentials)
 $dbHost = 'sql5.freesqldatabase.com';
 $dbName = 'sql5737763';
 $dbUser = 'sql5737763';
@@ -14,18 +12,19 @@ try {
     die("Connection failed: " . $e->getMessage());
 }
 
-// Clear session token from the database
-if (isset($_SESSION['username'])) {
-    $username = $_SESSION['username'];
-    $stmt = $db->prepare("UPDATE accounts SET session_token = NULL, session_expires = NULL WHERE username = ?");
-    $stmt->execute([$username]);
+// Clear session token from the database if the session_token cookie is set
+if (isset($_COOKIE['session_token'])) {
+    $session_token = $_COOKIE['session_token'];
+    
+    // Clear the session token in the database
+    $stmt = $db->prepare("UPDATE accounts SET session_token = NULL, session_expires = NULL WHERE session_token = ?");
+    $stmt->execute([$session_token]);
+
+    // Remove the session token cookie by setting its expiration to a past time
+    setcookie('session_token', '', time() - 3600, "/");
 }
 
-// Clear the session
-session_unset();
-session_destroy();
-
-// Redirect to homepage
+// Redirect to homepage after logout
 header("Location: index.php");
 exit();
 ?>
