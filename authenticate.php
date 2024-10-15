@@ -25,20 +25,27 @@ if($statement->execute())
     $resultToken=$result->fetch_all();
     $sessionToken = $resultToken[0][0];
     echo "client receiveds $sessionToken".PHP_EOL;
+    $expire_time = time() + 10;
+    setcookie('session_token', $sessionToken, $expire_time, "/");
 }
 
 else
 {
     echo "fail";
 }
-$expire_time = time() + 10;
-setcookie('session_token', $sessionToken, $expire_time, "/");
-echo "client receiveds $sessionToken".PHP_EOL;
+include('logout.php');
+
+echo "client receiveds ". $_COOKIE['session_token'].PHP_EOL;
 print_r($response);
+print_r(headers_list());
+print_r($_COOKIE);
 echo $response;
 return $response;
 
-// if()
+if(time() > $expire_time)
+{
+    include('logout.php');
+}
 
 
 // function doLogin($username, $password){
