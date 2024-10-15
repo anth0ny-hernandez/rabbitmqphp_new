@@ -31,14 +31,14 @@ else
 {
     echo "fail";
 }
-
-setcookie('session_token', $sessionToken, time() + 3600, "/");
+$expire_time = time() + 10;
+setcookie('session_token', $sessionToken, $expire_time, "/");
 echo "client receiveds $sessionToken".PHP_EOL;
 print_r($response);
 echo $response;
 return $response;
 
-
+// if()
 
 
 // function doLogin($username, $password){
