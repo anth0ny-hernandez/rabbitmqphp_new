@@ -15,7 +15,7 @@ try {
 }
 
 // Create a client for communicating with the RabbitMQ server
-$client = new rabbitMQClient("testRabbitMQ.ini", "testServer");
+$client = new rabbitMQClient("testDB_RMQ", "dbConnect");
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
