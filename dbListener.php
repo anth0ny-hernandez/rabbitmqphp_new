@@ -61,7 +61,7 @@ function databaseProcessor($request) {
 }
 
 // Create a server that listens for requests from clients
-$dbServer = new rabbitMQServer("testRabbitMQ.ini", "dbConnect");
+$dbServer = new rabbitMQServer("testDB_RMQ.ini", "dbConnect");
 
 echo "RabbitMQ Server is running and waiting for requests...\n";
 $dbServer->process_requests('databaseProcessor');
