@@ -12,7 +12,7 @@ function databaseProcessor($request) {
     $password = $request['password'];
 
     switch($request['type']) {
-        case "login":
+        case "register":
             echo "Processing username registration...\n";
             echo "================================\n";
 
@@ -33,7 +33,7 @@ function databaseProcessor($request) {
                 $insert = "Error: " . $conn->error;
             }
             return $insert;
-        case "register":
+        case "login":
             echo "Processing login for $username...\n";
             echo "================================\n";
             $select = "";
