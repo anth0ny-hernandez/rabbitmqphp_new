@@ -4,7 +4,7 @@ require_once('rabbitMQLib.inc');
 // Database connection (updated with new credentials)
 $dbHost = '172.22.53.55';
 $dbName = 'testdb';
-$dbUser = 'alvee-jalal';
+$dbUser = 'anthonyhz';
 $dbPassword = 'password';
 
 try {
