@@ -13,14 +13,14 @@ function requestProcessor($request) {
     switch ($request['type']) {
         case "login":
             // creates new client to establish new connection to db's own server
-            $dbClient = new rabbitMQClient("testRabbitMQ.ini", "dbConnect");
+            $dbClient = new rabbitMQClient("testDB_RMQ.ini", "dbConnect");
             $result = $testClient->send_request($request);
             // $result = doLogin($request['username'], $request['password']);
             // echo "Sending response for login: $result\n";  // Debugging output
             return $result;
         case "register":
             // creates new client to establish new connection to db's own server
-            $dbClient = new rabbitMQClient("testRabbitMQ.ini", "dbConnect");
+            $dbClient = new rabbitMQClient("testDB_RMQ.ini", "dbConnect");
             $result = $testClient->send_request($request);
             // $result = doRegister($request['username'], $request['password']);
             // echo "Sending response for registration: $result\n";  // Debugging output
