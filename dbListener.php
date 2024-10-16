@@ -47,11 +47,35 @@ function databaseProcessor($request) {
                 if(password_verify($password, $row['password'])) {
                     echo "Login successful for user $username !\n";
                     echo "================================\n";
-                    $select = "Login successful for user $username !";
+                    $select = "Login successful";
                 } else {
                     echo "Incorrect password for user $username !\n";
                     echo "================================\n";
                     $select = "Incorrect password for user $username !";
+                }
+
+                // creates cookie
+                if ($select == "Login successful") {
+                    // Generate a session token and expiration time (30 seconds from now)
+                    $session_token = bin2hex(random_bytes(16)); // Generate a random token
+                    $session_expires = time() + 30; // Set the session to expire in 30 seconds
+
+                    // Update the database with the session token and expiration time
+                    $stmt = $db->prepare("UPDATE accounts SET session_token = ?, session_expires = ? WHERE username = ?");
+                    $stmt->execute([$session_token, $session_expires, $username]);
+
+                    // Set the session token cookie (expire in 30 seconds)
+                    //Source for setting cookie: https://www.w3schools.com/php/func_network_setcookie.asp
+                    setcookie('session_token', $session_token, $session_expires, "/");
+
+                    // Redirect to the homepage
+                    if($stmt->execute($stmt->execute([$session_token, $session_expires, $username])))
+                    {
+                        return true;
+                    }
+                } else {
+                    // If login fails, show an error message
+                    $error_message = "Invalid login credentials. Please try again.";
                 }
             }
             return $select;

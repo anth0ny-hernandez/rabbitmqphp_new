@@ -30,27 +30,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     // Send the login request via RabbitMQ
     $response = $client->send_request($request);
-
-    // Handle the response from RabbitMQ
-    if ($response == "Login successful for user: $username") {
-        // Generate a session token and expiration time (30 seconds from now)
-        $session_token = bin2hex(random_bytes(16)); // Generate a random token
-        $session_expires = time() + 30; // Set the session to expire in 30 seconds
-
-        // Update the database with the session token and expiration time
-        $stmt = $db->prepare("UPDATE accounts SET session_token = ?, session_expires = ? WHERE username = ?");
-        $stmt->execute([$session_token, $session_expires, $username]);
-
-        // Set the session token cookie (expire in 30 seconds)
-        //Source for setting cookie: https://www.w3schools.com/php/func_network_setcookie.asp
-        setcookie('session_token', $session_token, $session_expires, "/");
-
-        // Redirect to the homepage
+    if($response) {
         header("Location: index.php");
         exit();
-    } else {
-        // If login fails, show an error message
-        $error_message = "Invalid login credentials. Please try again.";
     }
 }
 ?>
