@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $response = $client->send_request($request);
 
     // If the registration is successful, redirect to login page
-    if ($response == "User $username registered successfully") {
+    if ($response) {
         header("Location: login.php");
         exit();  // Always call exit after header to stop further execution
     } else {

@@ -1,6 +1,7 @@
 <?php
 require_once('rabbitMQLib.inc');
 
+/*
 // Database connection (updated with new credentials)
 $dbHost = '172.22.53.55';
 $dbName = 'testdb';
@@ -13,9 +14,10 @@ try {
 } catch (PDOException $e) {
     die("Connection failed: " . $e->getMessage());
 }
+*/
 
 // Create a client for communicating with the RabbitMQ server
-$client = new rabbitMQClient("testDB_RMQ", "dbConnect");
+$client = new rabbitMQClient("testRabbitMQ.ini", "testServer");
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {

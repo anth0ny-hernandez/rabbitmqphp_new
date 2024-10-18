@@ -1,6 +1,8 @@
-#!/bin/php
+#!/usr/bin/php
 <?php
 require_once('rabbitMQLib.inc');
+require_once('path.inc');
+require_once('get_host_info.inc');
 
 function databaseProcessor($request) {
     echo "Received request: ";
@@ -17,26 +19,28 @@ function databaseProcessor($request) {
             echo "================================\n";
 
             // insert result
-            $insert = "";
+            $insert = null;
             // link to source
             $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
 
             $sql = "INSERT INTO accounts (username, password) VALUES ('$username', '$hashedPassword')";
-            if ($conn->query($sql) === TRUE) {
+            if ($conn->query($sql) === true) {
                 echo "User $username registered successfully!\n";  // Debugging
                 echo "================================\n";
-                $insert = "User $username registered successfully!";
+                $insert = true;
             } else {
                 // Log and return the error
                 error_log("Error in registration: " . $conn->error);
                 echo "Error: " . $conn->error . "\n";
-                $insert = "Error: " . $conn->error;
+                $insert = false;
             }
+            // Close the database connection
+            $conn->close();
             return $insert;
         case "login":
             echo "Processing login for $username...\n";
             echo "================================\n";
-            $select = "";
+            $select = null;
 
             $sql = "SELECT password FROM accounts WHERE username = '$username'";
             $ray = $conn->query($sql);
@@ -47,37 +51,17 @@ function databaseProcessor($request) {
                 if(password_verify($password, $row['password'])) {
                     echo "Login successful for user $username !\n";
                     echo "================================\n";
-                    $select = "Login successful";
+                    $select = true;
                 } else {
                     echo "Incorrect password for user $username !\n";
                     echo "================================\n";
-                    $select = "Incorrect password for user $username !";
+                    $select = false;
                 }
 
-                // creates cookie
-                if ($select == "Login successful") {
-                    // Generate a session token and expiration time (30 seconds from now)
-                    $session_token = bin2hex(random_bytes(16)); // Generate a random token
-                    $session_expires = time() + 30; // Set the session to expire in 30 seconds
-
-                    // Update the database with the session token and expiration time
-                    $stmt = $db->prepare("UPDATE accounts SET session_token = ?, session_expires = ? WHERE username = ?");
-                    $stmt->execute([$session_token, $session_expires, $username]);
-
-                    // Set the session token cookie (expire in 30 seconds)
-                    //Source for setting cookie: https://www.w3schools.com/php/func_network_setcookie.asp
-                    setcookie('session_token', $session_token, $session_expires, "/");
-
-                    // Redirect to the homepage
-                    if($stmt->execute($stmt->execute([$session_token, $session_expires, $username])))
-                    {
-                        return true;
-                    }
-                } else {
-                    // If login fails, show an error message
-                    $error_message = "Invalid login credentials. Please try again.";
-                }
+                
             }
+            // Close the database connection
+            $conn->close();
             return $select;
         default:
             return "Database Client-Server error";
@@ -89,8 +73,5 @@ $dbServer = new rabbitMQServer("testDB_RMQ.ini", "dbConnect");
 
 echo "RabbitMQ Server is running and waiting for requests...\n";
 $dbServer->process_requests('databaseProcessor');
-
-// Close the database connection
-$conn->close();
 
 ?>
