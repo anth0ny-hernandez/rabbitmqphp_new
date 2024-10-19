@@ -1,5 +1,7 @@
 <?php
 ob_start();
+require_once('path.inc');
+require_once('get_host_info.inc');
 require_once('rabbitMQLib.inc');
 
 // Database connection (updated with new credentials)
@@ -62,4 +64,3 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     </form>
 </body>
 </html>
-

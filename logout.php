@@ -1,16 +1,16 @@
 <?php
 // Database connection (updated with new credentials)
-$dbHost = '172.22.53.55';
-$dbName = 'testdb';
-$dbUser = 'anthonyhz';
-$dbPassword = 'password';
+// $dbHost = '172.22.53.55';
+// $dbName = 'testdb';
+// $dbUser = 'anthonyhz';
+// $dbPassword = 'password';
 
-try {
-    $db = new PDO("mysql:host=$dbHost;dbname=$dbName", $dbUser, $dbPassword);
-    $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch (PDOException $e) {
-    die("Connection failed: " . $e->getMessage());
-}
+// try {
+//     $db = new PDO("mysql:host=$dbHost;dbname=$dbName", $dbUser, $dbPassword);
+//     $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+// } catch (PDOException $e) {
+//     die("Connection failed: " . $e->getMessage());
+// }
 
 // Clear session token from the database if the session_token cookie is set
 if (isset($_COOKIE['session_token'])) {
