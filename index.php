@@ -1,18 +1,4 @@
 <?php
-// Database connection (updated with new credentials)
-$dbHost = '172.22.53.55';
-$dbName = 'testdb';
-$dbUser = 'anthonyhz';
-$dbPassword = 'password';
-
-try {
-    //connect to db. throw exception if connection fails for error handling. 
-    //Source: https://stackoverflow.com/questions/49959415/what-does-setattributepdoattr-errmode-pdoerrmode-exception-do-more-exactl
-    $db = new PDO("mysql:host=$dbHost;dbname=$dbName", $dbUser, $dbPassword);
-    $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch (PDOException $e) {
-    die("Connection failed: " . $e->getMessage());
-}
 
 $is_logged_in = false;
 $username = null;
