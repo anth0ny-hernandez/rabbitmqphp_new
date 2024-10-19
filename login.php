@@ -1,21 +1,22 @@
 <?php
+ob_start();
 require_once('rabbitMQLib.inc');
 
 // Database connection (updated with new credentials)
-$dbHost = '172.22.53.55';
-$dbName = 'testdb';
-$dbUser = 'anthonyhz';
-$dbPassword = 'password';
+//$dbHost = '172.22.53.55';
+//$dbName = 'testdb';
+//$dbUser = 'anthonyhz';
+//$dbPassword = 'password';
 
-try {
-    $db = new PDO("mysql:host=$dbHost;dbname=$dbName", $dbUser, $dbPassword);
-    $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch (PDOException $e) {
-    die("Connection failed: " . $e->getMessage());
-}
+// try {
+//     $db = new PDO("mysql:host=$dbHost;dbname=$dbName", $dbUser, $dbPassword);
+//     $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+// } catch (PDOException $e) {
+//     die("Connection failed: " . $e->getMessage());
+// }
 
 // Create a client for communicating with the RabbitMQ server
-$client = new rabbitMQClient("testDB_RMQ", "dbConnect");
+$client = new rabbitMQClient("testRabbitMQ.ini", "testServer");
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -32,9 +33,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $response = $client->send_request($request);
     if($response) {
         header("Location: index.php");
+        //ob_end_flush();
         exit();
     }
 }
+//ob_end_flush();
 ?>
 
 <!DOCTYPE html>
