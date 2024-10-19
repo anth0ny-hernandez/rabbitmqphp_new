@@ -200,7 +200,6 @@ class rabbitMQClient
       $params['login'] = $this->USER;
       $params['password'] = $this->PASSWORD;
       $params['vhost'] = $this->VHOST;
-
 			$conn = new AMQPConnection($params);
 			$conn->connect();
 
@@ -269,4 +268,3 @@ class rabbitMQClient
 	}
 }
 ?>
-
