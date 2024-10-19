@@ -1,21 +1,10 @@
 <?php
 require_once('rabbitMQLib.inc');
-
-// Database connection (updated with new credentials)
-$dbHost = '172.22.53.55';
-$dbName = 'testdb';
-$dbUser = 'anthonyhz';
-$dbPassword = 'password';
-
-try {
-    $db = new PDO("mysql:host=$dbHost;dbname=$dbName", $dbUser, $dbPassword);
-    $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch (PDOException $e) {
-    die("Connection failed: " . $e->getMessage());
-}
+require_once('get_host_info.inc');
+require_once('path.inc');
 
 // Create a client for communicating with the RabbitMQ server
-$client = new rabbitMQClient("testDB_RMQ", "dbConnect");
+$client = new rabbitMQClient("testRabbitMQ.ini", "testServer");
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -33,6 +22,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if($response) {
         header("Location: index.php");
         exit();
+    } else {
+        echo "<p>Registration failed: " . htmlspecialchars($response) . "</p>";
     }
 }
 ?>
