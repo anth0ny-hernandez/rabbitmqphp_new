@@ -30,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         setcookie('session_token', $session_token, [
             'expires' => $expire_time,
             'path' => '/',
-            'samesite' => 'Lax', // Set to 'Lax' or 'None' based on your requirement
+            'samesite' => 'None', // Set to 'Lax' or 'None' based on your requirement
             'secure' => false, // Use true if your site is served over HTTPS
             'httponly' => true
         ]);
