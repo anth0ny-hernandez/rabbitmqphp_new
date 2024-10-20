@@ -37,49 +37,37 @@ function databaseProcessor($request) {
                 $insert = "Error: " . $conn->error;
             }
             return $insert;
-        case "login":
-            echo "Processing login for $username...\n";
-            echo "================================\n";
-            $select = "";
-
-            $sql = "SELECT password FROM accounts WHERE username = '$username'";
-            $ray = $conn->query($sql);
-
-            if($ray->num_rows > 0) {
-                $row = $ray->fetch_assoc();
-                // insert source link
-                if(password_verify($password, $row['password'])) {
-                    echo "Login successful for user $username !\n";
-                    echo "================================\n";
-                    $select = "Login successful";
-
-                    // Generate a session token and expiration time (30 seconds from now)
-                    $session_token = bin2hex(random_bytes(16)); // Generate a random token
-                    $session_expires = time() + 30; // Set the session to expire in 30 seconds
-
-                    // Update the database with the session token and expiration time
-                    $stmt = $conn->prepare("UPDATE accounts SET session_token = ?, session_expires = ? WHERE username = ?");
-
-                    if($stmt->execute([$session_token, $session_expires, $username]))
-                    {
-                        setcookie('session_token', $session_token, $session_expires, "/");
-                        return true;
-                    }
-
-                    // Set the session token cookie (expire in 30 seconds)
-                    //Source for setting cookie: https://www.w3schools.com/php/func_network_setcookie.asp
-                    // Redirect to the homepage
-
-                } 
-                else {
-                    echo "Incorrect password for user $username !\n";
-                    echo "================================\n";
-                    $select = "Incorrect password for user $username !";
-                    return false;
+            case "login":
+                $username = $request['username'];
+                $password = $request['password'];
+    
+                // Query the database to check for user credentials
+                $query = "SELECT * FROM users WHERE username = ? AND password = ?";
+                $stmt = $conn->prepare($query);
+                $stmt->bind_param("ss", $username, $password);
+                $stmt->execute();
+                $result = $stmt->get_result();
+    
+                if ($result->num_rows > 0) {
+                    // Login is successful
+                    // Generate a session token (e.g., using a random string or hash function)
+                    $session_token = bin2hex(random_bytes(16));
+    
+                    // Optionally, you can store the session token in the database for verification purposes
+                    $updateQuery = "UPDATE users SET session_token = ? WHERE username = ?";
+                    $updateStmt = $conn->prepare($updateQuery);
+                    $updateStmt->bind_param("ss", $session_token, $username);
+                    $updateStmt->execute();
+    
+                    // Return a successful response with the session token
+                    return array("success" => true, "session_token" => $session_token);
+                } else {
+                    // Login failed
+                    return array("success" => false, "message" => "Invalid username or password");
                 }
                   
                 
-            }
+            
         default:
             return "Database Client-Server error";
     }

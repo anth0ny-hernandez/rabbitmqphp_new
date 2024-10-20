@@ -3,51 +3,55 @@ require_once('rabbitMQLib.inc');
 require_once('get_host_info.inc');
 require_once('path.inc');
 
-// Create a client for communicating with the RabbitMQ server
-$client = new rabbitMQClient("testRabbitMQ.ini", "testServer");
-
-// Handle form submission
+// Check if the form is submitted
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $username = $_POST['username'];
     $password = $_POST['password'];
 
-    // Create a login request
+    // Create a client to send the login request to RabbitMQ
+    $client = new rabbitMQClient("testRabbitMQ.ini", "testServer");
+
+    // Prepare the request
     $request = array();
     $request['type'] = "login";
     $request['username'] = $username;
     $request['password'] = $password;
 
-    // Send the login request via RabbitMQ
+    // Send the request and get the response
     $response = $client->send_request($request);
-    if($response) {
-        header("Location: index.php");
+
+    // Check the response from the RabbitMQ server
+    if ($response['success']) {
+        // Login successful, set the session token cookie
+        $session_token = $response['session_token'];
+        $expire_time = time() + 30; // Cookie expires in 30 seconds
+        setcookie('session_token', $session_token, $expire_time, "/");
+
+        // Redirect to the home page
+        header("Location: home.php");
         exit();
     } else {
-        echo "<p>Registration failed: " . htmlspecialchars($response) . "</p>";
+        // Login failed, show an error message
+        echo "<p>Login failed: " . $response['message'] . "</p>";
     }
 }
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
 </head>
 <body>
-    <h1>Login Page</h1>
-
-    <?php if (isset($error_message)): ?>
-        <p style="color: red;"><?php echo $error_message; ?></p>
-    <?php endif; ?>
-
-    <!-- Login Form -->
-    <form action="login.php" method="POST">
-        Username: <input type="text" name="username" required><br>
-        Password: <input type="password" name="password" required><br>
+    <h2>Login</h2>
+    <form method="POST" action="login.php">
+        <label for="username">Username:</label>
+        <input type="text" name="username" id="username" required><br><br>
+        <label for="password">Password:</label>
+        <input type="password" name="password" id="password" required><br><br>
         <input type="submit" value="Login">
     </form>
 </body>
 </html>
+
 
