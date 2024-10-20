@@ -25,14 +25,23 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         // Login successful, set the session token cookie
         $session_token = $response['session_token'];
         $expire_time = time() + 30; // Cookie expires in 30 seconds
-        setcookie('session_token', $session_token, $expire_time, "/");
+
+        // Set the session token cookie with appropriate attributes
+        setcookie('session_token', $session_token, [
+            'expires' => $expire_time,
+            'path' => '/',
+            'samesite' => 'Lax', // Set to 'Lax' or 'None' based on your requirement
+            'secure' => false, // Use true if your site is served over HTTPS
+            'httponly' => true
+        ]);
 
         // Redirect to the home page
         header("Location: home.php");
         exit();
     } else {
-        // Login failed, show an error message
-        echo "<p>Login failed: " . $response['message'] . "</p>";
+        // Log the error message if login fails
+        error_log("Login failed: " . $response['message']);
+        echo "<p>Login failed: " . htmlspecialchars($response['message']) . "</p>";
     }
 }
 ?>
@@ -53,5 +62,3 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     </form>
 </body>
 </html>
-
-
