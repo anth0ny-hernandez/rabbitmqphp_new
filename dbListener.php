@@ -16,6 +16,37 @@ function databaseProcessor($request) {
     $password = $request['password'];
 
     switch($request['type']) {
+        case "verify_session":
+            $session_token = $request['session_token'];
+
+            // Query the database to verify the session token and check expiration
+            $sql = "SELECT username, session_expires FROM accounts WHERE session_token = ?";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("s", $session_token);
+            $stmt->execute();
+            $ray = $stmt->get_result();
+
+            if ($ray->num_rows > 0) {
+                $row = $ray->fetch_assoc();
+                $current_time = time();
+
+                // Check if the session is still active
+                if ($row['session_expires'] > $current_time) {
+                    echo "Session is active for user " . $row['username'] . ".\n";
+                    return array(
+                        "success" => true,
+                        "username" => $row['username'],
+                        "session_expires" => $row['session_expires']
+                    );
+                } else {
+                    echo "Session expired for user " . $row['username'] . ".\n";
+                    return array("success" => false, "message" => "Session expired.");
+                }
+            } else {
+                echo "Invalid session token.\n";
+                return array("success" => false, "message" => "Invalid session token.");
+            }
+            
         case "register":
             echo "Processing username registration...\n";
             echo "================================\n";
