@@ -40,30 +40,57 @@ function databaseProcessor($request) {
             case "login":
                 $username = $request['username'];
                 $password = $request['password'];
-    
-                // Query the database to check for user credentials
-                $query = "SELECT * FROM users WHERE username = ? AND password = ?";
-                $stmt = $conn->prepare($query);
-                $stmt->bind_param("ss", $username, $password);
+            
+                echo "Processing login for $username...\n";
+                echo "================================\n";
+            
+                // Query to get the hashed password for the specified username
+                $sql = "SELECT password FROM accounts WHERE username = ?";
+                $stmt = $conn->prepare($sql);
+                $stmt->bind_param("s", $username);
                 $stmt->execute();
-                $result = $stmt->get_result();
-    
-                if ($result->num_rows > 0) {
-                    // Login is successful
-                    // Generate a session token (e.g., using a random string or hash function)
-                    $session_token = bin2hex(random_bytes(16));
-    
-                    // Optionally, you can store the session token in the database for verification purposes
-                    $updateQuery = "UPDATE users SET session_token = ? WHERE username = ?";
-                    $updateStmt = $conn->prepare($updateQuery);
-                    $updateStmt->bind_param("ss", $session_token, $username);
-                    $updateStmt->execute();
-    
-                    // Return a successful response with the session token
-                    return array("success" => true, "session_token" => $session_token);
+                $ray = $stmt->get_result();
+            
+                if ($ray->num_rows > 0) {
+                    $row = $ray->fetch_assoc();
+                    
+                    // Verify the password using password_verify
+                    if (password_verify($password, $row['password'])) {
+                        echo "Login successful for user $username!\n";
+                        echo "================================\n";
+            
+                        // Generate a session token and expiration time (30 seconds from now)
+                        $session_token = bin2hex(random_bytes(16)); // Generate a random token
+                        $session_expires = time() + 30; // Set the session to expire in 30 seconds
+            
+                        // Update the database with the session token and expiration time
+                        $updateQuery = "UPDATE accounts SET session_token = ?, session_expires = ? WHERE username = ?";
+                        $updateStmt = $conn->prepare($updateQuery);
+                        $updateStmt->bind_param("sis", $session_token, $session_expires, $username);
+                        
+                        if ($updateStmt->execute()) {
+                            // Set the session token cookie with a 30-second expiration
+                            setcookie('session_token', $session_token, $session_expires, "/");
+                            
+                            // Return a successful response with the session token
+                            return array("success" => true, "session_token" => $session_token);
+                        } else {
+                            // If updating the session token fails, return an error message
+                            echo "Failed to update session information for $username.\n";
+                            echo "================================\n";
+                            return array("success" => false, "message" => "Failed to update session information.");
+                        }
+                    } else {
+                        // Password verification failed
+                        echo "Incorrect password for user $username!\n";
+                        echo "================================\n";
+                        return array("success" => false, "message" => "Incorrect password.");
+                    }
                 } else {
-                    // Login failed
-                    return array("success" => false, "message" => "Invalid username or password");
+                    // No user found with the specified username
+                    echo "User $username not found!\n";
+                    echo "================================\n";
+                    return array("success" => false, "message" => "User not found.");
                 }
                   
                 
