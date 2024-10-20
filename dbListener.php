@@ -52,14 +52,7 @@ function databaseProcessor($request) {
                     echo "Login successful for user $username !\n";
                     echo "================================\n";
                     $select = "Login successful";
-                } else {
-                    echo "Incorrect password for user $username !\n";
-                    echo "================================\n";
-                    $select = "Incorrect password for user $username !";
-                }
 
-                // creates cookie
-                if ($select == "Login successful") {
                     // Generate a session token and expiration time (30 seconds from now)
                     $session_token = bin2hex(random_bytes(16)); // Generate a random token
                     $session_expires = time() + 30; // Set the session to expire in 30 seconds
@@ -67,19 +60,25 @@ function databaseProcessor($request) {
                     // Update the database with the session token and expiration time
                     $stmt = $conn->prepare("UPDATE accounts SET session_token = ?, session_expires = ? WHERE username = ?");
 
-                    // Set the session token cookie (expire in 30 seconds)
-                    //Source for setting cookie: https://www.w3schools.com/php/func_network_setcookie.asp
-                    // Redirect to the homepage
                     if($stmt->execute([$session_token, $session_expires, $username]))
                     {
                         setcookie('session_token', $session_token, $session_expires, "/");
                         return true;
                     }
-                } else {
-                    // If login fails, show an error message
-                    $error_message = "Invalid login credentials. Please try again.";
+
+                    // Set the session token cookie (expire in 30 seconds)
+                    //Source for setting cookie: https://www.w3schools.com/php/func_network_setcookie.asp
+                    // Redirect to the homepage
+
+                } 
+                else {
+                    echo "Incorrect password for user $username !\n";
+                    echo "================================\n";
+                    $select = "Incorrect password for user $username !";
                     return false;
                 }
+                  
+                
             }
         default:
             return "Database Client-Server error";
@@ -93,5 +92,39 @@ echo "RabbitMQ Server is running and waiting for requests...\n";
 $dbServer->process_requests('databaseProcessor');
 // Close the database connection
 $conn->close();
+
+
+
+// $query = "SELECT session_token FROM users WHERE username=?";
+// $statement = $db->prepare($query);
+// $statement->bind_param("s", $username);
+// if($statement->execute())
+// {
+//     $result = $statement->get_result();
+//     echo "success!";
+//     $resultToken=$result->fetch_all();
+//     $sessionToken = $resultToken[0][0];
+//     echo "client receiveds $sessionToken".PHP_EOL;
+//     $expire_time = time() + 10;
+//     setcookie('session_token', $sessionToken, $expire_time, "/");
+// }
+
+// else
+// {
+//     echo "fail";
+// }
+// include('logout.php');
+
+// echo "client receiveds ". $_COOKIE['session_token'].PHP_EOL;
+// print_r($response);
+// print_r(headers_list());
+// print_r($_COOKIE);
+// echo $response;
+// return $response;
+
+// if(time() > $expire_time)
+// {
+//     include('logout.php');
+// }
 
 ?>
