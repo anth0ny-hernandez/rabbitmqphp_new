@@ -70,16 +70,11 @@ function databaseProcessor($request) {
                         
                         if ($updateStmt->execute()) {
                             // Set the session token cookie with a 30-second expiration
-                            setcookie('session_token', $session_token, $session_expires, "/");
+                            
                             
                             // Return a successful response with the session token
                             return array("success" => true, "session_token" => $session_token);
-                        } else {
-                            // If updating the session token fails, return an error message
-                            echo "Failed to update session information for $username.\n";
-                            echo "================================\n";
-                            return array("success" => false, "message" => "Failed to update session information.");
-                        }
+                        } 
                     } else {
                         // Password verification failed
                         echo "Incorrect password for user $username!\n";
