@@ -1,7 +1,13 @@
 <?php
+unset($_COOKIE['session_token']);
 require_once('rabbitMQLib.inc');
 require_once('get_host_info.inc');
 require_once('path.inc');
+
+var_dump($_COOKIE);
+if($_COOKIE['session_token']) {
+    unset($_COOKIE['session_token']);
+}
 
 // Check if the form is submitted
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -24,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if ($response['success']) {
         // Login successful, set the session token cookie
         $session_token = $response['session_token'];
-        $expire_time = time() + 30; // Cookie expires in 30 seconds
+        $expire_time = time() + 10; // Cookie expires in 30 seconds
         setcookie('session_token', $session_token, $expire_time, "/");
 
         // Redirect to the home page

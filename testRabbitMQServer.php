@@ -17,7 +17,10 @@ function requestProcessor($request) {
         case "login":
             // creates new client to establish new connection to db's own server
             $dbClient = new rabbitMQClient("testDB_RMQ.ini", "dbConnect");
+            echo "Sending to alvee...\n";
             $result = $dbClient->send_request($request);
+            echo "Receiving from alvee...\n";
+            var_dump($result);
             return $result;
 
           // directs register process
