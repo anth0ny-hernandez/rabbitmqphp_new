@@ -26,11 +26,17 @@ $channel = $connection->channel();
 // Declare the queue if it does not exist
 $channel->queue_declare($queue_name, false, true, false, false);
 
+// Database connection setup
+$conn = new mysqli('localhost', 'testUser', '12345', 'testdb');
+if ($conn->connect_error) {
+    die("Database connection failed: " . $conn->connect_error);
+}
+
 echo "Consumer is running and waiting for messages from the queue: $queue_name...\n";
 
 // Function to process incoming messages
 function processMessage($msg) {
-    global $channel;
+    global $conn, $channel;
 
     $request = json_decode($msg->body, true); // Assuming the request is sent as JSON
     echo "Received request: ";
@@ -38,18 +44,63 @@ function processMessage($msg) {
 
     $response = null;
 
-    // Process the request
+    // Database operation handling
+    $username = $request['username'] ?? null;
+    $password = $request['password'] ?? null;
+
     switch ($request['type']) {
-        case "login":
-            echo "Processing login...\n";
-            // Simulate a login response (for demonstration purposes)
-            $response = array("success" => true, "message" => "Login successful.");
+        case "register":
+            echo "Processing username registration...\n";
+            echo "================================\n";
+            $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
+
+            $sql = "INSERT INTO accounts (username, password) VALUES (?, ?)";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("ss", $username, $hashedPassword);
+
+            if ($stmt->execute()) {
+                echo "User $username registered successfully!\n";
+                $response = array("success" => true, "message" => "User registered successfully.");
+            } else {
+                echo "Error: " . $conn->error . "\n";
+                $response = array("success" => false, "message" => "Registration failed: " . $conn->error);
+            }
             break;
 
-        case "register":
-            echo "Processing registration...\n";
-            // Simulate a registration response (for demonstration purposes)
-            $response = array("success" => true, "message" => "User registered successfully.");
+        case "login":
+            echo "Processing login for $username...\n";
+            echo "================================\n";
+            $sql = "SELECT password FROM accounts WHERE username = ?";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("s", $username);
+            $stmt->execute();
+            $result = $stmt->get_result();
+
+            if ($result->num_rows > 0) {
+                $row = $result->fetch_assoc();
+                if (password_verify($password, $row['password'])) {
+                    echo "Login successful for user $username.\n";
+                    $session_token = bin2hex(random_bytes(16));
+                    $session_expires = time() + 30;
+
+                    $updateQuery = "UPDATE accounts SET session_token = ?, session_expires = ? WHERE username = ?";
+                    $updateStmt = $conn->prepare($updateQuery);
+                    $updateStmt->bind_param("sis", $session_token, $session_expires, $username);
+
+                    if ($updateStmt->execute()) {
+                        $response = array("success" => true, "session_token" => $session_token);
+                    } else {
+                        echo "Error updating session: " . $conn->error . "\n";
+                        $response = array("success" => false, "message" => "Session update failed.");
+                    }
+                } else {
+                    echo "Incorrect password for user $username.\n";
+                    $response = array("success" => false, "message" => "Incorrect password.");
+                }
+            } else {
+                echo "User $username not found.\n";
+                $response = array("success" => false, "message" => "User not found.");
+            }
             break;
 
         default:
@@ -87,4 +138,6 @@ while ($channel->is_consuming()) {
 // Clean up
 $channel->close();
 $connection->close();
+$conn->close();
+
 ?>
