@@ -16,7 +16,7 @@ function requestProcessor($request) {
         // directs the login process
         case "login":
             // creates new client to establish new connection to db's own server
-            $dbClient = new rabbitMQClient("testDB_RMQ.ini", "dbConnect");
+            $dbClient = new rabbitMQClient("testRabbitMQ.ini", "testServer");
             echo "Sending to alvee...\n";
             $result = $dbClient->send_request($request);
             echo "Receiving from alvee...\n";
@@ -26,7 +26,7 @@ function requestProcessor($request) {
           // directs register process
         case "register":
             // creates new client to establish new connection to db's own server
-            $dbClient = new rabbitMQClient("testDB_RMQ.ini", "dbConnect");
+            $dbClient = new rabbitMQClient("testRabbitMQ.ini", "testServer");
             $result = $dbClient->send_request($request);
             return $result;
 
@@ -36,12 +36,10 @@ function requestProcessor($request) {
 }
 
 // Create a server that listens for requests from clients
-$frontserver = new rabbitMQServer("testRabbitMQ.ini", "testServer");
-$dbServer = new rabbitMQServer("testDB_RMQ.ini", "dbConnect");
-echo "RabbitMQ Server is running and waiting for requests...\n";
-$frontserver->process_requests('requestProcessor');
-$dbServer->process_requests('requestProcessor');
-// Close the database connection
-// $conn->close();
+$frontServer = new rabbitMQServer("testRabbitMQ.ini", "testServer");
+echo "RabbitMQ Front Server is running and waiting for requests...\n";
+
+// Process incoming requests using the requestProcessor function
+$frontServer->process_requests('requestProcessor');
 ?>
 
