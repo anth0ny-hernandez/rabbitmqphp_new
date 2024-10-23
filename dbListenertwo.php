@@ -5,14 +5,37 @@ require_once('rabbitMQLib.inc');
 require_once('get_host_info.inc');
 require_once('path.inc');
 
-// Database connection & credential setup (move outside the function)
+// Load configuration from the .ini file
+$config = parse_ini_file("testRabbitMQ.ini", true);
+$queue_name = $config['dbConnect']['QUEUE'];
+
+// Establish a connection to RabbitMQ using the configuration
+$connection = new AMQPStreamConnection(
+    $config['dbConnect']['BROKER_HOST'],
+    $config['dbConnect']['BROKER_PORT'],
+    $config['dbConnect']['USER'],
+    $config['dbConnect']['PASSWORD'],
+    $config['dbConnect']['VHOST']
+);
+
+$channel = $connection->channel();
+
+// Declare the queue if it does not exist
+$channel->queue_declare($queue_name, false, true, false, false);
+
+// Database connection setup
 $conn = new mysqli('localhost', 'testUser', '12345', 'testdb');
 if ($conn->connect_error) {
     die("Database connection failed: " . $conn->connect_error);
 }
 
-function databaseProcessor($request, $msg) {
+echo "RabbitMQ DB Listener is running and waiting for messages from the queue: $queue_name...\n";
+
+// Callback function to process incoming messages
+function databaseProcessor($msg) {
     global $conn;
+
+    $request = json_decode($msg->body, true); // Assuming the request is sent as JSON
 
     echo "Received request: ";
     var_dump($request);
@@ -20,24 +43,26 @@ function databaseProcessor($request, $msg) {
     $username = $request['username'];
     $password = $request['password'];
 
-    switch($request['type']) {
+    switch ($request['type']) {
         case "register":
             echo "Processing username registration...\n";
             echo "================================\n";
 
             $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
-            $sql = "INSERT INTO accounts (username, password) VALUES ('$username', '$hashedPassword')";
-            if ($conn->query($sql) === TRUE) {
+            $sql = "INSERT INTO accounts (username, password) VALUES (?, ?)";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("ss", $username, $hashedPassword);
+
+            if ($stmt->execute()) {
                 echo "User $username registered successfully!\n";
                 echo "================================\n";
-                $msg->delivery_info['channel']->basic_ack($msg->delivery_info['delivery_tag']); // Acknowledge the message
-                return true;
+                $msg->ack(); // Acknowledge the message
             } else {
-                error_log("Error in registration: " . $conn->error);
                 echo "Error: " . $conn->error . "\n";
-                $msg->delivery_info['channel']->basic_ack($msg->delivery_info['delivery_tag']); // Acknowledge even on failure
-                return false;
+                error_log("Error in registration: " . $conn->error);
+                $msg->ack(); // Acknowledge even on failure to remove the message from the queue
             }
+            break;
 
         case "login":
             echo "Processing login for $username...\n";
@@ -47,11 +72,10 @@ function databaseProcessor($request, $msg) {
             $stmt = $conn->prepare($sql);
             $stmt->bind_param("s", $username);
             $stmt->execute();
-            $ray = $stmt->get_result();
+            $result = $stmt->get_result();
 
-            if ($ray->num_rows > 0) {
-                $row = $ray->fetch_assoc();
-
+            if ($result->num_rows > 0) {
+                $row = $result->fetch_assoc();
                 if (password_verify($password, $row['password'])) {
                     echo "Login successful for user $username!\n";
                     echo "================================\n";
@@ -62,48 +86,40 @@ function databaseProcessor($request, $msg) {
                     $updateQuery = "UPDATE accounts SET session_token = ?, session_expires = ? WHERE username = ?";
                     $updateStmt = $conn->prepare($updateQuery);
                     $updateStmt->bind_param("sis", $session_token, $session_expires, $username);
+                    $updateStmt->execute();
 
-                    if ($updateStmt->execute()) {
-                        $msg->delivery_info['channel']->basic_ack($msg->delivery_info['delivery_tag']); // Acknowledge the message
-                        return array("success" => true, "session_token" => $session_token);
-                    } else {
-                        error_log("Error updating session: " . $conn->error);
-                        echo "Error updating session for $username!\n";
-                        $msg->delivery_info['channel']->basic_ack($msg->delivery_info['delivery_tag']); // Acknowledge even on failure
-                        return array("success" => false, "message" => "Session update failed.");
-                    }
+                    $msg->ack(); // Acknowledge the message
                 } else {
                     echo "Incorrect password for user $username!\n";
                     echo "================================\n";
-                    $msg->delivery_info['channel']->basic_ack($msg->delivery_info['delivery_tag']); // Acknowledge even on failure
-                    return array("success" => false, "message" => "Incorrect password.");
+                    $msg->ack(); // Acknowledge the message even if login failed
                 }
             } else {
                 echo "User $username not found!\n";
                 echo "================================\n";
-                $msg->delivery_info['channel']->basic_ack($msg->delivery_info['delivery_tag']); // Acknowledge even on failure
-                return array("success" => false, "message" => "User not found.");
+                $msg->ack(); // Acknowledge the message even if the user is not found
             }
+            break;
 
         default:
-            $msg->delivery_info['channel']->basic_ack($msg->delivery_info['delivery_tag']); // Acknowledge even on unrecognized type
-            return "Database Client-Server error";
+            echo "Unsupported message type: " . $request['type'] . "\n";
+            $msg->ack(); // Acknowledge unsupported messages to avoid re-queueing
+            break;
     }
 }
 
-// Create a server that listens for requests from clients
-$dbServer = new rabbitMQServer("testDB_RMQ.ini", "dbConnect");
-ob_end_flush();
-echo "RabbitMQ Server is running and waiting for requests...\n";
+// Set up a consumer that uses the callback function for processing
+$channel->basic_consume($queue_name, '', false, false, false, false, 'databaseProcessor');
 
-// Process incoming requests with error handling
-try {
-    $dbServer->process_requests('databaseProcessor');
-} catch (Exception $e) {
-    echo "Error processing request: " . $e->getMessage() . "\n";
+// Keep the script running and waiting for messages
+while ($channel->is_consuming()) {
+    $channel->wait();
 }
 
-// Close the database connection
+// Clean up
+$channel->close();
+$connection->close();
 $conn->close();
-echo "Database connection closed.\n";
+
+ob_end_flush();
 ?>
