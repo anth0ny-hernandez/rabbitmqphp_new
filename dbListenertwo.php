@@ -7,15 +7,15 @@ require_once('path.inc');
 
 // Load configuration from the .ini file
 $config = parse_ini_file("testRabbitMQ.ini", true);
-$queue_name = $config['dbConnect']['QUEUE'];
+$queue_name = $config['testServer']['testQueue'];
 
 // Establish a connection to RabbitMQ using the configuration
 $connection = new AMQPStreamConnection(
-    $config['dbConnect']['BROKER_HOST'],
-    $config['dbConnect']['BROKER_PORT'],
-    $config['dbConnect']['USER'],
-    $config['dbConnect']['PASSWORD'],
-    $config['dbConnect']['VHOST']
+    $config['testServer']['BROKER_HOST'],
+    $config['testServer']['BROKER_PORT'],
+    $config['testServer']['USER'],
+    $config['testServer']['PASSWORD'],
+    $config['testServer']['VHOST']
 );
 
 $channel = $connection->channel();
