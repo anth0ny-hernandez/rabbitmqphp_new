@@ -1,15 +1,18 @@
 #!/bin/php
 <?php
 ob_start();
+require_once __DIR__ . '/vendor/autoload.php';
 require_once('rabbitMQLib.inc');
 require_once('get_host_info.inc');
 require_once('path.inc');
 
 // Load configuration from the .ini file
 $config = parse_ini_file("testRabbitMQ.ini", true);
-$queue_name = $config['testServer']['testQueue'];
+$queue_name = $config['testServer']['QUEUE'];
 
 // Establish a connection to RabbitMQ using the configuration
+use PhpAmqpLib\Connection\AMQPStreamConnection;
+
 $connection = new AMQPStreamConnection(
     $config['testServer']['BROKER_HOST'],
     $config['testServer']['BROKER_PORT'],

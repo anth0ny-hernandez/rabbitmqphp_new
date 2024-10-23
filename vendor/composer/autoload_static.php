@@ -37,6 +37,16 @@ class ComposerStaticInitc90d84d249ff0d626d3727a42d9c91ad
         ),
     );
 
+    public static $prefixesPsr0 = array (
+        'P' => 
+        array (
+            'PhpAmqpLib' => 
+            array (
+                0 => __DIR__ . '/..' . '/php-amqplib/php-amqplib',
+            ),
+        ),
+    );
+
     public static $classMap = array (
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
     );
@@ -46,6 +56,7 @@ class ComposerStaticInitc90d84d249ff0d626d3727a42d9c91ad
         return \Closure::bind(function () use ($loader) {
             $loader->prefixLengthsPsr4 = ComposerStaticInitc90d84d249ff0d626d3727a42d9c91ad::$prefixLengthsPsr4;
             $loader->prefixDirsPsr4 = ComposerStaticInitc90d84d249ff0d626d3727a42d9c91ad::$prefixDirsPsr4;
+            $loader->prefixesPsr0 = ComposerStaticInitc90d84d249ff0d626d3727a42d9c91ad::$prefixesPsr0;
             $loader->classMap = ComposerStaticInitc90d84d249ff0d626d3727a42d9c91ad::$classMap;
 
         }, null, ClassLoader::class);
