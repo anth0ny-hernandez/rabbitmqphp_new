@@ -26,65 +26,30 @@ $channel = $connection->channel();
 // Declare the queue if it does not exist
 $channel->queue_declare($queue_name, false, true, false, false);
 
-// Database connection setup
-$conn = new mysqli('localhost', 'testUser', '12345', 'testdb');
-if ($conn->connect_error) {
-    die("Database connection failed: " . $conn->connect_error);
-}
-
 echo "Consumer is running and waiting for messages from the queue: $queue_name...\n";
 
-// Callback function to process incoming messages
+// Function to process incoming messages
 function processMessage($msg) {
-    global $conn, $channel;
+    global $channel;
 
     $request = json_decode($msg->body, true); // Assuming the request is sent as JSON
-
     echo "Received request: ";
     var_dump($request);
 
     $response = null;
-    $username = $request['username'] ?? null;
-    $password = $request['password'] ?? null;
 
+    // Process the request
     switch ($request['type']) {
-        case "register":
-            echo "Processing registration...\n";
-            $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
-            $sql = "INSERT INTO accounts (username, password) VALUES (?, ?)";
-            $stmt = $conn->prepare($sql);
-            $stmt->bind_param("ss", $username, $hashedPassword);
-
-            if ($stmt->execute()) {
-                echo "User $username registered successfully.\n";
-                $response = array("success" => true, "message" => "User registered successfully.");
-            } else {
-                echo "Error: " . $conn->error . "\n";
-                $response = array("success" => false, "message" => "Registration failed.");
-            }
+        case "login":
+            echo "Processing login...\n";
+            // Simulate a login response (for demonstration purposes)
+            $response = array("success" => true, "message" => "Login successful.");
             break;
 
-        case "login":
-            echo "Processing login for $username...\n";
-            $sql = "SELECT password FROM accounts WHERE username = ?";
-            $stmt = $conn->prepare($sql);
-            $stmt->bind_param("s", $username);
-            $stmt->execute();
-            $result = $stmt->get_result();
-
-            if ($result->num_rows > 0) {
-                $row = $result->fetch_assoc();
-                if (password_verify($password, $row['password'])) {
-                    echo "Login successful for user $username.\n";
-                    $response = array("success" => true, "message" => "Login successful.");
-                } else {
-                    echo "Incorrect password for user $username.\n";
-                    $response = array("success" => false, "message" => "Incorrect password.");
-                }
-            } else {
-                echo "User $username not found.\n";
-                $response = array("success" => false, "message" => "User not found.");
-            }
+        case "register":
+            echo "Processing registration...\n";
+            // Simulate a registration response (for demonstration purposes)
+            $response = array("success" => true, "message" => "User registered successfully.");
             break;
 
         default:
@@ -93,16 +58,25 @@ function processMessage($msg) {
             break;
     }
 
-    // Send the response back to RabbitMQ
-    $responseQueue = 'response_queue'; // You can change this to the actual response queue name
-    $msgResponse = new AMQPMessage(json_encode($response), array('delivery_mode' => 2));
-    $channel->basic_publish($msgResponse, '', $responseQueue);
+    // Send the response back to the reply_to queue specified in the original message
+    $reply_to = $msg->get('reply_to');
+    $correlation_id = $msg->get('correlation_id');
+    if ($reply_to) {
+        $responseMsg = new AMQPMessage(
+            json_encode($response),
+            array('correlation_id' => $correlation_id)
+        );
+        $channel->basic_publish($responseMsg, '', $reply_to);
+        echo "Response sent to the queue: $reply_to\n";
+    } else {
+        echo "No reply_to queue specified in the message.\n";
+    }
 
     // Acknowledge the original message
     $msg->ack();
 }
 
-// Set up a consumer that uses the callback function for processing
+// Set up a consumer that uses the processMessage function for processing
 $channel->basic_consume($queue_name, '', false, false, false, false, 'processMessage');
 
 // Keep the script running and waiting for messages
@@ -113,6 +87,4 @@ while ($channel->is_consuming()) {
 // Clean up
 $channel->close();
 $connection->close();
-$conn->close();
-
 ?>
