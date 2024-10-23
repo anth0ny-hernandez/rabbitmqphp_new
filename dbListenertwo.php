@@ -1,101 +1,106 @@
+#!/bin/php
 <?php
+ob_start();
 require_once('rabbitMQLib.inc');
 require_once('get_host_info.inc');
 require_once('path.inc');
 
-// Database connection details (adjust these as needed for your local database)
-$host = '127.0.0.1';  // Localhost for the local database
-$dbname = 'testdb';  // Replace with your local database name
-$username = 'testUser';  // Replace with your database username
-$password = '12345';  // Replace with your database password
-$port = 3306;
-
-// Establish a connection to the local database
-$conn = new mysqli($host, $username, $password, $dbname, $port);
+// Database connection & credential setup (move outside the function)
+$conn = new mysqli('localhost', 'testUser', '12345', 'testdb');
 if ($conn->connect_error) {
     die("Database connection failed: " . $conn->connect_error);
 }
 
-// Function to process database-related tasks based on request type
-function processDatabaseRequest($request)
-{
+function databaseProcessor($request, $msg) {
     global $conn;
 
-    // Check if the request type is set
-    if (!isset($request['type'])) {
-        return array("success" => false, "message" => "ERROR: Unsupported message type");
-    }
+    echo "Received request: ";
+    var_dump($request);
 
-    // Handle the request based on its type
-    switch ($request['type']) {
-        case "login":
-            $username = $request['username'];
-            $password = $request['password'];
+    $username = $request['username'];
+    $password = $request['password'];
 
-            // Query the database to check for user credentials
-            $query = "SELECT * FROM users WHERE username = ? AND password = ?";
-            $stmt = $conn->prepare($query);
-            $stmt->bind_param("ss", $username, $password);
-            $stmt->execute();
-            $result = $stmt->get_result();
+    switch($request['type']) {
+        case "register":
+            echo "Processing username registration...\n";
+            echo "================================\n";
 
-            if ($result->num_rows > 0) {
-                // Login is successful
-                // Generate a session token
-                $session_token = bin2hex(random_bytes(16));
-
-                // Optionally, store the session token in the database
-                $updateQuery = "UPDATE users SET session_token = ? WHERE username = ?";
-                $updateStmt = $conn->prepare($updateQuery);
-                $updateStmt->bind_param("ss", $session_token, $username);
-                $updateStmt->execute();
-
-                return array("success" => true, "session_token" => $session_token);
+            $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
+            $sql = "INSERT INTO accounts (username, password) VALUES ('$username', '$hashedPassword')";
+            if ($conn->query($sql) === TRUE) {
+                echo "User $username registered successfully!\n";
+                echo "================================\n";
+                $msg->delivery_info['channel']->basic_ack($msg->delivery_info['delivery_tag']); // Acknowledge the message
+                return true;
             } else {
-                // Login failed
-                return array("success" => false, "message" => "Invalid username or password");
+                error_log("Error in registration: " . $conn->error);
+                echo "Error: " . $conn->error . "\n";
+                $msg->delivery_info['channel']->basic_ack($msg->delivery_info['delivery_tag']); // Acknowledge even on failure
+                return false;
             }
 
-        case "register":
-            $username = $request['username'];
-            $password = $request['password'];
+        case "login":
+            echo "Processing login for $username...\n";
+            echo "================================\n";
 
-            // Insert new user into the database
-            $query = "INSERT INTO users (username, password) VALUES (?, ?)";
-            $stmt = $conn->prepare($query);
-            $stmt->bind_param("ss", $username, $password);
+            $sql = "SELECT password FROM accounts WHERE username = ?";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("s", $username);
+            $stmt->execute();
+            $ray = $stmt->get_result();
 
-            if ($stmt->execute()) {
-                return array("success" => true, "message" => "Registration successful");
+            if ($ray->num_rows > 0) {
+                $row = $ray->fetch_assoc();
+
+                if (password_verify($password, $row['password'])) {
+                    echo "Login successful for user $username!\n";
+                    echo "================================\n";
+
+                    $session_token = bin2hex(random_bytes(16));
+                    $session_expires = time() + 30;
+
+                    $updateQuery = "UPDATE accounts SET session_token = ?, session_expires = ? WHERE username = ?";
+                    $updateStmt = $conn->prepare($updateQuery);
+                    $updateStmt->bind_param("sis", $session_token, $session_expires, $username);
+
+                    if ($updateStmt->execute()) {
+                        $msg->delivery_info['channel']->basic_ack($msg->delivery_info['delivery_tag']); // Acknowledge the message
+                        return array("success" => true, "session_token" => $session_token);
+                    } else {
+                        error_log("Error updating session: " . $conn->error);
+                        echo "Error updating session for $username!\n";
+                        $msg->delivery_info['channel']->basic_ack($msg->delivery_info['delivery_tag']); // Acknowledge even on failure
+                        return array("success" => false, "message" => "Session update failed.");
+                    }
+                } else {
+                    echo "Incorrect password for user $username!\n";
+                    echo "================================\n";
+                    $msg->delivery_info['channel']->basic_ack($msg->delivery_info['delivery_tag']); // Acknowledge even on failure
+                    return array("success" => false, "message" => "Incorrect password.");
+                }
             } else {
-                return array("success" => false, "message" => "Registration failed: " . $stmt->error);
+                echo "User $username not found!\n";
+                echo "================================\n";
+                $msg->delivery_info['channel']->basic_ack($msg->delivery_info['delivery_tag']); // Acknowledge even on failure
+                return array("success" => false, "message" => "User not found.");
             }
 
         default:
-            return array("success" => false, "message" => "ERROR: Unsupported message type");
+            $msg->delivery_info['channel']->basic_ack($msg->delivery_info['delivery_tag']); // Acknowledge even on unrecognized type
+            return "Database Client-Server error";
     }
 }
 
-// Create a RabbitMQ client to communicate with the RabbitMQ server
-$client = new rabbitMQClient("testDB_RMQ.ini", "dbConnect");
+// Create a server that listens for requests from clients
+$dbServer = new rabbitMQServer("testDB_RMQ.ini", "dbConnect");
+ob_end_flush();
+echo "RabbitMQ Server is running and waiting for requests...\n";
 
-$request = array(
-    "type" => "login",  // Or "register" based on what you want to test
-    "username" => "testuser",
-    "password" => "testpassword"
-);
-
-
-// Send the request to RabbitMQ
-$response = $client->send_request($request);
-
-// If the request was processed successfully by RabbitMQ, perform database processing
-if ($response['success']) {
-    echo "Request was successful. Processing database operation...\n";
-    $dbResponse = processDatabaseRequest($response);
-    print_r($dbResponse);
-} else {
-    echo "Request failed: " . $response['message'] . "\n";
+// Process incoming requests with error handling
+try {
+    $dbServer->process_requests('databaseProcessor');
+} catch (Exception $e) {
+    echo "Error processing request: " . $e->getMessage() . "\n";
 }
 
 // Close the database connection
