@@ -5,6 +5,7 @@ require_once('get_host_info.inc');
 require_once('path.inc');
 
 function requestProcessor($request) {
+    $dbClient = new rabbitMQClient("testRabbitMQ.ini", "testServer");
     echo "Received request: ";
     var_dump($request);
 
@@ -16,7 +17,6 @@ function requestProcessor($request) {
         // directs the login process
         case "login":
             // creates new client to establish new connection to db's own server
-            $dbClient = new rabbitMQClient("testRabbitMQ.ini", "testServer");
             echo "Sending to alvee...\n";
             $result = $dbClient->send_request($request);
             echo "Receiving from alvee...\n";
@@ -26,7 +26,6 @@ function requestProcessor($request) {
           // directs register process
         case "register":
             // creates new client to establish new connection to db's own server
-            $dbClient = new rabbitMQClient("testRabbitMQ.ini", "testServer");
             $result = $dbClient->send_request($request);
             return $result;
 
