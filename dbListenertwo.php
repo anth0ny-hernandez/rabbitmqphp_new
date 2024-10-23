@@ -79,6 +79,12 @@ function processDatabaseRequest($request)
 // Create a RabbitMQ client to communicate with the RabbitMQ server
 $client = new rabbitMQClient("testDB_RMQ.ini", "dbConnect");
 
+$request = array(
+    "type" => "login",  // Or "register" based on what you want to test
+    "username" => "testuser",
+    "password" => "testpassword"
+);
+
 
 // Send the request to RabbitMQ
 $response = $client->send_request($request);
