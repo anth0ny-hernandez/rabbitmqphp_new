@@ -5,7 +5,7 @@ require_once('get_host_info.inc');
 require_once('path.inc');
 
 function requestProcessor($request) {
-    $dbClient = new rabbitMQClient("testRabbitMQ.ini", "testServer");
+    $dbClient = new rabbitMQClient("testDB_RMQ.ini", "dbConnect");
     echo "Received request: ";
     var_dump($request);
 

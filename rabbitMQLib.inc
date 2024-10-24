@@ -225,8 +225,8 @@ class rabbitMQClient
 			$response = $this->response_queue[$uid];
 			unset($this->response_queue[$uid]);
 
-			// $channel->close();
-
+			$channel->close();
+			$conn->disconnect();
 			return $response;
 		}
 		catch(Exception $e)
