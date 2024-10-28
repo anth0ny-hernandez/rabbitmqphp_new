@@ -5,19 +5,14 @@ require_once('rabbitMQLib.inc');
 require_once('get_host_info.inc');
 require_once('path.inc');
 
-function databaseProcessor($request) {
-
     echo "Received request: ";
-    var_dump($request);
 
     // database connection & credential variable assignment
-    $conn = new mysqli('localhost', 'testUser', '12345', 'testdb');
-    $username = $request['username'];
-    $password = $request['password'];
 
-    switch($request['type']) {
+$conn = new mysqli('localhost', 'testUser', '12345', 'testdb');
 
-        case "register":
+    function processRegistration($username, $password){
+        $conn = new mysqli('localhost', 'testUser', '12345', 'testdb');
             echo "Processing username registration...\n";
             echo "================================\n";
 
@@ -39,9 +34,11 @@ function databaseProcessor($request) {
                 $insert = "Error: " . $conn->error;
                 return false;
             }
-        case "login":
-            $username = $request['username'];
-            $password = $request['password'];
+        }
+
+        function processLogin($username, $password){
+            $conn = new mysqli('localhost', 'testUser', '12345', 'testdb');
+   
         
             echo "Processing login for $username...\n";
             echo "================================\n";
@@ -89,19 +86,14 @@ function databaseProcessor($request) {
                 echo "================================\n";
                 return array("success" => false, "message" => "User not found.");
             }
-                
+        }
             
         
-        default:
-            return "Database Client-Server error";
-    }
-}
 
+    
 // Create a server that listens for requests from clients
-$dbServer = new rabbitMQServer("testRabbitMQ.ini", "testServer");
 ob_end_flush();
 echo "RabbitMQ Server is running and waiting for requests...\n";
-$dbServer->process_requests('databaseProcessor');
 // Close the database connection
 $conn->close();
 
