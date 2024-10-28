@@ -9,10 +9,10 @@ require_once('path.inc');
 
     // database connection & credential variable assignment
 
-$conn = new mysqli('localhost', 'testUser', '12345', 'testdb');
+    $conn = new mysqli('172.22.53.55', 'testUser', '12345', 'testdb');
 
     function processRegistration($username, $password){
-        $conn = new mysqli('localhost', 'testUser', '12345', 'testdb');
+        $conn = new mysqli('172.22.53.55', 'testUser', '12345', 'testdb');
             echo "Processing username registration...\n";
             echo "================================\n";
 
@@ -37,7 +37,7 @@ $conn = new mysqli('localhost', 'testUser', '12345', 'testdb');
         }
 
         function processLogin($username, $password){
-            $conn = new mysqli('localhost', 'testUser', '12345', 'testdb');
+            $conn = new mysqli('172.22.53.55', 'testUser', '12345', 'testdb');
    
         
             echo "Processing login for $username...\n";

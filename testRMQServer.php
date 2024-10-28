@@ -3,16 +3,7 @@
 require_once('rabbitMQLib.inc');
 require_once('get_host_info.inc');
 require_once('path.inc');
-
-// function doLogin($credits) {
-//     // Create a server that listens for requests from clients
-//     echo "//////////////////////";
-//     echo "\nNow connecting to database listener...\n";
-//     $dbServer = new rabbitMQServer("testDB_RMQ.ini", "dbConnect");
-
-//     echo "Connection successful, now sending info...\n";
-//     $dbServer->process_requests('requestProcessor');
-// }
+require_once('dbListener.php'); // Include dbListener.php for processing
 
 function requestProcessor($request) {
     echo "Received request: ";
@@ -23,31 +14,17 @@ function requestProcessor($request) {
     }
 
     switch ($request['type']) {
-        // directs the login process
+        // Direct the login process to dbListener
         case "login":
-            // creates new client to establish new connection to db's own server
-            // $dbClient = new rabbitMQClient("testDB_RMQ.ini", "dbConnect");
-            // echo "Sending to alvee...\n";
-            // $result = $dbClient->send_request($request);
-            // echo "Receiving from alvee...\n";
-            // var_dump($result);
-            // doLogin($request);
+            echo "Processing login in dbListener...\n";
+            $response = databaseProcessor($request); // Call the function from dbListener.php
+            return $response;
 
-            // Create a server that listens for requests from clients
-            echo "//////////////////////";
-            echo "\nNow connecting to database listener...\n";
-            $dbServer = new rabbitMQServer("testDB_RMQ.ini", "dbConnect");
-
-            echo "Connection successful, now sending info...\n";
-            $dbServer->process_requests('doLogin');
-            return $result;
-
-          // directs register process
+        // Direct the registration process to dbListener
         case "register":
-            // creates new client to establish new connection to db's own server
-            $dbClient = new rabbitMQClient("testDB_RMQ.ini", "dbConnect");
-            $result = $dbClient->send_request($request);
-            return $result;
+            echo "Processing registration in dbListener...\n";
+            $response = databaseProcessor($request); // Call the function from dbListener.php
+            return $response;
 
         default:
             return "ERROR: unsupported message type";
@@ -55,12 +32,9 @@ function requestProcessor($request) {
 }
 
 // Create a server that listens for requests from clients
-$server = new rabbitMQServer("testRabbitMQ.ini", "testServer");
+$frontServer = new rabbitMQServer("testRabbitMQ.ini", "testServer");
+echo "RabbitMQ Front Server is running and waiting for requests...\n";
 
-echo "RabbitMQ Server is running and waiting for requests...\n";
-$server->process_requests('requestProcessor');
-
-// Close the database connection
-// $conn->close();
+// Process incoming requests using the requestProcessor function
+$frontServer->process_requests('requestProcessor');
 ?>
-

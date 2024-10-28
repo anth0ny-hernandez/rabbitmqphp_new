@@ -3,7 +3,7 @@
 require_once('rabbitMQLib.inc');
 require_once('get_host_info.inc');
 require_once('path.inc');
-require_once('dbListener.php');
+require_once('dbListenerUpdated.php');
 
 function requestProcessor($request) {
     echo "Received request: ";
