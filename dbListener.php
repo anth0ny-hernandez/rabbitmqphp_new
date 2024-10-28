@@ -72,13 +72,20 @@ class DbListenerServer {
     }
 }
 
+function processRequest($request) {
+
+    databaseProcessor($request);
+
+    return true; // Call databaseProcessor function and return result
+}
+
 // Function to process login and registration requests
 function databaseProcessor($request) {
     echo "Received request in dbListener: ";
     var_dump($request);
 
     // Database connection & credential variable assignment
-    $conn = new mysqli('localhost', 'testUser', '12345', 'testdb');
+    $conn = new mysqli('172.22.53.55', 'testUser', '12345', 'testdb');
     if ($conn->connect_error) {
         die("Database connection failed: " . $conn->connect_error);
     }
@@ -151,6 +158,6 @@ function databaseProcessor($request) {
 }
 
 // Instantiate the server and start processing requests
-$dbServer = new DbListenerServer("testDB_RMQ.ini", "dbConnect");
-$dbServer->processRequests('databaseProcessor');
+$dbServer = new rabbitMQServer("testRabbitMQ.ini", "testServer");
+$dbServer->process_requests('databaseProcessor');
 ?>
