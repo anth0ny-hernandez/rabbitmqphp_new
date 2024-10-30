@@ -30,6 +30,21 @@ function requestProcessor($request) {
             $result = $dbClient->send_request($request);
             return $result;
 
+        case "getMealPlan":
+            // New case for getting a weekly meal plan
+            $dmzClient = new rabbitMQClient("testRabbitMQ.ini", "testServer");
+            // Forward the request to the DMZ server for meal planning
+            $result = $dmzClient->send_request($request);
+            return $result;
+        
+        case "searchRecipe":
+            // Handle recipe search requests by forwarding to the DMZ
+            $dmzClient = new rabbitMQClient("testRabbitMQ.ini", "testServer");
+            $result = $dmzClient->send_request($request);
+            return $result;
+        
+        
+
         default:
             return "ERROR: unsupported message type";
     }
