@@ -32,14 +32,13 @@ function requestProcessor($request) {
 
         case "getMealPlan":
             // New case for getting a weekly meal plan
-            $dmzClient = new rabbitMQClient("testRabbitMQ.ini", "testServer");
-            // Forward the request to the DMZ server for meal planning
+            $dmzClient = new rabbitMQClient("dmzConfig.ini", "dmzServer");
             $result = $dmzClient->send_request($request);
             return $result;
         
         case "searchRecipe":
             // Handle recipe search requests by forwarding to the DMZ
-            $dmzClient = new rabbitMQClient("testRabbitMQ.ini", "testServer");
+            $dmzClient = new rabbitMQClient("dmzConfig.ini", "dmzServer");
             $result = $dmzClient->send_request($request);
             return $result;
         

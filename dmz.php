@@ -103,7 +103,7 @@ function requestProcessor($request) {
 }
 
 // Create a server that listens for requests from clients
-$server = new rabbitMQServer("testRabbitMQ.ini", "testServer");
+$server = new rabbitMQServer("dmzConfig.ini", "dmzServer");
 echo "DMZ Server for Meal Planning and Recipe Search is running and waiting for requests...\n";
 $server->process_requests('requestProcessor');
 ?>
