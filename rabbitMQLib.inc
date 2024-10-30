@@ -200,7 +200,6 @@ class rabbitMQClient
       $params['login'] = $this->USER;
       $params['password'] = $this->PASSWORD;
       $params['vhost'] = $this->VHOST;
-
 			$conn = new AMQPConnection($params);
 			$conn->connect();
 
@@ -225,6 +224,9 @@ class rabbitMQClient
 
 			$response = $this->response_queue[$uid];
 			unset($this->response_queue[$uid]);
+
+			$channel->close();
+
 			return $response;
 		}
 		catch(Exception $e)
@@ -269,4 +271,3 @@ class rabbitMQClient
 	}
 }
 ?>
-
