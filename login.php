@@ -34,7 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         setcookie('session_token', $session_token, $expire_time, "/");
 
         // Redirect to the home page
-        header("Location: home.php");
+        header("Location: index.php");
         exit();
     } else {
         // Login failed, show an error message
