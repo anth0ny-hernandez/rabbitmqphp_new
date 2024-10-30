@@ -114,6 +114,7 @@ footer {
         <p>Feel free to browse around or log in to access more features.</p>
         <a href="login.php"><button class="button">Login</button></a>
         <a href="registration.php"><button class="button">Register</button></a>
+        <a href="dietrestrictions.php"><button class="button">Diet Restricitons</button></a>
     <?php endif; ?>
 
     <!-- JavaScript for auto-logout and popup warning if logged in -->

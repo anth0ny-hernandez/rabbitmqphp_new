@@ -125,5 +125,6 @@ footer {
 <footer>
 <a href="index.php"><button class="button">Homepage</button></a>
 <a href="registration.php"><button class="button">Register</button></a>
+<a href="dietrestrictions.php"><button class="button">Diet Restricitons</button></a>
 </footer>
 </html>
