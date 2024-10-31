@@ -6,20 +6,58 @@ require_once('rabbitMQLib.inc');
 require_once('get_host_info.inc');
 require_once('path.inc');
 
-// function dmzProcessor($request){
+function dmzProcessor($request){
 echo "Received request: ";
-var_dump($request);
+// var_dump($request);
+
 $params = array(
 'type'=>'public', 
-'q'=>'teriyaki', 
+'q'=>$request['label'], 
 'app_id'=>'4577783c', 
 'app_key'=>'2ebd6b0aa43312e5f01f2077882ca32f',
-'nutrients%5BENERC_KCAL%5D'=>'1030',
-'nutrients%5BFAMS%5D'=>'50',
-'nutrients%5BSUGAR%5D'=>'21',);
+'health'=>$request['healthLabels'],
+'cuisineType'=>$request['cuisineType'],
+'mealType'=>$request['mealType'],
+'nutrients[ENERC_KCAL]'=>$request['ENERC_KCAL'],
+'nutrients[CA]'=>$request['calcium'],
+'nutrients[CHOCDF]'=>$request['c'],
+'nutrients[CHOLE]'=>$request['cholesterol'],
+'nutrients[FAT]'=>$request['fat'],
+'nutrients[FIBTF]'=>$request['fiber'],
+'nutrients[NA]'=>$request['sodium'],
+'nutrients[PROCNT]'=>$request['protein'],
+'nutrients[SUGAR]'=>$request['sugar'],
+'nutrients[VITA_RAE]'=>$request['vitaminA'],
+'nutrients[VITC]'=>$request['vitaminCs'],
+'ingredientLines'=>$request['ingredients'],
+);
+
+
+// $params = array(
+// 'type'=>'public', 
+// 'q'=>'teriyaki', 
+// 'app_id'=>'4577783c', 
+// 'app_key'=>'2ebd6b0aa43312e5f01f2077882ca32f',
+// 'health'=>
+// 'cuisineType'=>
+// 'mealType'=>
+// 'calories'=>
+// 'nutrients[CA]'=>'1030+',
+// 'nutrients[CHOCDF]'=>'1030+',
+// 'nutrients[CHOLE]'=>'1030+',
+// 'nutrients[ENERC_KCAL]'=>'1030+',
+// 'nutrients[FAT]'=>'1030+',
+// 'nutrients[FIBTF]'=>'1030+',
+// 'nutrients[NA]'=>'1030+',
+// 'nutrients[PROCNT]'=>'1030+',
+// 'nutrients[SUGAR]'=>'35+',
+// 'nutrients[VITA_RAE]'=>'35+',
+// 'nutrients[VITC]'=>'35+'
+// );
 
 $cu = curl_init();
-
+$url = "https://api.edamam.com/api/recipes/v2?". http_build_query($params);
+echo($url);
 curl_setopt($cu, CURLOPT_URL, "https://api.edamam.com/api/recipes/v2?". http_build_query($params));
 curl_setopt($cu, CURLOPT_RETURNTRANSFER, true);
 
@@ -36,7 +74,8 @@ curl_close($cu);
 
 $data2 =json_decode($data);
 var_dump($data2);
-var_dump($data);
-// }
+// var_dump($data);
+// var_dump($cu);
+}
 
 ?>
