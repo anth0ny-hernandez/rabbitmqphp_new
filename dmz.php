@@ -168,8 +168,31 @@ $data2 =json_decode($data, true);
 foreach($data2['hits'] as $hit)
 {
     $recipe = $hit['recipe'];
-
     $recipeName = $recipe['label'];
+    $image = $recipe['image'];
+    $healthLabels = $recipe['healthLabels'];
+    $recipeName = $recipe['label'];
+    $recipeName = $recipe['label'];
+    $recipeName = $recipe['label'];
+    $recipeName = $recipe['label'];
+    $recipeName = $recipe['label'];
+    $recipeName = $recipe['label'];
+    $recipeName = $recipe['label'];
+    $recipeName = $recipe['label'];
+    $recipeName = $recipe['label'];
+    $recipeName = $recipe['label'];
+    $recipeName = $recipe['label'];
+    $recipeName = $recipe['label'];
+    $recipeName = $recipe['label'];
+    $recipeName = $recipe['label'];
+    $recipeName = $recipe['label'];
+    $recipeName = $recipe['label'];
+    $recipeName = $recipe['label'];
+    $recipeName = $recipe['label'];
+
+    $query = "INSERT INTO recipes (recipeId, label, image, url, healthLabels, ENERC_KCAL, ingredientLines, calories, cuisineType, mealType, fat, carbs, fiber, sugars, protein, cholesterol, sodium, calcium, vitaminA, vitaminC, timestamp)
+    values ($recipeName, $image, $healthLabels)";
+    echo $query;
 
 }
 }
