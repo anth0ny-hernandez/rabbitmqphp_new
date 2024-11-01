@@ -30,6 +30,30 @@ function requestProcessor($request) {
             $result = $dbClient->send_request($request);
             return $result;
 
+        case "searchRecipe":
+            $dbClient = new rabbitMQClient("testDB_RMQ.ini", "dbConnect");
+            echo "Connected to database...\n";
+
+            $result = $dbClient->send_request($request);
+            echo "Asking database if recipe(s) exist within it...\n";
+
+            // checks that recipe(s) do exist, otherwise send a request to DMZ
+            if(!$result) {
+                $dmzClient = new rabbitMQClient("dmzRMQ.ini", "dmzConnect");
+                $result = $dmzClient->send_request($request);
+                // if even DMZ returns no matches, then let the user know
+                if(!$result) {
+                    echo "Sorry, no recipes match that! Returning no matches...\n";
+                    return $result;
+                } else {
+                    echo "Recipe(s) found! Updating the database now...\n";
+                    // insert DB code
+                }
+            } else {
+                echo "Recipes found! Sending back to front-end user...\n"
+                return $result;
+            }
+        
         default:
             return "ERROR: unsupported message type";
     }

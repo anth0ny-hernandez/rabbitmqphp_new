@@ -90,7 +90,29 @@ function databaseProcessor($request) {
                 return array("success" => false, "message" => "User not found.");
             }
                 
-            
+        case "searchRecipe":
+            // retrieve parameters from client request
+            $label = $request["label"];
+            $healthLabels = $request["healthLabels"];
+            $calories = $request["ENERC_KCAL"];
+            $cuisine = $request["cuisineType"];
+            $meal = $request["mealType"];
+
+            $sql = "SELECT * FROM recipes WHERE label = ? 
+                    AND healthLabels = ? AND ENERC_KCAL <= ?
+                    AND cuisineType = ? AND mealType = ?";
+            $stmt = $conn->prepare($sql);
+            // KCAL might need to be integer
+            $stmt->bind_param("sssss", $label, $healthLabels, $calories, $cuisine, $meal);
+            $stmt->execute();
+            $arrays = $stmt->get_result();
+            if ($arrays->num_rows > 0) {
+                $recipes = $ray->fetch_assoc();
+                return $recipes;
+            } else {
+                return false;
+            }
+
         
         default:
             return "Database Client-Server error";
