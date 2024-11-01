@@ -13,6 +13,7 @@ function requestProcessor($request) {
     }
 
     switch ($request['type']) {
+<<<<<<< HEAD
         // directs the login process
         case "login":
             // creates new client to establish new connection to db's own server
@@ -24,12 +25,27 @@ function requestProcessor($request) {
             return $result;
 
           // directs register process
+=======
+        case "login":
+            // creates new client to establish new connection to db's own server
+            $dbClient = new rabbitMQClient("testDB_RMQ.ini", "dbConnect");
+            $result = $dbClient->send_request($request);
+            // $result = doLogin($request['username'], $request['password']);
+            // echo "Sending response for login: $result\n";  // Debugging output
+            return $result;
+>>>>>>> b9058052c2c4186884f62a449d4d974e71d07225
         case "register":
             // creates new client to establish new connection to db's own server
             $dbClient = new rabbitMQClient("testDB_RMQ.ini", "dbConnect");
             $result = $dbClient->send_request($request);
+<<<<<<< HEAD
             return $result;
 
+=======
+            // $result = doRegister($request['username'], $request['password']);
+            // echo "Sending response for registration: $result\n";  // Debugging output
+            return $result;
+>>>>>>> b9058052c2c4186884f62a449d4d974e71d07225
         default:
             return "ERROR: unsupported message type";
     }
@@ -42,6 +58,10 @@ echo "RabbitMQ Server is running and waiting for requests...\n";
 $server->process_requests('requestProcessor');
 
 // Close the database connection
+<<<<<<< HEAD
 // $conn->close();
+=======
+$conn->close();
+>>>>>>> b9058052c2c4186884f62a449d4d974e71d07225
 ?>
 

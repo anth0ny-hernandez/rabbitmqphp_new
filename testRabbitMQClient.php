@@ -1,6 +1,12 @@
 #!/usr/bin/php
 <?php
 require_once __DIR__ . '/vendor/autoload.php';
+<<<<<<< HEAD
+=======
+require_once('path.inc');
+require_once('get_host_info.inc');
+require_once('rabbitMQLib.inc');
+>>>>>>> b9058052c2c4186884f62a449d4d974e71d07225
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
 

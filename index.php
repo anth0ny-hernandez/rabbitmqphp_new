@@ -1,4 +1,21 @@
 <?php
+<<<<<<< HEAD
+=======
+// Database connection (updated with new credentials)
+// $dbHost = '172.22.53.55';
+// $dbName = 'testdb';
+// $dbUser = 'anthonyhz';
+// $dbPassword = 'password';
+
+// try {
+//     //connect to db. throw exception if connection fails for error handling. 
+//     //Source: https://stackoverflow.com/questions/49959415/what-does-setattributepdoattr-errmode-pdoerrmode-exception-do-more-exactl
+//     $db = new PDO("mysql:host=$dbHost;dbname=$dbName", $dbUser, $dbPassword);
+//     $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+// } catch (PDOException $e) {
+//     die("Connection failed: " . $e->getMessage());
+// }
+>>>>>>> b9058052c2c4186884f62a449d4d974e71d07225
 
 $is_logged_in = false;
 $username = null;
@@ -48,6 +65,7 @@ if (isset($_COOKIE['session_token'])) {
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Welcome Page</title>
+<<<<<<< HEAD
     
     <style>
         header {
@@ -101,6 +119,25 @@ footer {
 }
     </style>
 
+=======
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        h1 {
+            font-size: 48px;
+            font-weight: bold;
+        }
+        .button {
+            padding: 10px 20px;
+            font-size: 18px;
+            cursor: pointer;
+            margin: 10px;
+        }
+    </style>
+>>>>>>> b9058052c2c4186884f62a449d4d974e71d07225
 </head>
 <body>
     <?php if ($is_logged_in): ?>
@@ -109,12 +146,19 @@ footer {
             <button type="submit" class="button">Logout</button>
         </form>
     <?php else: ?>
+<<<<<<< HEAD
         <h1>Welcome ARAY Nutritions!</h1>
         <p>Feel free to browse around or log in to access more features.</p>
         <a href="login.php"><button class="button">Login</button></a>
         <a href="registration.php"><button class="button">Register</button></a>
         <a href="dietrestrictions.php"><button class="button">Diet Restricitons</button></a>
         <a href="search.php"><button class="button">Search</button></a>
+=======
+        <h1>Welcome to Our Site!</h1>
+        <p>Feel free to browse around or log in to access more features.</p>
+        <a href="login.php"><button class="button">Login</button></a>
+        <a href="registration.php"><button class="button">Register</button></a>
+>>>>>>> b9058052c2c4186884f62a449d4d974e71d07225
     <?php endif; ?>
 
     <!-- JavaScript for auto-logout and popup warning if logged in -->
