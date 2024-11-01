@@ -168,30 +168,30 @@ $data2 =json_decode($data, true);
 foreach($data2['hits'] as $hit)
 {
     $recipe = $hit['recipe'];
+
     $recipeName = $recipe['label'];
     $image = $recipe['image'];
-    $healthLabels = $recipe['healthLabels'];
-    $recipeName = $recipe['label'];
-    $recipeName = $recipe['label'];
-    $recipeName = $recipe['label'];
-    $recipeName = $recipe['label'];
-    $recipeName = $recipe['label'];
-    $recipeName = $recipe['label'];
-    $recipeName = $recipe['label'];
-    $recipeName = $recipe['label'];
-    $recipeName = $recipe['label'];
-    $recipeName = $recipe['label'];
-    $recipeName = $recipe['label'];
-    $recipeName = $recipe['label'];
-    $recipeName = $recipe['label'];
-    $recipeName = $recipe['label'];
-    $recipeName = $recipe['label'];
-    $recipeName = $recipe['label'];
-    $recipeName = $recipe['label'];
-    $recipeName = $recipe['label'];
+    $url = $recipe['url'];
+    $healthLabels = implode(',', $recipe['healthLabels']);
+    $energy = $recipe['totalNutrients']['ENERC_KCAL']['quantity'];
+    $ingredients = implode(',', $recipe['ingredientLines']);
+    $calories = $recipe['calories'];
+    $cuisineType = implode(',', $recipe['cuisineType']);
+    $mealType = implode(',', $recipe['mealType']);
+    $fat = $recipe['totalNutrients']['FAT']['quantity'];
+    $carbs = $recipe['totalNutrients']['CHOCDF']['quantity'];
+    $fiber = $recipe['totalNutrients']['FIBTG']['quantity'];
+    $sugar = $recipe['totalNutrients']['SUGAR']['quantity'];
+    $protein = $recipe['totalNutrients']['PROCNT']['quantity'];
+    $cholesterol = $recipe['totalNutrients']['CHOLE']['quantity'];
+    $sodium = $recipe['totalNutrients']['NA']['quantity'];
+    $calcium = $recipe['totalNutrients']['CA']['quantity'];
+    $vitaminA = $recipe['totalNutrients']['VITA_RAE']['quantity'];
+    $vitaminC = $recipe['totalNutrients']['VITC']['quantity'];
+
 
     $query = "INSERT INTO recipes (recipeId, label, image, url, healthLabels, ENERC_KCAL, ingredientLines, calories, cuisineType, mealType, fat, carbs, fiber, sugars, protein, cholesterol, sodium, calcium, vitaminA, vitaminC, timestamp)
-    values ($recipeName, $image, $healthLabels)";
+    values ($recipeName, $image, $url, $healthLabels, $energy, $ingredients, $calories, $cuisineType, $mealType, $fat, $carbs, $fiber, $sugar, $protein, $cholesterol, $sodium, $calcium, $vitaminA, $vitaminC," . time() . ")";
     echo $query;
 
 }
