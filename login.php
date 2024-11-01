@@ -37,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         header("Location: home.php");
         exit();
     } else {
-        // Login failed, show an error message
+        // Show Login failed message
         echo "<p>Login failed: " . $response['message'] . "</p>";
     }
 }
@@ -95,7 +95,6 @@ p {
     transition: background-color 0.3s;
     padding: 10px 20px;
     font-size: 18px;
-    cursor: pointer;
     margin: 10px;
 }
 
@@ -122,9 +121,8 @@ footer {
         <input type="submit" value="Login">
     </form>
 </body>
-<footer>
-<a href="index.php"><button class="button">Homepage</button></a>
-<a href="registration.php"><button class="button">Register</button></a>
-<a href="dietrestrictions.php"><button class="button">Diet Restricitons</button></a>
-</footer>
+    <footer>
+        <a href="index.php"><button class="button">Homepage</button></a>
+        <a href="registration.php"><button class="button">Register</button></a>
+    </footer>
 </html>

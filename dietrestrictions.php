@@ -53,7 +53,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             transition: background-color 0.3s;
             padding: 10px 20px;
             font-size: 18px;
-            cursor: pointer;
             margin: 10px;
         }
 
@@ -85,7 +84,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             transition: background-color 0.3s;
             padding: 10px 20px;
             font-size: 18px;
-            cursor: pointer;
             margin: 10px;
         }
 
@@ -138,5 +136,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <a href="index.php"><button class="button">Homepage</button></a>
     <a href="registration.php"><button class="button">Register</button></a>
     <a href="login.php"><button class="button">Login</button></a>
+    <a href="search.php"><button class="button">Search</button></a>
 </footer>
 </html>

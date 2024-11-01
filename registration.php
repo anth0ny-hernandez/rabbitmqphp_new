@@ -82,7 +82,6 @@ p {
     transition: background-color 0.3s;
     padding: 10px 20px;
     font-size: 18px;
-    cursor: pointer;
     margin: 10px;
 }
 
@@ -108,9 +107,8 @@ footer {
     <input type="submit" value="Register">
 </form>
 </body>
-<footer>
-<a href="index.php"><button class="button">Homepage</button></a>
-<a href="login.php"><button class="button">Login</button></a>
-<a href="dietrestrictions.php"><button class="button">Diet Restricitons</button></a>
-</footer>
+    <footer>
+        <a href="index.php"><button class="button">Homepage</button></a>
+        <a href="login.php"><button class="button">Login</button></a>
+    </footer>
 </html>
