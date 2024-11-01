@@ -11,26 +11,107 @@ echo "Received request: ";
 // var_dump($request);
 
 $params = array(
-'type'=>'public', 
-'q'=>$request['label'], 
+'type'=>'public'?? null,
+'q'=>$request['label'] ?? null, 
 'app_id'=>'4577783c', 
 'app_key'=>'2ebd6b0aa43312e5f01f2077882ca32f',
-'health'=>$request['healthLabels'],
-'cuisineType'=>$request['cuisineType'],
-'mealType'=>$request['mealType'],
-'nutrients[ENERC_KCAL]'=>$request['ENERC_KCAL'],
-'nutrients[CA]'=>$request['calcium'],
-'nutrients[CHOCDF]'=>$request['c'],
-'nutrients[CHOLE]'=>$request['cholesterol'],
-'nutrients[FAT]'=>$request['fat'],
-'nutrients[FIBTF]'=>$request['fiber'],
-'nutrients[NA]'=>$request['sodium'],
-'nutrients[PROCNT]'=>$request['protein'],
-'nutrients[SUGAR]'=>$request['sugar'],
-'nutrients[VITA_RAE]'=>$request['vitaminA'],
-'nutrients[VITC]'=>$request['vitaminCs'],
-'ingredientLines'=>$request['ingredients'],
+'health'=>$request['healthLabels'] ?? null,
+'cuisineType'=>$request['cuisineType'] ?? null,
+'mealType'=>$request['mealType'] ?? null,
+'nutrients[ENERC_KCAL]'=>$request['ENERC_KCAL'] ?? null,
+'nutrients[CA]'=>$request['calcium'] ?? null,
+'nutrients[CHOCDF]'=>$request['carbohydrate'] ?? null,
+'nutrients[CHOLE]'=>$request['cholesterol'] ?? null,
+'nutrients[FAT]'=>$request['fat'] ?? null,
+'nutrients[FIBTF]'=>$request['fiber'] ?? null,
+'nutrients[NA]'=>$request['sodium'] ?? null,
+'nutrients[PROCNT]'=>$request['protein'] ?? null,
+'nutrients[SUGAR]'=>$request['sugar'] ?? null,
+'nutrients[VITA_RAE]'=>$request['vitaminA'] ?? null,
+'nutrients[VITC]'=>$request['vitaminC'] ?? null,
+'ingredientLines'=>$request['ingredients'] ?? null,
 );
+
+// if($request['healthLabels'])
+// {
+//   $params['health'] = $request['healthLabels'];
+// }
+
+
+// if($request['cuisineType'])
+// {
+//   $params['cuisineType'] = $request['cuisineType'];
+// }
+
+
+// if($request['mealType'])
+// {
+//   $params['mealType'] = $request['mealType'];
+// }
+
+
+// if($request['ENERC_KCAL'])
+// {
+//   $params['nutrients[ENERC_KCAL]'] = $request['ENERC_KCAL'];
+// }
+
+
+// if($request['calcium'])
+// {
+//   $params['nutrients[CA]'] = $request['calcium'];
+// }
+
+
+// if($request['carbohydrate'])
+// {
+//   $params['nutrients[CHOCDF]'] = $request['carbohydrate'];
+// }
+
+
+// if($request['cholesterol'])
+// {
+//   $params['nutrients[CHOLE]'] = $request['cholesterol'];
+// }
+
+// if($request['fat'])
+// {
+//   $params['nutrients[FAT]'] = $request['fat'];
+// }
+
+// if($request['fiber'])
+// {
+//   $params['nutrients[FIBTF]'] = $request['fiber'];
+// }
+
+// if($request['sodium'])
+// {
+//   $params['nutrients[NA]'] = $request['sodium'];
+// }
+
+// if($request['protein'])
+// {
+//   $params['nutrients[PROCNT]'] = $request['protein'];
+// }
+
+// if($request['sugar'])
+// {
+//   $params['nutrients[SUGAR]'] = $request['sugar'];
+// }
+
+// if($request['vitaminA'])
+// {
+//   $params['nutrients[VITA_RAE]'] = $request['vitaminA'];
+// }
+
+// if($request['vitaminC'])
+// {
+//   $params['nutrients[VITC]'] = $request['vitaminC'];
+// }
+// if($request['ingredients'])
+// {
+//   $params['ingredientLines'] = $request['ingredients'];
+// }
+
 
 
 // $params = array(
@@ -72,10 +153,28 @@ $data = curl_exec($cu);
 
 curl_close($cu);
 
-$data2 =json_decode($data);
-var_dump($data2);
+$data2 =json_decode($data, true);
+// var_dump($data2);
 // var_dump($data);
+// $data3 = json_encode($data2, JSON_PRETTY_PRINT);
+// var_dump($data3);
+
 // var_dump($cu);
+
+
+//logic to send it back to rmq which sends to db. Access nested indices, then send back to rmq as a query to insert into DB.
+
+
+foreach($data2['hits'] as $hit)
+{
+    $recipe = $hit['recipe'];
+
+    $recipeName = $recipe['label'];
+
+}
 }
 
+$request = array('label'=> 'chicken', 'sodium'=>"1600+");
+
+dmzProcessor($request);
 ?>
