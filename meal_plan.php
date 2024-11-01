@@ -22,12 +22,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $client = new rabbitMQClient("testRabbitMQ.ini", "testServer");
 
     if (isset($_POST['searchRecipe'])) {
-        // Recipe search request
-        $query = $_POST['recipeQuery'];
+        // Collect form data for recipe search
         $request = [
             "type" => "searchRecipe",
-            "query" => $query
+            "label" => $_POST['label'] ?? null,
+            "healthLabels" => $_POST['healthLabels'] ?? null,
+            "cuisineType" => $_POST['cuisineType'] ?? null,
+            "mealType" => $_POST['mealType'] ?? null,
+            "ENERC_KCAL" => $_POST['ENERC_KCAL'] ?? null,
         ];
+
         $recipeSearchResponse = $client->send_request($request);
     } elseif (isset($_POST['generateMealPlan'])) {
         // Weekly meal planner request
@@ -141,32 +145,50 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <p>Could not retrieve meal plan. Please try again later.</p>
     <?php endif; ?>
 
+
     <h2>Recipe Search</h2>
 
-    <!-- Recipe Search Form -->
-    <form method="POST" action="meal_plan.php">
-        <label for="recipeQuery">Search for Recipes:</label>
-        <input type="text" id="recipeQuery" name="recipeQuery" placeholder="e.g., pasta, salad" required>
-        <br><br>
-        <input type="submit" name="searchRecipe" value="Search">
-    </form>
+<!-- Recipe Search Form -->
+<form method="POST" action="meal_plan.php">
+    <label for="recipeQuery">Search for Recipes:</label>
+    <input type="text" id="recipeQuery" name="label" placeholder="e.g., pasta, salad" required>
+    <br><br>
 
-    <?php if ($recipeSearchResponse && isset($recipeSearchResponse['hits'])): ?>
-        <h3>Search Results:</h3>
-        <?php foreach ($recipeSearchResponse['hits'] as $hit): ?>
-            <div class="meal-item">
-                <strong><?php echo $hit['recipe']['label']; ?></strong><br>
-                <a href="<?php echo $hit['recipe']['url']; ?>" target="_blank">View Recipe</a><br>
-                Calories: <?php echo round($hit['recipe']['calories']); ?><br>
-                <?php if (!empty($hit['recipe']['image'])): ?>
-                    <img src="<?php echo $hit['recipe']['image']; ?>" alt="<?php echo $hit['recipe']['label']; ?>" width="100">
-                <?php endif; ?>
-            </div>
-        <?php endforeach; ?>
-    <?php elseif ($recipeSearchResponse !== null): ?>
-        <p>No recipes found. Please try a different search term.</p>
-    <?php endif; ?>
-</div>
+    <label for="healthLabels">Health Labels (optional):</label>
+    <input type="text" id="healthLabels" name="healthLabels" placeholder="e.g., vegan, gluten-free">
+    <br><br>
+
+    <label for="cuisineType">Cuisine Type (optional):</label>
+    <input type="text" id="cuisineType" name="cuisineType" placeholder="e.g., Italian, Indian">
+    <br><br>
+
+    <label for="mealType">Meal Type (optional):</label>
+    <input type="text" id="mealType" name="mealType" placeholder="e.g., Breakfast, Dinner">
+    <br><br>
+
+    <label for="ENERC_KCAL">Calories (optional):</label>
+    <input type="number" id="ENERC_KCAL" name="ENERC_KCAL" placeholder="Max Calories">
+    <br><br>
+
+    <input type="submit" name="searchRecipe" value="Search">
+</form>
+
+<!-- Display Logic for Recipe Search Results -->
+<?php if ($recipeSearchResponse && isset($recipeSearchResponse['hits'])): ?>
+    <h3>Search Results:</h3>
+    <?php foreach ($recipeSearchResponse['hits'] as $hit): ?>
+        <div class="meal-item">
+            <strong><?php echo htmlspecialchars($hit['recipe']['label']); ?></strong><br>
+            <a href="<?php echo htmlspecialchars($hit['recipe']['url']); ?>" target="_blank">View Recipe</a><br>
+            Calories: <?php echo round($hit['recipe']['calories']); ?><br>
+            <?php if (!empty($hit['recipe']['image'])): ?>
+                <img src="<?php echo htmlspecialchars($hit['recipe']['image']); ?>" alt="<?php echo htmlspecialchars($hit['recipe']['label']); ?>" width="100">
+            <?php endif; ?>
+        </div>
+    <?php endforeach; ?>
+<?php else: ?>
+    <p>No recipes found. Please try a different search term.</p>
+<?php endif; ?>
 
 <!-- JavaScript to handle automatic logout after session expiration -->
 <script>

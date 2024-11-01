@@ -56,21 +56,48 @@ function getWeeklyMealPlan($dietaryRestrictions = "", $caloriesPerMeal = 500) {
     return $mealPlanner;
 }
 
-function searchRecipe($query) {
-    $app_id = "4577783c"; // Replace with actual App ID
-    $app_key = "2ebd6b0aa43312e5f01f2077882ca32f"; // Replace with actual App Key
-    $url = "https://api.edamam.com/api/recipes/v2?type=public&q=" . urlencode($query) . "&app_id={$app_id}&app_key={$app_key}";
+function searchRecipe($request) {
+    // Define parameters based on the user's request
+    $params = array(
+        'type' => 'public',
+        'q' => $request['label'] ?? null, 
+        'app_id' => '4577783c', 
+        'app_key' => '2ebd6b0aa43312e5f01f2077882ca32f',
+        'health' => $request['healthLabels'] ?? null,
+        'cuisineType' => $request['cuisineType'] ?? null,
+        'mealType' => $request['mealType'] ?? null,
+        'nutrients[ENERC_KCAL]' => $request['ENERC_KCAL'] ?? null,
+        'nutrients[CA]' => $request['calcium'] ?? null,
+        'nutrients[CHOCDF]' => $request['carbohydrate'] ?? null,
+        'nutrients[CHOLE]' => $request['cholesterol'] ?? null,
+        'nutrients[FAT]' => $request['fat'] ?? null,
+        'nutrients[FIBTF]' => $request['fiber'] ?? null,
+        'nutrients[NA]' => $request['sodium'] ?? null,
+        'nutrients[PROCNT]' => $request['protein'] ?? null,
+        'nutrients[SUGAR]' => $request['sugar'] ?? null,
+        'nutrients[VITA_RAE]' => $request['vitaminA'] ?? null,
+        'nutrients[VITC]' => $request['vitaminC'] ?? null,
+        'ingredientLines' => $request['ingredients'] ?? null,
+    );
 
+    // Filter out any null parameters
+    $params = array_filter($params, function($value) {
+        return !is_null($value);
+    });
+
+    // Build the query string
+    $url = "https://api.edamam.com/api/recipes/v2?" . http_build_query($params);
+
+    // Initialize cURL
     $curl = curl_init();
     curl_setopt($curl, CURLOPT_URL, $url);
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
 
+    // Execute the request and handle the response
     $response = curl_exec($curl);
-    if (!$response) {
-        return ["error" => "API request failed"];
-    }
     curl_close($curl);
 
+    // Decode the response and check for data
     $data = json_decode($response, true);
     if (!isset($data['hits'])) {
         return ["error" => "No recipes found"];
@@ -78,6 +105,7 @@ function searchRecipe($query) {
 
     return $data;
 }
+
 
 function requestProcessor($request) {
     echo "Received request: ";

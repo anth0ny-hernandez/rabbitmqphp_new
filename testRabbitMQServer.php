@@ -35,10 +35,11 @@ function requestProcessor($request) {
             return $result;
         
         case "searchRecipe":
-            // Handle recipe search requests by forwarding to the DMZ
+            // Route recipe search requests to the DMZ server
             $dmzClient = new rabbitMQClient("dmzConfig.ini", "dmzServer");
             $result = $dmzClient->send_request($request);
             return $result;
+
         
         
 
