@@ -25,7 +25,7 @@ if (isset($_COOKIE['session_token'])) {
 }
 
 // Redirect to homepage after logout
-header("Location: index.php");
+header("Location: login.php");
 exit();
 ?>
 
