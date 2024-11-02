@@ -39,7 +39,7 @@ function requestProcessor($request) {
 
             // checks that recipe(s) do exist, otherwise send a request to DMZ
             if(!$result) {
-                $dmzClient = new rabbitMQClient("dmzRMQ.ini", "dmzConnect");
+                $dmzClient = new rabbitMQClient("testDMZ_RMQ.ini", "testDMZ");
                 $result = $dmzClient->send_request($request);
                 // if even DMZ returns no matches, then let the user know
                 if(!$result) {
@@ -47,10 +47,12 @@ function requestProcessor($request) {
                     return $result;
                 } else {
                     echo "Recipe(s) found! Updating the database now...\n";
-                    // insert DB code
+                    $request['type'] = 'insertRecipe'; // modify request parameter
+                    $result = $dbClient->send_request($request);
+                    return $result;
                 }
             } else {
-                echo "Recipes found! Sending back to front-end user...\n"
+                echo "Recipes found! Sending back to front-end user...\n";
                 return $result;
             }
         

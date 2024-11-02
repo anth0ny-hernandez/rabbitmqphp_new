@@ -113,6 +113,35 @@ function databaseProcessor($request) {
                 return false;
             }
 
+        // called when no recipes exist and RMQ server requests & sends API data to insert 
+        case "insertRecipe":
+            $queryStatement = "INSERT INTO recipes (label, image, url, healthLabels, 
+                                            ENERC_KCAL, ingredientLines, calories, cuisineType, 
+                                            mealType, fat, carbs, fiber, sugars, protein, 
+                                            cholesterol, sodium, calcium, vitaminA, vitaminC, timestamp)
+                                        values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 
+                                                ?, ?, ?, ?, ?, ? )";
+            $query = $conn->prepare($queryStatement);
+            $query->bind_param("ssssisissiiiiiiiiiii", 
+                                $recipeName, $image, $url, $healthLabels, 
+                                $energy, $ingredients, $calories, $cuisineType, 
+                                $mealType, $fat, $carbs, $fiber, $sugar, $protein, 
+                                $cholesterol, $sodium, $calcium, $vitaminA, 
+                                $vitaminC, $time);
+            
+            if ($query->execute()) {
+                echo "Recipe(s) inserted successfully!\n";
+                echo "================================\n";
+                $response['query'] = $queryStatement;
+                echo $response['query'];
+                return $response;
+            } else {
+                // Log and return the error
+                error_log("Error in registration: " . $conn->error);
+                echo "Error: " . $conn->error . "\n";
+                $insert = "Error: " . $conn->error;
+                return false;
+            }
         
         default:
             return "Database Client-Server error";
