@@ -31,81 +31,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 ?>
 
 <!-- Registration Form -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Register</title>
-    <style>
-        /* Basic styling for a centered, clean registration form */
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #f3f4f6;  /* Light background color for a clean look */
-        }
-        .register-container {
-            background-color: #ffffff;
-            padding: 30px;
-            width: 300px;
-            border-radius: 10px;
-            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.2);
-            text-align: center;
-        }
-        h2 {
-            margin: 0 0 20px;
-            color: #333;  /* Darker font for the title */
-        }
-        label {
-            display: block;
-            font-weight: bold;
-            color: #555;
-            margin-bottom: 5px;
-            text-align: left;
-        }
-        input[type="text"], input[type="password"] {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 15px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            font-size: 14px;
-        }
-        input[type="submit"] {
-            width: 100%;
-            padding: 10px;
-            font-size: 16px;
-            color: #fff;
-            background-color: #007bff;  /* Primary color for the button */
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        input[type="submit"]:hover {
-            background-color: #0056b3;  /* Darker shade on hover */
-        }
-        .register-container p {
-            color: #666;
-            font-size: 14px;
-        }
-    </style>
-</head>
-<body>
-    <div class="register-container">
-        <h2>Register</h2>
-        <form action="registration.php" method="POST">
-            <label for="username">Username:</label>
-            <input type="text" name="username" id="username" required>
-            <label for="password">Password:</label>
-            <input type="password" name="password" id="password" required>
-            <input type="submit" value="Register">
-        </form>
-    </div>
-</body>
-</html>
-
+<form action="registration.php" method="POST">
+    Username: <input type="text" name="username" required><br>
+    Password: <input type="password" name="password" required><br>
+    <input type="submit" value="Register">
+</form>
 

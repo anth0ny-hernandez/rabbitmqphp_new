@@ -1,14 +1,18 @@
 <?php
 // Check if the session token cookie is set
 if (!isset($_COOKIE['session_token'])) {
+    // If not set, redirect to login page
     header("Location: login.php");
     exit();
 }
 
-// Refresh session token to extend expiration by another 30 seconds
+// Get the session token from the cookie
 $session_token = $_COOKIE['session_token'];
+
+// Refresh the cookie to extend the expiration by another 30 seconds
 $expire_time = time() + 30;
 setcookie('session_token', $session_token, $expire_time, "/");
+
 ?>
 
 <!DOCTYPE html>
@@ -70,7 +74,8 @@ setcookie('session_token', $session_token, $expire_time, "/");
     <p>You are logged in. Your session will be automatically refreshed every 30 seconds to keep you logged in.</p>
 
     <div class="button-group">
-        <a href="meal_plan.php" class="button">Recipe Search</a>
+        <a href="meal_plan.php" class="button">Go to Meal Planner</a>
+        <a href="recipe_search.php" class="button">Search for Recipes</a>
         <a href="logout.php" class="button logout-button">Logout</a>
     </div>
 </div>
@@ -78,9 +83,11 @@ setcookie('session_token', $session_token, $expire_time, "/");
 <!-- JavaScript to handle automatic logout after session expiration -->
 <script>
     setTimeout(function() {
+        // Delete the session token cookie by setting its expiration date in the past
         document.cookie = 'session_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+        // Redirect to the login page
         window.location.href = 'login.php';
-    }, 30000); // 30 seconds
+    }, 30000); // 30,000 milliseconds = 30 seconds
 </script>
 
 </body>
