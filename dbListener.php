@@ -5,6 +5,52 @@ require_once('rabbitMQLib.inc');
 require_once('get_host_info.inc');
 require_once('path.inc');
 
+function checkCache($query) {
+    $db = connectDatabase();
+    $stmt = $db->prepare("SELECT label, url, image, calories, ingredients, source FROM recipes WHERE query = ?");
+    $stmt->bind_param("s", $query);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    $recipes = [];
+    while ($row = $result->fetch_assoc()) {
+        $recipes[] = [
+            'label' => $row['label'],
+            'url' => $row['url'],
+            'image' => $row['image'],
+            'calories' => $row['calories'],
+            'ingredients' => $row['ingredients'],
+            'source' => $row['source']
+        ];
+    }
+
+    $stmt->close();
+    $db->close();
+
+    return ['hits' => $recipes];
+}
+
+// Cache new recipes in the database
+function cacheRecipes($query, $recipes) {
+    $db = connectDatabase();
+    $stmt = $db->prepare("INSERT INTO recipes (query, label, url, image, calories, ingredients, source) VALUES (?, ?, ?, ?, ?, ?, ?)");
+
+    foreach ($recipes as $recipe) {
+        $label = $recipe['label'];
+        $url = $recipe['url'];
+        $image = $recipe['image'] ?? null;
+        $calories = $recipe['calories'];
+        $ingredients = json_encode($recipe['ingredients'] ?? []);
+        $source = $recipe['source'];
+
+        $stmt->bind_param("sssssss", $query, $label, $url, $image, $calories, $ingredients, $source);
+        $stmt->execute();
+    }
+
+    $stmt->close();
+    $db->close();
+}
+
 function databaseProcessor($request) {
 
     echo "Received request: ";
