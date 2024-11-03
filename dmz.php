@@ -1,74 +1,180 @@
+#!/bin/php
+
 <?php
+//need logic to process requests from frontend, then need to place in database and response back to frontend. 
 require_once('rabbitMQLib.inc');
 require_once('get_host_info.inc');
 require_once('path.inc');
 
+function dmzProcessor($request){
+echo "Received request: ";
+// var_dump($request);
+
+$params = array(
+'type'=>'public'?? null,
+'q'=>$request['label'] ?? null, 
+'app_id'=>'4577783c', 
+'app_key'=>'2ebd6b0aa43312e5f01f2077882ca32f',
+'health'=>$request['healthLabels'] ?? null,
+'cuisineType'=>$request['cuisineType'] ?? null,
+'mealType'=>$request['mealType'] ?? null,
+'nutrients[ENERC_KCAL]'=>$request['ENERC_KCAL'] ?? null,
+'nutrients[CA]'=>$request['calcium'] ?? null,
+'nutrients[CHOCDF]'=>$request['carbohydrate'] ?? null,
+'nutrients[CHOLE]'=>$request['cholesterol'] ?? null,
+'nutrients[FAT]'=>$request['fat'] ?? null,
+'nutrients[FIBTF]'=>$request['fiber'] ?? null,
+'nutrients[NA]'=>$request['sodium'] ?? null,
+'nutrients[PROCNT]'=>$request['protein'] ?? null,
+'nutrients[SUGAR]'=>$request['sugar'] ?? null,
+'nutrients[VITA_RAE]'=>$request['vitaminA'] ?? null,
+'nutrients[VITC]'=>$request['vitaminC'] ?? null,
+'ingredientLines'=>$request['ingredients'] ?? null,
+);
+
+// if($request['healthLabels'])
+// {
+//   $params['health'] = $request['healthLabels'];
+// }
 
 
-function searchRecipe($request) {
-    // Define parameters for the request, ensuring 'q' is present
-    $params = array(
-        'type' => 'public',
-        'q' => $request['label'] ?? null,  // Default to 'chicken' if no query provided
-        'app_id' => '4577783c', 
-        'app_key' => '2ebd6b0aa43312e5f01f2077882ca32f',
-        'health' => $request['healthLabels'] ?? null,
-        'cuisineType' => $request['cuisineType'] ?? null,
-        'mealType' => $request['mealType'] ?? null,
-        'nutrients[ENERC_KCAL]' => $request['ENERC_KCAL'] ?? null,
-    );
+// if($request['cuisineType'])
+// {
+//   $params['cuisineType'] = $request['cuisineType'];
+// }
 
-    $params = array_filter($params);  // Remove null values
-    $url = "https://api.edamam.com/api/recipes/v2?" . http_build_query($params);
 
-    echo "Request URL: $url\n";  // Debugging output for URL
+// if($request['mealType'])
+// {
+//   $params['mealType'] = $request['mealType'];
+// }
 
-    // Set up cURL request with headers
-    $curl = curl_init();
-    curl_setopt($curl, CURLOPT_URL, $url);
-    curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
 
-    // Add custom header for account verification
-    $headers = [
-        'Edamam-Account-User: AlveeJalal',
-    ];
-    curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+// if($request['ENERC_KCAL'])
+// {
+//   $params['nutrients[ENERC_KCAL]'] = $request['ENERC_KCAL'];
+// }
 
-    // Execute the request and decode the response
-    $response = curl_exec($curl);
-    curl_close($curl);
 
-    $data = json_decode($response, true);
-    //var_dump($data);  // Debugging output for response data
+// if($request['calcium'])
+// {
+//   $params['nutrients[CA]'] = $request['calcium'];
+// }
 
-    // Check if 'hits' contains data
-    if (!isset($data['hits']) || empty($data['hits'])) {
-        return ["error" => "No recipes found"];
-    }
 
-    return $data;
+// if($request['carbohydrate'])
+// {
+//   $params['nutrients[CHOCDF]'] = $request['carbohydrate'];
+// }
+
+
+// if($request['cholesterol'])
+// {
+//   $params['nutrients[CHOLE]'] = $request['cholesterol'];
+// }
+
+// if($request['fat'])
+// {
+//   $params['nutrients[FAT]'] = $request['fat'];
+// }
+
+// if($request['fiber'])
+// {
+//   $params['nutrients[FIBTF]'] = $request['fiber'];
+// }
+
+// if($request['sodium'])
+// {
+//   $params['nutrients[NA]'] = $request['sodium'];
+// }
+
+// if($request['protein'])
+// {
+//   $params['nutrients[PROCNT]'] = $request['protein'];
+// }
+
+// if($request['sugar'])
+// {
+//   $params['nutrients[SUGAR]'] = $request['sugar'];
+// }
+
+// if($request['vitaminA'])
+// {
+//   $params['nutrients[VITA_RAE]'] = $request['vitaminA'];
+// }
+
+// if($request['vitaminC'])
+// {
+//   $params['nutrients[VITC]'] = $request['vitaminC'];
+// }
+// if($request['ingredients'])
+// {
+//   $params['ingredientLines'] = $request['ingredients'];
+// }
+
+
+
+// $params = array(
+// 'type'=>'public', 
+// 'q'=>'teriyaki', 
+// 'app_id'=>'4577783c', 
+// 'app_key'=>'2ebd6b0aa43312e5f01f2077882ca32f',
+// 'health'=>
+// 'cuisineType'=>
+// 'mealType'=>
+// 'calories'=>
+// 'nutrients[CA]'=>'1030+',
+// 'nutrients[CHOCDF]'=>'1030+',
+// 'nutrients[CHOLE]'=>'1030+',
+// 'nutrients[ENERC_KCAL]'=>'1030+',
+// 'nutrients[FAT]'=>'1030+',
+// 'nutrients[FIBTF]'=>'1030+',
+// 'nutrients[NA]'=>'1030+',
+// 'nutrients[PROCNT]'=>'1030+',
+// 'nutrients[SUGAR]'=>'35+',
+// 'nutrients[VITA_RAE]'=>'35+',
+// 'nutrients[VITC]'=>'35+'
+// );
+
+$cu = curl_init();
+$url = "https://api.edamam.com/api/recipes/v2?". http_build_query($params);
+echo($url);
+curl_setopt($cu, CURLOPT_URL, "https://api.edamam.com/api/recipes/v2?". http_build_query($params));
+curl_setopt($cu, CURLOPT_RETURNTRANSFER, true);
+
+$headers = [
+    'Edamam-Account-User: AlveeJalal',
+    
+];
+
+curl_setopt($cu, CURLOPT_HTTPHEADER, $headers);
+
+$data = curl_exec($cu);
+
+curl_close($cu);
+
+$data2 =json_decode($data, true);
+// var_dump($data2);
+// var_dump($data);
+// $data3 = json_encode($data2, JSON_PRETTY_PRINT);
+// var_dump($data3);
+
+// var_dump($cu);
+
+
+//logic to send it back to rmq which sends to db. Access nested indices, then send back to rmq as a query to insert into DB.
+
+
+foreach($data2['hits'] as $hit)
+{
+    $recipe = $hit['recipe'];
+
+    $recipeName = $recipe['label'];
+
+}
 }
 
-function requestProcessor($request) {
-    echo "Received request: ";
-    var_dump($request);
+$request = array('label'=> 'chicken', 'sodium'=>"1600+");
 
-    if (!isset($request['type'])) {
-        return ["error" => "Unsupported message type"];
-    }
-
-    switch ($request['type']) {
-
-        case "searchRecipe":
-            return searchRecipe($request);  // Pass the entire request array to searchRecipe
-
-        default:
-            return ["error" => "Unsupported message type"];
-    }
-}
-
-// Create a server that listens for requests from clients
-$server = new rabbitMQServer("dmzConfig.ini", "dmzServer");
-echo "DMZ Server for Meal Planning and Recipe Search is running and waiting for requests...\n";
-$server->process_requests('requestProcessor');
+dmzProcessor($request);
 ?>
