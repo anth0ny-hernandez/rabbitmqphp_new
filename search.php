@@ -97,7 +97,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['searchRecipe'])) {
     <h2>Recipe Search</h2>
 
     <!-- Recipe Search Form -->
-    <form method="POST" action="meal_plan.php">
+    <form method="POST" action="search.php">
         <label for="label">Search for Recipes:</label>
         <input type="text" id="label" name="label" placeholder="e.g., pasta, salad" required>
         <br><br>

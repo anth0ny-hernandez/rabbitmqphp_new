@@ -87,7 +87,7 @@
     <p>Please select what you would like to do today. You will be logged out in 30 seconds.</p>
 
     <div class="button-group">
-        <a href="meal_plan.php" class="button">Recipe Search</a>
+        <a href="search.php" class="button">Recipe Search</a>
         <a href="dietrestrictions.php" class="button">Diet Restrictions</a>
         <a href="logout.php" class="button logout-button">Logout</a>
     </div>

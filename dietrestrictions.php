@@ -12,23 +12,25 @@ require_once('rabbitMQLib.inc');
 // $expire_time = time() + 30;
 // setcookie('session_token', $session_token, $expire_time, "/");
 
-$diet_type = $allergies = $other_restrictions = "";
+$dietType = $allergyType = $otherRestrictions = "";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['dietaryRestrictions'])) {
     $client = new rabbitMQClient("testRabbitMQ.ini", "testServer");
 
-    $diet_type = ucfirst($_POST['dietaryRestrictions']);
-    $allergies = isset($_POST['allergies']) ? implode(", ", $_POST['allergies']) : "None";
-    $other_restrictions = htmlspecialchars($_POST['otherRestrictions']);
+    $dietType = ucfirst($_POST['dietType']);
+    $allergyType = isset($_POST['allergyType']) ? implode(", ", $_POST['allergyType']) : "None";
+    $otherRestrictions = htmlspecialchars($_POST['otherRestrictions']);
     
-    $data = [
-        'diet_type' => $diet_type,
-        'allergies' => $allergies,
-        'other_restrictions' => $other_restrictions
+    $request = [
+        "type" => "dietRestrictions",
+        "label" => $_POST['label'] ?? null,
+        "healthLabels" => $_POST['healthLabels'] ?? null,
+        'dietType' => $dietType,
+        'allergyType' => $allergyType,
+        'otherRestrictions' => $otherRestrictions,
     ];
 
-    // Send the data to RabbitMQ
-    $response = $client->send_request($data);
+    $response = $client->send_request($request);
 }
 
 ?>
@@ -90,6 +92,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['dietaryRestrictions'])
             border: 1px solid #ccc;
             border-radius: 4px;
         }
+
+        .highlight {
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -98,29 +104,34 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['dietaryRestrictions'])
     <!-- Dietary Restrictions Form -->
     <form method="POST" action="">
         
-        <!-- Dietary Restrictions -->
+        <!-- Dietary Restrictions --> 
         <div class="form-section">
-            <label for="dietaryRestrictions">Dietary Restrictions (optional):</label>
-            <select id="dietaryRestrictions" name="dietaryRestrictions">
-                <option value="" <?php echo $diet_type == "" ? "selected" : ""; ?>>None</option>
-                <option value="halal" <?php echo $diet_type == "Halal" ? "selected" : ""; ?>>Halal</option>
-                <option value="kosher" <?php echo $diet_type == "Kosher" ? "selected" : ""; ?>>Kosher</option>
-                <option value="vegetarian" <?php echo $diet_type == "Vegetarian" ? "selected" : ""; ?>>Vegetarian</option>
-                <option value="vegan" <?php echo $diet_type == "Vegan" ? "selected" : ""; ?>>Vegan</option>
-                <option value="gluten-free" <?php echo $diet_type == "Gluten-free" ? "selected" : ""; ?>>Gluten-Free</option>
-                <option value="dairy-free" <?php echo $diet_type == "Dairy-free" ? "selected" : ""; ?>>Dairy-Free</option>
-                <option value="nut-free" <?php echo $diet_type == "Nut-free" ? "selected" : ""; ?>>Nut-Free</option>
-            </select>
+            <label>Dietary Restrictions (select all that apply):</label><br>
+            <?php
+            $dietary_options = [
+                "Kosher",
+                "Vegetarian",
+                "Vegan",
+                "Pescatarian",
+                "Keto-Friendly",
+                "Pork-Free",
+                "Alcohol-Free"
+            ];
+            foreach ($dietary_options as $diet) {
+                $checked = (isset($_POST['dietaryRestrictions']) && in_array($diet, $_POST['dietaryRestrictions'])) ? "checked" : "";
+                echo "<input type='checkbox' name='dietaryRestrictions[]' value='$diet' $checked> $diet<br>";
+            }
+            ?>
         </div>
 
-        <!-- Allergies Section -->
+        <!-- Allergies -->
         <div class="form-section">
-            <label for="allergies">Allergies (select all that apply, if an allergy you have is not here specify in other restrictions.):</label><br>
+            <label for="allergyType">Allergies (select all that apply, if an allergy you have is not here specify in other restrictions.):</label><br>
             <?php
             $allergy_options = ["Peanuts", "Tree Nuts", "Soy", "Dairy", "Gluten", "Shellfish", "Eggs", "Fish"];
             foreach ($allergy_options as $allergy) {
-                $checked = (isset($_POST['allergies']) && in_array($allergy, $_POST['allergies'])) ? "checked" : "";
-                echo "<input type='checkbox' name='allergies[]' value='$allergy' $checked> $allergy<br>";
+                $checked = (isset($_POST['allergyType']) && in_array($allergy, $_POST['allergyType'])) ? "checked" : "";
+                echo "<input type='checkbox' name='allergyType[]' value='$allergy' $checked> $allergy<br>";
             }
             ?>
         </div>
@@ -128,7 +139,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['dietaryRestrictions'])
         <!-- Other Restrictions Section -->
         <div class="form-section">
             <label for="otherRestrictions">Other Restrictions (optional):</label><br>
-            <input type="text" id="otherRestrictions" name="otherRestrictions" placeholder="e.g., low sodium, low sugar" value="<?php echo htmlspecialchars($other_restrictions); ?>">
+            <input type="text" id="otherRestrictions" name="otherRestrictions" placeholder="e.g., low sodium, low sugar" value="<?php echo htmlspecialchars($otherRestrictions); ?>">
         </div>
 
         <input type="submit" name="setRestrictions" value="Save Restrictions" class="button">
@@ -136,10 +147,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['dietaryRestrictions'])
 
     <?php if ($_SERVER["REQUEST_METHOD"] == "POST"): ?>
     <div class="response-container">
-        <h2>Here are your selected Dietary Restrictions</h2>
-        <p>Diet Type: <span class="highlight"><?php echo $diet_type; ?></span></p>
-        <p>Allergies: <span class="highlight"><?php echo $allergies; ?></span></p>
-        <p>Other Restrictions: <span class="highlight"><?php echo !empty($other_restrictions) ? $other_restrictions : "None"; ?></span></p>
+        <p><?php echo $responseMessage; ?></p>
+        <h2>Your Selected Dietary Restrictions</h2>
+        <p>Diet Restrictions: <span class="highlight"><?php echo isset($_POST['dietaryRestrictions']) ? implode(", ", $_POST['dietaryRestrictions']) : "None"; ?></span></p>
+        <p>Allergies: <span class="highlight"><?php echo isset($_POST['allergyType']) ? implode(", ", $_POST['allergyType']) : "None"; ?></span></p>
+        <p>Other Restrictions: <span class="highlight"><?php echo !empty($otherRestrictions) ? $otherRestrictions : "None"; ?></span></p>
     </div>
     <?php endif; ?>
 </body>
