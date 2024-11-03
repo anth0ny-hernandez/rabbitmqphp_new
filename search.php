@@ -88,6 +88,27 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['searchRecipe'])) {
             box-shadow: 0px 0px 50px lightgreen;
         }
 
+        .form-section {
+            margin-bottom: 20px;
+            font-size: 18px;
+        }
+
+        select, input[type="text"], textarea {
+            font-size: 20px;
+        }
+
+        label {
+            font-size: 20px;
+        }
+
+        select, input[type="number"], textarea {
+            font-size: 20px;
+        }
+
+        select, input[type="submit"], button {
+            font-size: 20px;
+        }
+
         h3 {
             margin-top: 0;
         }
@@ -155,6 +176,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['searchRecipe'])) {
     <div class="nav-buttons">
         <a href="home.php" class="button">Home</a>
         <a href="dietrestrictions.php" class="button">Diet Restrictions</a>
+        <a href="recommendations.php" class="button">Recommendations</a>
         <a href="logout.php" class="button logout-button">Logout</a>
     </div>
 

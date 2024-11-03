@@ -89,6 +89,7 @@
     <div class="button-group">
         <a href="search.php" class="button">Recipe Search</a>
         <a href="dietrestrictions.php" class="button">Diet Restrictions</a>
+        <a href="recommendations.php" class="button">Recommendations</a>
         <a href="logout.php" class="button logout-button">Logout</a>
     </div>
 </div>
