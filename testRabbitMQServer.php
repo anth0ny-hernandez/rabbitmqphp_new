@@ -100,7 +100,7 @@ function requestProcessor($request) {
     
                 // checks that recipe(s) do exist, otherwise send a request to DMZ
                 if(!$result) {
-                    $dmzClient = new rabbitMQClient("testDMZ_RMQ.ini", "testDMZ");
+                    $dmzClient = new rabbitMQClient("dmzConfig.ini", "dmzServer");
                     $result = $dmzClient->send_request($request);
                     // if even DMZ returns no matches, then let the user know
                     if(!$result) {
