@@ -157,8 +157,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['searchRecipe'])) {
                 <?php endif; ?>
             </div>
         <?php endforeach; ?>
-    <?php else: ?>
-        <!-- <p>No recipes found. Please try a different search term.</p> -->
     <?php endif; ?>
 </div>
 
@@ -169,7 +167,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['searchRecipe'])) {
         window.location.href = 'login.php';
     }, 30000); // 30 seconds
 </script> -->
-
 </body>
 <footer>
 <div class="container">
@@ -178,6 +175,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['searchRecipe'])) {
         <a href="dietrestrictions.php" class="button">Diet Restrictions</a>
         <a href="recommendations.php" class="button">Recommendations</a>
         <a href="review.php" class="button">Rate and Review</a>
+        <a href="mealplannerform.php" class="button">Weekly Meal Planner Form</Form></a>
+        <a href="weeklyMealPlanner.php" class="button">Weekly Meal Planner</a>
         <a href="logout.php" class="button logout-button">Logout</a>
     </div>
 

@@ -124,6 +124,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['recommendRecipe'])) {
     <?php endif; ?>
 </div>
 
+<!-- JavaScript to handle automatic logout after session expiration -->
+<!-- <script>
+    setTimeout(function() {
+        document.cookie = 'session_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+        window.location.href = 'login.php';
+    }, 30000); // 30 seconds
+</script> -->
 </body>
 <footer>
 <div class="container">
@@ -132,6 +139,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['recommendRecipe'])) {
         <a href="search.php" class="button">Recipe Search</a>
         <a href="dietrestrictions.php" class="button">Diet Restrictions</a>
         <a href="review.php" class="button">Rate and Review</a>
+        <a href="mealplannerform.php" class="button">Weekly Meal Planner Form</Form></a>
+        <a href="weeklyMealPlanner.php" class="button">Weekly Meal Planner</a>
         <a href="logout.php" class="button" style="background-color: crimson;">Logout</a>
     </div>
 </footer>

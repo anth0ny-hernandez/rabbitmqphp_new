@@ -6,8 +6,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $rating = intval($_POST["rating"]);
     $review = htmlspecialchars($_POST["review"]);
 
-    // In a real-world scenario, you would save the data in a database here
-    // For now, we just display a confirmation message
 }
 ?>
 
@@ -117,14 +115,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </form>
 </div>
 
+<!-- JavaScript to handle automatic logout after session expiration -->
+<!-- <script>
+    setTimeout(function() {
+        document.cookie = 'session_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+        window.location.href = 'login.php';
+    }, 30000); // 30 seconds
+</script> -->
+</body>
 <footer>
     <div class="container nav-buttons">
         <a href="home.php" class="button">Home</a>
         <a href="search.php" class="button">Recipe Search</a>
         <a href="dietrestrictions.php" class="button">Diet Restrictions</a>
-        <a href="logout.php" class="button logout">Logout</a>
+        <a href="recommendations.php" class="button">Recommendations</a>
+        <a href="mealplannerform.php" class="button">Weekly Meal Planner Form</Form></a>
+        <a href="weeklyMealPlanner.php" class="button">Weekly Meal Planner</a>
+        <a href="logout.php" class="button" style="background-color: crimson;">Logout</a>
     </div>
 </footer>
-
-</body>
 </html>
