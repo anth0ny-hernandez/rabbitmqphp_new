@@ -90,6 +90,11 @@ function requestProcessor($request) {
             $result = $dbClient->send_request($request);
             return $result;
 
+        case "getMealPlan":
+            // New case for getting a weekly meal plan
+            $dmzClient = new rabbitMQClient("dmzConfig.ini", "dmzServer");
+            $result = $dmzClient->send_request($request);
+            return $result;
         
             case "searchRecipe":
                 $dbClient = new rabbitMQClient("testDB_RMQ.ini", "dbConnect");
@@ -116,6 +121,11 @@ function requestProcessor($request) {
                     echo "Recipes found! Sending back to front-end user...\n";
                     return $result;
                 }
+        case "searchRecipe":
+            // Route recipe search requests to the DMZ server
+            $dmzClient = new rabbitMQClient("dmzConfig.ini", "dmzServer");
+            $result = $dmzClient->send_request($request);
+            return $result;
 
         
         
