@@ -132,8 +132,8 @@ function databaseProcessor($request) {
             if ($query->execute()) {
                 echo "Recipe(s) inserted successfully!\n";
                 echo "================================\n";
-                $response['query'] = $queryStatement;
-                echo $response['query'];
+                // $response['query'] = $queryStatement;
+                // echo $response['query'];
                 return $response;
             } else {
                 // Log and return the error
