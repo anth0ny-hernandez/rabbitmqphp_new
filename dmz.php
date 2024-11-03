@@ -4,8 +4,8 @@ require_once('get_host_info.inc');
 require_once('path.inc');
 
 function getWeeklyMealPlan($dietaryRestrictions = "", $caloriesPerMeal = 500) {
-    $app_id = "4577783c"; // Replace with actual App ID
-    $app_key = "2ebd6b0aa43312e5f01f2077882ca32f"; // Replace with actual App Key
+    $app_id = "4577783c";
+    $app_key = "2ebd6b0aa43312e5f01f2077882ca32f";
     $mealPlanner = [];
 
     // Define meal types and days
@@ -16,7 +16,6 @@ function getWeeklyMealPlan($dietaryRestrictions = "", $caloriesPerMeal = 500) {
         $mealPlanner[$day] = [];
         
         foreach ($mealTypes as $meal) {
-            // Customize the API request
             $query = "meal";
             $url = "https://api.edamam.com/api/recipes/v2?type=public&q={$query}&app_id={$app_id}&app_key={$app_key}&calories={$caloriesPerMeal}";
             if ($dietaryRestrictions) {
@@ -57,55 +56,48 @@ function getWeeklyMealPlan($dietaryRestrictions = "", $caloriesPerMeal = 500) {
 }
 
 function searchRecipe($request) {
-    // Define parameters based on the user's request
+    // Define parameters for the request, ensuring 'q' is present
     $params = array(
         'type' => 'public',
-        'q' => $request['label'] ?? null, 
+        'q' => $request['label'] ?? 'chicken',  // Default to 'chicken' if no query provided
         'app_id' => '4577783c', 
         'app_key' => '2ebd6b0aa43312e5f01f2077882ca32f',
         'health' => $request['healthLabels'] ?? null,
         'cuisineType' => $request['cuisineType'] ?? null,
         'mealType' => $request['mealType'] ?? null,
         'nutrients[ENERC_KCAL]' => $request['ENERC_KCAL'] ?? null,
-        'nutrients[CA]' => $request['calcium'] ?? null,
-        'nutrients[CHOCDF]' => $request['carbohydrate'] ?? null,
-        'nutrients[CHOLE]' => $request['cholesterol'] ?? null,
-        'nutrients[FAT]' => $request['fat'] ?? null,
-        'nutrients[FIBTF]' => $request['fiber'] ?? null,
-        'nutrients[NA]' => $request['sodium'] ?? null,
-        'nutrients[PROCNT]' => $request['protein'] ?? null,
-        'nutrients[SUGAR]' => $request['sugar'] ?? null,
-        'nutrients[VITA_RAE]' => $request['vitaminA'] ?? null,
-        'nutrients[VITC]' => $request['vitaminC'] ?? null,
-        'ingredientLines' => $request['ingredients'] ?? null,
     );
 
-    // Filter out any null parameters
-    $params = array_filter($params, function($value) {
-        return !is_null($value);
-    });
-
-    // Build the query string
+    $params = array_filter($params);  // Remove null values
     $url = "https://api.edamam.com/api/recipes/v2?" . http_build_query($params);
 
-    // Initialize cURL
+    echo "Request URL: $url\n";  // Debugging output for URL
+
+    // Set up cURL request with headers
     $curl = curl_init();
     curl_setopt($curl, CURLOPT_URL, $url);
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
 
-    // Execute the request and handle the response
+    // Add custom header for account verification
+    $headers = [
+        'Edamam-Account-User: AlveeJalal',
+    ];
+    curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+
+    // Execute the request and decode the response
     $response = curl_exec($curl);
     curl_close($curl);
 
-    // Decode the response and check for data
     $data = json_decode($response, true);
-    if (!isset($data['hits'])) {
+    //var_dump($data);  // Debugging output for response data
+
+    // Check if 'hits' contains data
+    if (!isset($data['hits']) || empty($data['hits'])) {
         return ["error" => "No recipes found"];
     }
 
     return $data;
 }
-
 
 function requestProcessor($request) {
     echo "Received request: ";
@@ -122,8 +114,7 @@ function requestProcessor($request) {
             return getWeeklyMealPlan($dietaryRestrictions, $caloriesPerMeal);
 
         case "searchRecipe":
-            $query = $request['query'] ?? "";
-            return searchRecipe($query);
+            return searchRecipe($request);  // Pass the entire request array to searchRecipe
 
         default:
             return ["error" => "Unsupported message type"];
