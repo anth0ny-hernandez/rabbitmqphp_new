@@ -91,6 +91,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['searchRecipe'])) {
         <a href="home.php" class="button">Home</a>
         <a href="meal_plan.php" class="button">Recipe Search</a>
         <a href="dietRestrictions.php" class="button">Diet Restrictions</a>
+        <a href="recommendations.php" class="button">Recipe Recommendations</a>
         <a href="logout.php" class="button logout-button">Logout</a>
     </div>
 

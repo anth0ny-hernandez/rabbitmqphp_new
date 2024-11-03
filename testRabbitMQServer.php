@@ -47,6 +47,36 @@ function requestProcessor($request) {
             $result = $dbClient->send_request($request);
             return $result;
         
+        case "recommendRecipes":
+            // Check for user preferences through the database server
+            $dbClient = new rabbitMQClient("testDB_RMQ.ini", "dbConnect");
+            $preferencesRequest = [
+                "type" => "getUserPreferences",
+                "session_token" => $request['session_token']
+            ];
+            
+            $preferencesResponse = $dbClient->send_request($preferencesRequest);
+
+            // Check if user has preferences saved; if not, request random recipes
+            if ($preferencesResponse['success']) {
+                // Forward preferences to DMZ for recommendation
+                $dmzClient = new rabbitMQClient("dmzConfig.ini", "dmzServer");
+                $recommendRequest = [
+                    "type" => "recommendRecipes",
+                    "preferences" => $preferencesResponse
+                ];
+                return $dmzClient->send_request($recommendRequest);
+            } else {
+                // No preferences found, get random recipes
+                $dmzClient = new rabbitMQClient("dmzConfig.ini", "dmzServer");
+                $randomRequest = [
+                    "type" => "searchRecipe",
+                    "label" => "recipe"  // Generic query to get random recipes
+                ];
+                return $dmzClient->send_request($randomRequest);
+            }
+
+        
 
         default:
             return "ERROR: unsupported message type";

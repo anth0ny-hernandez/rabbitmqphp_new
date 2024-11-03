@@ -17,6 +17,38 @@ function databaseProcessor($request) {
 
     switch($request['type']) {
 
+        case "getUserPreferences":
+            $session_token = $request['session_token'];
+        
+            // Retrieve user ID based on session token
+            $userQuery = "SELECT id FROM accounts WHERE session_token = ?";
+            $userStmt = $conn->prepare($userQuery);
+            $userStmt->bind_param("s", $session_token);
+            $userStmt->execute();
+            $userResult = $userStmt->get_result();
+        
+            if ($userResult->num_rows > 0) {
+                $user = $userResult->fetch_assoc();
+                $user_id = $user['id'];
+        
+                // Retrieve dietary preferences
+                $prefQuery = "SELECT dietaryRestrictions, allergyType, otherRestrictions FROM preferences WHERE id = ?";
+                $prefStmt = $conn->prepare($prefQuery);
+                $prefStmt->bind_param("i", $user_id);
+                $prefStmt->execute();
+                $prefResult = $prefStmt->get_result();
+        
+                if ($prefResult->num_rows > 0) {
+                    $preferences = $prefResult->fetch_assoc();
+                    return array_merge(["success" => true], $preferences);
+                } else {
+                    return ["success" => false, "message" => "No dietary preferences found."];
+                }
+            } else {
+                return ["success" => false, "message" => "User not found."];
+            }
+        
+
         case "getDietRestrictions":
             $session_token = $request['session_token'];
         
