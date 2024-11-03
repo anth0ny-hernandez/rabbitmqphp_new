@@ -159,8 +159,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['dietaryRestrictions'])
 <div class="container">
     <div class="nav-buttons">
         <a href="home.php" class="button">Home</a>
-        <a href="search.php" class="button">Meal Plan</a>
+        <a href="search.php" class="button">Recipe Search</a>
         <a href="recommendations.php" class="button">Recommendations</a>
+        <a href="review.php" class="button">Rate and Review</a>
         <a href="logout.php" class="button" style="background-color: crimson;">Logout</a>
     </div>
 </footer>
