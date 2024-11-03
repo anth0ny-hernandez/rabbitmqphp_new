@@ -128,13 +128,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['setRestrictions'])) {
             <label>Dietary Restrictions (select all that apply):</label><br>
             <?php
             $dietary_options = [
-                "Kosher",
-                "Vegetarian",
-                "Vegan",
-                "Pescatarian",
-                "Keto-Friendly",
-                "Pork-Free",
-                "Alcohol-Free"
+                "kosher",
+                "vegetarian",
+                "vegan",
+                "pescatarian",
+                "keto-friendly",
+                "pork-free",
+                "alcohol-free"
             ];
             foreach ($dietary_options as $diet) {
                 $checked = in_array($diet, $dietaryRestrictions) ? "checked" : "";
@@ -147,7 +147,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['setRestrictions'])) {
         <div class="form-section">
             <label for="allergyType">Allergies (select all that apply):</label><br>
             <?php
-            $allergy_options = ["Peanuts", "Tree Nuts", "Soy", "Dairy", "Gluten", "Shellfish", "Eggs", "Fish"];
+            $allergy_options = ["peanuts", "tree nuts", "soy", "dairy", "gluten", "shellfish", "eggs", "fish"];
             foreach ($allergy_options as $allergy) {
                 $checked = (strpos($allergyType, $allergy) !== false) ? "checked" : "";
                 echo "<input type='checkbox' name='allergyType[]' value='$allergy' $checked> $allergy<br>";
