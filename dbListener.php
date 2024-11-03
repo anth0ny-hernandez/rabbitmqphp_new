@@ -107,7 +107,7 @@ function databaseProcessor($request) {
             $stmt->execute();
             $arrays = $stmt->get_result();
             if ($arrays->num_rows > 0) {
-                $recipes = $ray->fetch_assoc();
+                $recipes = $arrays->fetch_assoc();
                 return $recipes;
             } else {
                 return false;
@@ -132,7 +132,7 @@ function databaseProcessor($request) {
             if ($query->execute()) {
                 echo "Recipe(s) inserted successfully!\n";
                 echo "================================\n";
-                $recipesArray = selectRecipes($request); // uses function akin to searchRecipe case
+                $recipesArray = selectRecipes($request, $conn); // uses function akin to searchRecipe case
                 // $response['query'] = $queryStatement;
                 // echo $response['query'];
                 return $recipesArray;
@@ -149,7 +149,7 @@ function databaseProcessor($request) {
     }
 }
 
-function selectRecipes($request) {
+function selectRecipes($request, $conn) {
     // retrieve parameters from client request
     $label = $request["label"];
     $healthLabels = $request["healthLabels"];
@@ -166,7 +166,7 @@ function selectRecipes($request) {
     $stmt->execute();
     $arrays = $stmt->get_result();
     if ($arrays->num_rows > 0) {
-        $recipes = $ray->fetch_assoc();
+        $recipes = $arrays->fetch_assoc();
         return $recipes;
     } else {
         return false;
