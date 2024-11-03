@@ -42,38 +42,10 @@ function requestProcessor($request) {
             return $result;
         
         case "getDietRestrictions":
-            $session_token = $request['session_token'];
-
-            // Find the user ID using the session token
-            $userQuery = "SELECT id FROM accounts WHERE session_token = ?";
-            $userStmt = $conn->prepare($userQuery);
-            $userStmt->bind_param("s", $session_token);
-            $userStmt->execute();
-            $userResult = $userStmt->get_result();
-
-            if ($userResult->num_rows > 0) {
-                $user = $userResult->fetch_assoc();
-                $user_id = $user['id'];
-
-                // Retrieve dietary restrictions
-                $prefQuery = "SELECT dietaryRestrictions, allergyType, otherRestrictions FROM preferences WHERE id = ?";
-                $prefStmt = $conn->prepare($prefQuery);
-                $prefStmt->bind_param("i", $user_id);
-                $prefStmt->execute();
-                $prefResult = $prefStmt->get_result();
-
-                if ($prefResult->num_rows > 0) {
-                    $preferences = $prefResult->fetch_assoc();
-                    return array_merge(["success" => true], $preferences);
-                } else {
-                    return ["success" => false, "message" => "No dietary restrictions found."];
-                }
-            } else {
-                return ["success" => false, "message" => "User not found."];
-            }
-
-
-        
+            // Route the getDietRestrictions request to the database server
+            $dbClient = new rabbitMQClient("testDB_RMQ.ini", "dbConnect");
+            $result = $dbClient->send_request($request);
+            return $result;
         
 
         default:
