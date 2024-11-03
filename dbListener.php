@@ -7,7 +7,7 @@ require_once('path.inc');
 
 function checkCache($query) {
     $db = connectDatabase();
-    $stmt = $db->prepare("SELECT label, url, image, calories, ingredients, source FROM recipes WHERE query = ?");
+    $stmt = $db->prepare("SELECT label, image, url, healthLabels, ENERC_KCAL, ingredientLines, calories, cuisineType, mealtype, fat, Carbs, fiber, sugars, protein, cholesterol, sodium, Calcium, Vitamin_A, Vitamin_C FROM recipes WHERE label = ?");
     $stmt->bind_param("s", $query);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -16,11 +16,24 @@ function checkCache($query) {
     while ($row = $result->fetch_assoc()) {
         $recipes[] = [
             'label' => $row['label'],
-            'url' => $row['url'],
             'image' => $row['image'],
+            'url' => $row['url'],
+            'healthLabels' => $row['healthLabels'],
+            'ENERC_KCAL' => $row['ENERC_KCAL'],
+            'ingredientLines' => $row['ingredientLines'],
             'calories' => $row['calories'],
-            'ingredients' => $row['ingredients'],
-            'source' => $row['source']
+            'cuisineType' => $row['cuisineType'],
+            'mealtype' => $row['mealtype'],
+            'fat' => $row['fat'],
+            'Carbs' => $row['Carbs'],
+            'fiber' => $row['fiber'],
+            'sugars' => $row['sugars'],
+            'protein' => $row['protein'],
+            'cholesterol' => $row['cholesterol'],
+            'sodium' => $row['sodium'],
+            'Calcium' => $row['Calcium'],
+            'Vitamin_A' => $row['Vitamin_A'],
+            'Vitamin_C' => $row['Vitamin_C']
         ];
     }
 
@@ -33,17 +46,34 @@ function checkCache($query) {
 // Cache new recipes in the database
 function cacheRecipes($query, $recipes) {
     $db = connectDatabase();
-    $stmt = $db->prepare("INSERT INTO recipes (query, label, url, image, calories, ingredients, source) VALUES (?, ?, ?, ?, ?, ?, ?)");
+    $stmt = $db->prepare("INSERT INTO recipes (label, image, url, healthLabels, ENERC_KCAL, ingredientLines, calories, cuisineType, mealtype, fat, Carbs, fiber, sugars, protein, cholesterol, sodium, Calcium, Vitamin_A, Vitamin_C, Timestamp) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
     foreach ($recipes as $recipe) {
         $label = $recipe['label'];
-        $url = $recipe['url'];
         $image = $recipe['image'] ?? null;
-        $calories = $recipe['calories'];
-        $ingredients = json_encode($recipe['ingredients'] ?? []);
-        $source = $recipe['source'];
+        $url = $recipe['url'];
+        $healthLabels = implode(', ', $recipe['healthLabels'] ?? []);
+        $ENERC_KCAL = $recipe['ENERC_KCAL'] ?? null;
+        $ingredientLines = implode(', ', $recipe['ingredientLines'] ?? []);
+        $calories = $recipe['calories'] ?? null;
+        $cuisineType = implode(', ', $recipe['cuisineType'] ?? []);
+        $mealtype = implode(', ', $recipe['mealType'] ?? []);
+        $fat = $recipe['totalNutrients']['FAT']['quantity'] ?? null;
+        $Carbs = $recipe['totalNutrients']['CHOCDF']['quantity'] ?? null;
+        $fiber = $recipe['totalNutrients']['FIBTG']['quantity'] ?? null;
+        $sugars = $recipe['totalNutrients']['SUGAR']['quantity'] ?? null;
+        $protein = $recipe['totalNutrients']['PROCNT']['quantity'] ?? null;
+        $cholesterol = $recipe['totalNutrients']['CHOLE']['quantity'] ?? null;
+        $sodium = $recipe['totalNutrients']['NA']['quantity'] ?? null;
+        $Calcium = $recipe['totalNutrients']['CA']['quantity'] ?? null;
+        $Vitamin_A = $recipe['totalNutrients']['VITA_RAE']['quantity'] ?? null;
+        $Vitamin_C = $recipe['totalNutrients']['VITC']['quantity'] ?? null;
+        $Timestamp = time();
 
-        $stmt->bind_param("sssssss", $query, $label, $url, $image, $calories, $ingredients, $source);
+        $stmt->bind_param(
+            "ssssdsdssddddddddddd",
+            $label, $image, $url, $healthLabels, $ENERC_KCAL, $ingredientLines, $calories, $cuisineType, $mealtype, $fat, $Carbs, $fiber, $sugars, $protein, $cholesterol, $sodium, $Calcium, $Vitamin_A, $Vitamin_C, $Timestamp
+        );
         $stmt->execute();
     }
 

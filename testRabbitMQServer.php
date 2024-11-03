@@ -4,7 +4,7 @@ require_once('rabbitMQLib.inc');
 require_once('get_host_info.inc');
 require_once('path.inc');
 function checkRecipeCache($query) {
-    $dbClient = new rabbitMQClient("dbListener.ini", "dbServer");
+    $dbClient = new rabbitMQClient("testDB_RMQ.ini", "dbConnect");
 
     // Prepare the request to check cache
     $request = [
@@ -18,7 +18,7 @@ function checkRecipeCache($query) {
 
 // Function to cache new recipes in the database
 function cacheRecipes($query, $recipes) {
-    $dbClient = new rabbitMQClient("dbListener.ini", "dbServer");
+    $dbClient = new rabbitMQClient("testDB_RMQ.ini", "dbConnect");
 
     // Prepare the request to cache the recipes
     $request = [
