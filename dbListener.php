@@ -5,171 +5,133 @@ require_once('rabbitMQLib.inc');
 require_once('get_host_info.inc');
 require_once('path.inc');
 
-function checkCache($query) {
-    $db = connectDatabase();
-    $stmt = $db->prepare("SELECT label, image, url, healthLabels, ENERC_KCAL, ingredientLines, calories, cuisineType, mealtype, fat, Carbs, fiber, sugars, protein, cholesterol, sodium, Calcium, Vitamin_A, Vitamin_C FROM recipes WHERE label = ?");
-    $stmt->bind_param("s", $query);
-    $stmt->execute();
-    $result = $stmt->get_result();
-
-    $recipes = [];
-    while ($row = $result->fetch_assoc()) {
-        $recipes[] = [
-            'label' => $row['label'],
-            'image' => $row['image'],
-            'url' => $row['url'],
-            'healthLabels' => $row['healthLabels'],
-            'ENERC_KCAL' => $row['ENERC_KCAL'],
-            'ingredientLines' => $row['ingredientLines'],
-            'calories' => $row['calories'],
-            'cuisineType' => $row['cuisineType'],
-            'mealtype' => $row['mealtype'],
-            'fat' => $row['fat'],
-            'Carbs' => $row['Carbs'],
-            'fiber' => $row['fiber'],
-            'sugars' => $row['sugars'],
-            'protein' => $row['protein'],
-            'cholesterol' => $row['cholesterol'],
-            'sodium' => $row['sodium'],
-            'Calcium' => $row['Calcium'],
-            'Vitamin_A' => $row['Vitamin_A'],
-            'Vitamin_C' => $row['Vitamin_C']
-        ];
-    }
-
-    $stmt->close();
-    $db->close();
-
-    return ['hits' => $recipes];
-}
-
-// Cache new recipes in the database
-function cacheRecipes($query, $recipes) {
-    $db = connectDatabase();
-    $stmt = $db->prepare("INSERT INTO recipes (label, image, url, healthLabels, ENERC_KCAL, ingredientLines, calories, cuisineType, mealtype, fat, Carbs, fiber, sugars, protein, cholesterol, sodium, Calcium, Vitamin_A, Vitamin_C, Timestamp) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-
-    foreach ($recipes as $recipe) {
-        $label = $recipe['label'];
-        $image = $recipe['image'] ?? null;
-        $url = $recipe['url'];
-        $healthLabels = implode(', ', $recipe['healthLabels'] ?? []);
-        $ENERC_KCAL = $recipe['ENERC_KCAL'] ?? null;
-        $ingredientLines = implode(', ', $recipe['ingredientLines'] ?? []);
-        $calories = $recipe['calories'] ?? null;
-        $cuisineType = implode(', ', $recipe['cuisineType'] ?? []);
-        $mealtype = implode(', ', $recipe['mealType'] ?? []);
-        $fat = $recipe['totalNutrients']['FAT']['quantity'] ?? null;
-        $Carbs = $recipe['totalNutrients']['CHOCDF']['quantity'] ?? null;
-        $fiber = $recipe['totalNutrients']['FIBTG']['quantity'] ?? null;
-        $sugars = $recipe['totalNutrients']['SUGAR']['quantity'] ?? null;
-        $protein = $recipe['totalNutrients']['PROCNT']['quantity'] ?? null;
-        $cholesterol = $recipe['totalNutrients']['CHOLE']['quantity'] ?? null;
-        $sodium = $recipe['totalNutrients']['NA']['quantity'] ?? null;
-        $Calcium = $recipe['totalNutrients']['CA']['quantity'] ?? null;
-        $Vitamin_A = $recipe['totalNutrients']['VITA_RAE']['quantity'] ?? null;
-        $Vitamin_C = $recipe['totalNutrients']['VITC']['quantity'] ?? null;
-        $Timestamp = time();
-
-        $stmt->bind_param(
-            "ssssdsdssddddddddddd",
-            $label, $image, $url, $healthLabels, $ENERC_KCAL, $ingredientLines, $calories, $cuisineType, $mealtype, $fat, $Carbs, $fiber, $sugars, $protein, $cholesterol, $sodium, $Calcium, $Vitamin_A, $Vitamin_C, $Timestamp
-        );
-        $stmt->execute();
-    }
-
-    $stmt->close();
-    $db->close();
-}
-
 function databaseProcessor($request) {
-
     echo "Received request: ";
     var_dump($request);
 
-    // database connection & credential variable assignment
+    // Database connection
     $conn = new mysqli('localhost', 'testUser', '12345', 'testdb');
-    $username = $request['username'];
-    $password = $request['password'];
+    if ($conn->connect_error) {
+        return ["error" => "Database connection failed: " . $conn->connect_error];
+    }
 
     switch($request['type']) {
 
         case "register":
             echo "Processing username registration...\n";
-            echo "================================\n";
+            $username = $request['username'];
+            $password = password_hash($request['password'], PASSWORD_BCRYPT);
+            $sql = "INSERT INTO accounts (username, password) VALUES (?, ?)";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("ss", $username, $password);
 
-            // insert result
-            $insert = "";
-            // link to source
-            $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
-
-            $sql = "INSERT INTO accounts (username, password) VALUES ('$username', '$hashedPassword')";
-            if ($conn->query($sql) === TRUE) {
-                echo "User $username registered successfully!\n";  // Debugging
-                echo "================================\n";
-                $insert = "User $username registered successfully!";
-                return true;
+            if ($stmt->execute()) {
+                echo "User $username registered successfully!\n";
+                return ["success" => true, "message" => "User registered successfully"];
             } else {
-                // Log and return the error
                 error_log("Error in registration: " . $conn->error);
-                echo "Error: " . $conn->error . "\n";
-                $insert = "Error: " . $conn->error;
-                return false;
+                return ["success" => false, "message" => "Error: " . $conn->error];
             }
+
         case "login":
             $username = $request['username'];
             $password = $request['password'];
-        
             echo "Processing login for $username...\n";
-            echo "================================\n";
         
-            // Query to get the hashed password for the specified username
             $sql = "SELECT password FROM accounts WHERE username = ?";
             $stmt = $conn->prepare($sql);
             $stmt->bind_param("s", $username);
             $stmt->execute();
-            $ray = $stmt->get_result();
-        
-            if ($ray->num_rows > 0) {
-                $row = $ray->fetch_assoc();
-                
-                // Verify the password using password_verify
+            $result = $stmt->get_result();
+
+            if ($result->num_rows > 0) {
+                $row = $result->fetch_assoc();
                 if (password_verify($password, $row['password'])) {
-                    echo "Login successful for user $username!\n";
-                    echo "================================\n";
-        
-                    // Generate a session token and expiration time (30 seconds from now)
-                    $session_token = bin2hex(random_bytes(16)); // Generate a random token
-                    $session_expires = time() + 30; // Set the session to expire in 30 seconds
-        
-                    // Update the database with the session token and expiration time
+                    $session_token = bin2hex(random_bytes(16));
+                    $session_expires = time() + 30;
+
                     $updateQuery = "UPDATE accounts SET session_token = ?, session_expires = ? WHERE username = ?";
                     $updateStmt = $conn->prepare($updateQuery);
                     $updateStmt->bind_param("sis", $session_token, $session_expires, $username);
                     
                     if ($updateStmt->execute()) {
-                        // Set the session token cookie with a 30-second expiration
-                        
-                        
-                        // Return a successful response with the session token
-                        return array("success" => true, "session_token" => $session_token);
-                    } 
+                        return ["success" => true, "session_token" => $session_token];
+                    } else {
+                        return ["success" => false, "message" => "Failed to set session token"];
+                    }
                 } else {
-                    // Password verification failed
-                    echo "Incorrect password for user $username!\n";
-                    echo "================================\n";
-                    return array("success" => false, "message" => "Incorrect password.");
+                    return ["success" => false, "message" => "Incorrect password."];
                 }
             } else {
-                // No user found with the specified username
-                echo "User $username not found!\n";
-                echo "================================\n";
-                return array("success" => false, "message" => "User not found.");
+                return ["success" => false, "message" => "User not found."];
             }
-                
-            
-        
+
+        case "searchRecipe":
+            $label = $request["label"];
+            $healthLabels = $request["healthLabels"] ?? "";
+            $calories = $request["ENERC_KCAL"] ?? 0;
+            $cuisineType = $request["cuisineType"] ?? "";
+            $mealType = $request["mealType"] ?? "";
+
+            $sql = "SELECT * FROM recipes WHERE label = ? AND healthLabels = ? AND ENERC_KCAL <= ? AND cuisineType = ? AND mealType = ?";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("ssiss", $label, $healthLabels, $calories, $cuisineType, $mealType);
+            $stmt->execute();
+            $result = $stmt->get_result();
+
+            $recipes = [];
+            while ($row = $result->fetch_assoc()) {
+                $recipes[] = $row;
+            }
+
+            if (!empty($recipes)) {
+                return ["hits" => $recipes];
+            } else {
+                return ["success" => false, "message" => "No recipes found."];
+            }
+
+        case "insertRecipe":
+            $recipes = $request['recipes'];
+            $queryStatement = "INSERT INTO recipes (label, image, url, healthLabels, ENERC_KCAL, ingredientLines, calories, cuisineType, mealType, fat, Carbs, fiber, sugars, protein, cholesterol, sodium, Calcium, Vitamin_A, Vitamin_C, Timestamp) 
+                               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            $stmt = $conn->prepare($queryStatement);
+
+            foreach ($recipes as $recipe) {
+                $label = $recipe['label'];
+                $image = $recipe['image'] ?? null;
+                $url = $recipe['url'];
+                $healthLabels = implode(', ', $recipe['healthLabels'] ?? []);
+                $ENERC_KCAL = $recipe['ENERC_KCAL'] ?? 0;
+                $ingredientLines = implode(', ', $recipe['ingredientLines'] ?? []);
+                $calories = $recipe['calories'] ?? 0;
+                $cuisineType = implode(', ', $recipe['cuisineType'] ?? []);
+                $mealType = implode(', ', $recipe['mealType'] ?? []);
+                $fat = $recipe['totalNutrients']['FAT']['quantity'] ?? 0;
+                $Carbs = $recipe['totalNutrients']['CHOCDF']['quantity'] ?? 0;
+                $fiber = $recipe['totalNutrients']['FIBTG']['quantity'] ?? 0;
+                $sugars = $recipe['totalNutrients']['SUGAR']['quantity'] ?? 0;
+                $protein = $recipe['totalNutrients']['PROCNT']['quantity'] ?? 0;
+                $cholesterol = $recipe['totalNutrients']['CHOLE']['quantity'] ?? 0;
+                $sodium = $recipe['totalNutrients']['NA']['quantity'] ?? 0;
+                $Calcium = $recipe['totalNutrients']['CA']['quantity'] ?? 0;
+                $Vitamin_A = $recipe['totalNutrients']['VITA_RAE']['quantity'] ?? 0;
+                $Vitamin_C = $recipe['totalNutrients']['VITC']['quantity'] ?? 0;
+                $timestamp = time();
+
+                $stmt->bind_param("ssssisissddddddddddd", 
+                    $label, $image, $url, $healthLabels, $ENERC_KCAL, $ingredientLines, 
+                    $calories, $cuisineType, $mealType, $fat, $Carbs, $fiber, $sugars, 
+                    $protein, $cholesterol, $sodium, $Calcium, $Vitamin_A, $Vitamin_C, $timestamp);
+
+                if (!$stmt->execute()) {
+                    error_log("Error inserting recipe: " . $stmt->error);
+                }
+            }
+
+            return ["success" => true, "message" => "Recipes inserted successfully."];
+
         default:
-            return "Database Client-Server error";
+            return ["error" => "Unsupported request type"];
     }
 }
 
@@ -178,41 +140,5 @@ $dbServer = new rabbitMQServer("testDB_RMQ.ini", "dbConnect");
 ob_end_flush();
 echo "RabbitMQ Server is running and waiting for requests...\n";
 $dbServer->process_requests('databaseProcessor');
-// Close the database connection
 $conn->close();
-
-
-
-// $query = "SELECT session_token FROM users WHERE username=?";
-// $statement = $db->prepare($query);
-// $statement->bind_param("s", $username);
-// if($statement->execute())
-// {
-//     $result = $statement->get_result();
-//     echo "success!";
-//     $resultToken=$result->fetch_all();
-//     $sessionToken = $resultToken[0][0];
-//     echo "client receiveds $sessionToken".PHP_EOL;
-//     $expire_time = time() + 10;
-//     setcookie('session_token', $sessionToken, $expire_time, "/");
-// }
-
-// else
-// {
-//     echo "fail";
-// }
-// include('logout.php');
-
-// echo "client receiveds ". $_COOKIE['session_token'].PHP_EOL;
-// print_r($response);
-// print_r(headers_list());
-// print_r($_COOKIE);
-// echo $response;
-// return $response;
-
-// if(time() > $expire_time)
-// {
-//     include('logout.php');
-// }
-
 ?>
