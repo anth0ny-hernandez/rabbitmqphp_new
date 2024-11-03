@@ -96,31 +96,7 @@ function requestProcessor($request) {
             $result = $dmzClient->send_request($request);
             return $result;
         
-            case "searchRecipe":
-                $dbClient = new rabbitMQClient("testDB_RMQ.ini", "dbConnect");
-                echo "Connected to database...\n";
-    
-                $result = $dbClient->send_request($request);
-                echo "Asking database if recipe(s) exist within it...\n";
-    
-                // checks that recipe(s) do exist, otherwise send a request to DMZ
-                if(!$result) {
-                    $dmzClient = new rabbitMQClient("dmzConfig.ini", "dmzServer");
-                    $result = $dmzClient->send_request($request);
-                    // if even DMZ returns no matches, then let the user know
-                    if(!$result) {
-                        echo "Sorry, no recipes match that! Returning no matches...\n";
-                        return $result;
-                    } else {
-                        echo "Recipe(s) found! Updating the database now...\n";
-                        $request['type'] = 'insertRecipe'; // modify request parameter
-                        $result = $dbClient->send_request($request);
-                        return $result;
-                    }
-                } else {
-                    echo "Recipes found! Sending back to front-end user...\n";
-                    return $result;
-                }
+        
         case "searchRecipe":
             // Route recipe search requests to the DMZ server
             $dmzClient = new rabbitMQClient("dmzConfig.ini", "dmzServer");
