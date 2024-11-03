@@ -103,7 +103,7 @@ function databaseProcessor($request) {
                     AND cuisineType = ? AND mealType = ?";
             $stmt = $conn->prepare($sql);
             // KCAL might need to be integer
-            $stmt->bind_param("sssss", $label, $healthLabels, $calories, $cuisine, $meal);
+            $stmt->bind_param("ssiss", $label, $healthLabels, $calories, $cuisine, $meal);
             $stmt->execute();
             $arrays = $stmt->get_result();
             if ($arrays->num_rows > 0) {
@@ -132,9 +132,10 @@ function databaseProcessor($request) {
             if ($query->execute()) {
                 echo "Recipe(s) inserted successfully!\n";
                 echo "================================\n";
+                $recipesArray = selectRecipes($request); // uses function akin to searchRecipe case
                 // $response['query'] = $queryStatement;
                 // echo $response['query'];
-                return $response;
+                return $recipesArray;
             } else {
                 // Log and return the error
                 error_log("Error in registration: " . $conn->error);
@@ -148,6 +149,30 @@ function databaseProcessor($request) {
     }
 }
 
+function selectRecipes($request) {
+    // retrieve parameters from client request
+    $label = $request["label"];
+    $healthLabels = $request["healthLabels"];
+    $calories = $request["ENERC_KCAL"];
+    $cuisine = $request["cuisineType"];
+    $meal = $request["mealType"];
+
+    $sql = "SELECT * FROM recipes WHERE label = ? 
+            AND healthLabels = ? AND ENERC_KCAL <= ?
+            AND cuisineType = ? AND mealType = ?";
+    $stmt = $conn->prepare($sql);
+    // KCAL might need to be integer
+    $stmt->bind_param("ssiss", $label, $healthLabels, $calories, $cuisine, $meal);
+    $stmt->execute();
+    $arrays = $stmt->get_result();
+    if ($arrays->num_rows > 0) {
+        $recipes = $ray->fetch_assoc();
+        return $recipes;
+    } else {
+        return false;
+    }
+}
+
 // Create a server that listens for requests from clients
 $dbServer = new rabbitMQServer("testDB_RMQ.ini", "dbConnect");
 ob_end_flush();
@@ -156,38 +181,5 @@ $dbServer->process_requests('databaseProcessor');
 // Close the database connection
 $conn->close();
 
-
-
-// $query = "SELECT session_token FROM users WHERE username=?";
-// $statement = $db->prepare($query);
-// $statement->bind_param("s", $username);
-// if($statement->execute())
-// {
-//     $result = $statement->get_result();
-//     echo "success!";
-//     $resultToken=$result->fetch_all();
-//     $sessionToken = $resultToken[0][0];
-//     echo "client receiveds $sessionToken".PHP_EOL;
-//     $expire_time = time() + 10;
-//     setcookie('session_token', $sessionToken, $expire_time, "/");
-// }
-
-// else
-// {
-//     echo "fail";
-// }
-// include('logout.php');
-
-// echo "client receiveds ". $_COOKIE['session_token'].PHP_EOL;
-// print_r($response);
-// print_r(headers_list());
-// print_r($_COOKIE);
-// echo $response;
-// return $response;
-
-// if(time() > $expire_time)
-// {
-//     include('logout.php');
-// }
 
 ?>
