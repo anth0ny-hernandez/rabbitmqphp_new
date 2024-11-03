@@ -89,12 +89,6 @@ function requestProcessor($request) {
             $dbClient = new rabbitMQClient("testDB_RMQ.ini", "dbConnect");
             $result = $dbClient->send_request($request);
             return $result;
-
-        case "getMealPlan":
-            // New case for getting a weekly meal plan
-            $dmzClient = new rabbitMQClient("dmzConfig.ini", "dmzServer");
-            $result = $dmzClient->send_request($request);
-            return $result;
         
         
         case "searchRecipe":
