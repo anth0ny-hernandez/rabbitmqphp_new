@@ -19,13 +19,13 @@ function databaseProcessor($request) {
 
         case "dietRestrictions":
             echo "Processing dietary restrictions...\n";
-
+        
             // Retrieve dietary restriction details
             $dietaryRestrictions = implode(", ", $request['dietaryRestrictions']);
             $allergyType = $request['allergyType'];
             $otherRestrictions = $request['otherRestrictions'];
             $session_token = $request['session_token'];
-
+        
             // Find the user ID associated with the session token
             $userQuery = "SELECT id FROM accounts WHERE session_token = ?";
             $userStmt = $conn->prepare($userQuery);
@@ -36,8 +36,8 @@ function databaseProcessor($request) {
             if ($userResult->num_rows > 0) {
                 $user = $userResult->fetch_assoc();
                 $user_id = $user['id'];
-
-                // Insert or update dietary preferences in the preferences table
+        
+                // Insert or update dietary preferences for this user
                 $prefQuery = "INSERT INTO preferences (id, dietaryRestrictions, allergyType, otherRestrictions) 
                               VALUES (?, ?, ?, ?)
                               ON DUPLICATE KEY UPDATE 
@@ -47,7 +47,7 @@ function databaseProcessor($request) {
                 
                 $prefStmt = $conn->prepare($prefQuery);
                 $prefStmt->bind_param("isss", $user_id, $dietaryRestrictions, $allergyType, $otherRestrictions);
-
+        
                 if ($prefStmt->execute()) {
                     echo "Dietary restrictions saved successfully.\n";
                     return array("success" => true, "message" => "Dietary restrictions saved successfully.");
@@ -59,6 +59,7 @@ function databaseProcessor($request) {
                 echo "User not found for the session token provided.\n";
                 return array("success" => false, "message" => "User not found.");
             }
+        
 
         case "register":
             echo "Processing username registration...\n";
