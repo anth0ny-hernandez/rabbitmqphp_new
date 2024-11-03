@@ -136,7 +136,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['searchRecipe'])) {
             </div>
         <?php endforeach; ?>
     <?php else: ?>
-        <p>No recipes found. Please try a different search term.</p>
+        
     <?php endif; ?>
 </div>
 

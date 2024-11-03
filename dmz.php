@@ -59,7 +59,7 @@ function searchRecipe($request) {
     // Define parameters for the request, ensuring 'q' is present
     $params = array(
         'type' => 'public',
-        'q' => $request['label'] ?? 'chicken',  // Default to 'chicken' if no query provided
+        'q' => $request['label'] ?? null,  // Default to 'chicken' if no query provided
         'app_id' => '4577783c', 
         'app_key' => '2ebd6b0aa43312e5f01f2077882ca32f',
         'health' => $request['healthLabels'] ?? null,
