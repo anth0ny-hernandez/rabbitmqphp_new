@@ -90,7 +90,7 @@ function databaseProcessor($request) {
                 return array("success" => false, "message" => "User not found.");
             }
                 
-        case "searchRecipe":
+        case "checkCache":
             // retrieve parameters from client request
             $label = $request["label"];
             $healthLabels = $request["healthLabels"];
@@ -114,7 +114,7 @@ function databaseProcessor($request) {
             }
 
         // called when no recipes exist and RMQ server requests & sends API data to insert 
-        case "insertRecipe":
+        case "cacheRecipes":
             $queryStatement = "INSERT INTO recipes (label, image, url, healthLabels, 
                                             ENERC_KCAL, ingredientLines, calories, cuisineType, 
                                             mealType, fat, carbs, fiber, sugars, protein, 
