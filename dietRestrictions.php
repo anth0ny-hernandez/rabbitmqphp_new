@@ -12,38 +12,47 @@ $session_token = $_COOKIE['session_token'];
 $expire_time = time() + 30;
 setcookie('session_token', $session_token, $expire_time, "/");
 
-// Initialize variables
-$dietType = $allergyType = $otherRestrictions = "";
-$responseMessage = "";  // Store the response message to show to the user
+// Initialize variables to store current restrictions
+$dietaryRestrictions = [];
+$allergyType = "";
+$otherRestrictions = "";
+$responseMessage = "";
 
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['setRestrictions'])) {
-    $client = new rabbitMQClient("testRabbitMQ.ini", "testServer");
+// Check if dietary restrictions are already saved
+$client = new rabbitMQClient("testRabbitMQ.ini", "testServer");
+$request = [
+    "type" => "getDietRestrictions",
+    "session_token" => $session_token
+];
+$response = $client->send_request($request);
 
-    $dietType = ucfirst($_POST['dietType'] ?? "None");
-    $allergyType = isset($_POST['allergyType']) ? implode(", ", $_POST['allergyType']) : "None";
-    $otherRestrictions = htmlspecialchars($_POST['otherRestrictions'] ?? "");
-
-    // Collect form data for request
-    $request = [
-        "type" => "dietRestrictions",
-        "session_token" => $session_token,  // Include the session token to identify the user
-        "dietType" => $dietType,
-        "allergyType" => $allergyType,
-        "otherRestrictions" => $otherRestrictions,
-        "dietaryRestrictions" => $_POST['dietaryRestrictions'] ?? []
-    ];
-
-    // Send the request to save the dietary restrictions
-    $response = $client->send_request($request);
-
-    // Check the response to display a success or error message
-    if ($response['success']) {
-        $responseMessage = "Your dietary restrictions have been saved successfully.";
-    } else {
-        $responseMessage = "Failed to save dietary restrictions. Please try again.";
-    }
+if ($response['success']) {
+    // Populate the form fields with existing data
+    $dietaryRestrictions = explode(", ", $response['dietaryRestrictions']);
+    $allergyType = $response['allergyType'];
+    $otherRestrictions = $response['otherRestrictions'];
+} else {
+    $responseMessage = "No dietary restrictions saved yet.";
 }
 
+// Handle form submission to save new restrictions
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['setRestrictions'])) {
+    $dietType = isset($_POST['dietaryRestrictions']) ? implode(", ", $_POST['dietaryRestrictions']) : "";
+    $allergyType = isset($_POST['allergyType']) ? implode(", ", $_POST['allergyType']) : "";
+    $otherRestrictions = htmlspecialchars($_POST['otherRestrictions'] ?? "");
+
+    // Prepare and send request to save dietary restrictions
+    $request = [
+        "type" => "dietRestrictions",
+        "session_token" => $session_token,
+        "dietaryRestrictions" => $dietType,
+        "allergyType" => $allergyType,
+        "otherRestrictions" => $otherRestrictions
+    ];
+
+    $response = $client->send_request($request);
+    $responseMessage = $response['message'];
+}
 ?>
 
 <!DOCTYPE html>
@@ -128,7 +137,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['setRestrictions'])) {
                 "Alcohol-Free"
             ];
             foreach ($dietary_options as $diet) {
-                $checked = (isset($_POST['dietaryRestrictions']) && in_array($diet, $_POST['dietaryRestrictions'])) ? "checked" : "";
+                $checked = in_array($diet, $dietaryRestrictions) ? "checked" : "";
                 echo "<input type='checkbox' name='dietaryRestrictions[]' value='$diet' $checked> $diet<br>";
             }
             ?>
@@ -136,11 +145,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['setRestrictions'])) {
 
         <!-- Allergies -->
         <div class="form-section">
-            <label for="allergyType">Allergies (select all that apply, if an allergy you have is not here specify in other restrictions.):</label><br>
+            <label for="allergyType">Allergies (select all that apply):</label><br>
             <?php
             $allergy_options = ["Peanuts", "Tree Nuts", "Soy", "Dairy", "Gluten", "Shellfish", "Eggs", "Fish"];
             foreach ($allergy_options as $allergy) {
-                $checked = (isset($_POST['allergyType']) && in_array($allergy, $_POST['allergyType'])) ? "checked" : "";
+                $checked = (strpos($allergyType, $allergy) !== false) ? "checked" : "";
                 echo "<input type='checkbox' name='allergyType[]' value='$allergy' $checked> $allergy<br>";
             }
             ?>
@@ -170,4 +179,4 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['setRestrictions'])) {
         <a href="logout.php" class="button" style="background-color: crimson;">Logout</a>
     </div>
 </footer>
-</html>  
+</html>
