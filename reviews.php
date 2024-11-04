@@ -65,12 +65,22 @@ $reviews = $reviewsResponse['reviews'] ?? [];
         }
         .container {
             max-width: 600px;
-            margin: auto;
+            margin: 20px auto;
             padding: 20px;
             border: 1px solid #ddd;
             border-radius: 8px;
             background-color: #fff;
             box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            color: #333;
+        }
+        .button-group {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
         }
         .button {
             background-color: #007bff;
@@ -79,6 +89,7 @@ $reviews = $reviewsResponse['reviews'] ?? [];
             border: none;
             border-radius: 4px;
             cursor: pointer;
+            text-decoration: none;
         }
         .button:hover {
             background-color: #0056b3;
@@ -119,7 +130,8 @@ $reviews = $reviewsResponse['reviews'] ?? [];
         <a href="home.php" class="button">Home</a>
         <a href="meal_plan.php" class="button">Recipe Search</a>
         <a href="dietRestrictions.php" class="button">Diet Restrictions</a>
-        <a href="reviews.php" class="button">Reviews</a>
+        <a href="recommendations.php" class="button">Recipe Recommendations</a>
+        <a href="reviews.php" class="button">Ratings and Reviews</a>
         <a href="logout.php" class="button logout-button">Logout</a>
     </div>
 
