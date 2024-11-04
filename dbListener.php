@@ -16,7 +16,31 @@ function databaseProcessor($request) {
     $password = $request['password'];
 
     switch($request['type']) {
-
+        case "submitReview":
+            $username = $request['username'];
+            $rating = $request['rating'];
+            $feedback = $request['feedback'];
+        
+            $stmt = $conn->prepare("INSERT INTO reviews (username, rating, feedback) VALUES (?, ?, ?)");
+            $stmt->bind_param("sis", $username, $rating, $feedback);
+        
+            if ($stmt->execute()) {
+                return ["success" => true];
+            } else {
+                return ["success" => false, "message" => $conn->error];
+            }
+        
+        case "fetchReviews":
+            $query = "SELECT username, rating, feedback, created_at FROM reviews ORDER BY created_at DESC";
+            $result = $conn->query($query);
+            $reviews = [];
+        
+            while ($row = $result->fetch_assoc()) {
+                $reviews[] = $row;
+            }
+        
+            return ["success" => true, "reviews" => $reviews];
+        
         case "getUserPreferences":
             $session_token = $request['session_token'];
         

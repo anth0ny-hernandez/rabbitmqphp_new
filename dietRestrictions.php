@@ -14,7 +14,6 @@ setcookie('session_token', $session_token, $expire_time, "/");
 
 // Initialize variables to store current restrictions
 $dietaryRestrictions = [];
-$allergyType = "";
 $otherRestrictions = "";
 $responseMessage = "";
 
@@ -29,7 +28,6 @@ $response = $client->send_request($request);
 if ($response['success']) {
     // Populate the form fields with existing data
     $dietaryRestrictions = explode(", ", $response['dietaryRestrictions']);
-    $allergyType = $response['allergyType'];
     $otherRestrictions = $response['otherRestrictions'];
 } else {
     $responseMessage = "No dietary restrictions saved yet.";
@@ -38,7 +36,6 @@ if ($response['success']) {
 // Handle form submission to save new restrictions
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['setRestrictions'])) {
     $dietType = isset($_POST['dietaryRestrictions']) ? implode(", ", $_POST['dietaryRestrictions']) : "";
-    $allergyType = isset($_POST['allergyType']) ? implode(", ", $_POST['allergyType']) : "";
     $otherRestrictions = htmlspecialchars($_POST['otherRestrictions'] ?? "");
 
     // Prepare and send request to save dietary restrictions
@@ -46,7 +43,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['setRestrictions'])) {
         "type" => "dietRestrictions",
         "session_token" => $session_token,
         "dietaryRestrictions" => $dietType,
-        "allergyType" => $allergyType,
         "otherRestrictions" => $otherRestrictions
     ];
 
@@ -143,18 +139,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['setRestrictions'])) {
             ?>
         </div>
 
-        <!-- Allergies -->
-        <div class="form-section">
-            <label for="allergyType">Allergies (select all that apply):</label><br>
-            <?php
-            $allergy_options = ["peanuts", "tree nuts", "soy", "dairy", "gluten", "shellfish", "eggs", "fish"];
-            foreach ($allergy_options as $allergy) {
-                $checked = (strpos($allergyType, $allergy) !== false) ? "checked" : "";
-                echo "<input type='checkbox' name='allergyType[]' value='$allergy' $checked> $allergy<br>";
-            }
-            ?>
-        </div>
-
         <!-- Other Restrictions Section -->
         <div class="form-section">
             <label for="otherRestrictions">Other Restrictions (optional):</label><br>
@@ -176,6 +160,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['setRestrictions'])) {
         <a href="home.php" class="button">Home</a>
         <a href="meal_plan.php" class="button">Recipe Search</a>
         <a href="dietRestrictions.php" class="button">Diet Restrictions</a>
+        <a href="reviews.php" class="button">Reviews</a>
         <a href="logout.php" class="button" style="background-color: crimson;">Logout</a>
     </div>
 </footer>

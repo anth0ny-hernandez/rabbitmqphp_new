@@ -28,6 +28,16 @@ function requestProcessor($request) {
             $result = $dbClient->send_request($request);
             return $result;
         
+        case "submitReview":
+            $dbClient = new rabbitMQClient("testDB_RMQ.ini", "dbConnect");
+            $result = $dbClient->send_request($request);
+            return $result;
+
+        case "fetchReviews":
+            $dbClient = new rabbitMQClient("testDB_RMQ.ini", "dbConnect");
+            $result = $dbClient->send_request($request);
+            return $result;
+
         
         case "searchRecipe":
             // Route recipe search requests to the DMZ server

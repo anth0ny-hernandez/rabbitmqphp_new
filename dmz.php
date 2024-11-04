@@ -10,7 +10,6 @@ function recommendRecipes($preferences) {
         'app_id' => '4577783c', 
         'app_key' => '2ebd6b0aa43312e5f01f2077882ca32f',
         'health' => $preferences['dietaryRestrictions'] ?? null,
-        'diet' => $preferences['allergyType'] ?? null,
         'q' => $preferences['otherRestrictions'] ?? 'recipe'  // Default query if no specific preference
     );
 
