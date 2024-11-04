@@ -4,10 +4,6 @@ require_once('get_host_info.inc');
 require_once('path.inc');
 
 function recommendRecipes($preferences) {
-    // Generate a random query term if otherRestrictions is not provided
-    $queryTerms = ['recipe', 'dinner', 'lunch', 'dessert', 'snack', 'breakfast'];
-    $randomQuery = $queryTerms[array_rand($queryTerms)];
-
     // Define parameters for the Edamam API request based on preferences
     $params = array(
         'type' => 'public',
@@ -15,7 +11,7 @@ function recommendRecipes($preferences) {
         'app_key' => '2ebd6b0aa43312e5f01f2077882ca32f',
         'health' => $preferences['dietaryRestrictions'] ?? null,
         'diet' => $preferences['allergyType'] ?? null,
-        'q' => $preferences['otherRestrictions'] ?? $randomQuery  // Use random query if no specific preference
+        'q' => $preferences['otherRestrictions'] ?? 'recipe'  // Default query if no specific preference
     );
 
     // Filter out empty parameters
@@ -42,17 +38,15 @@ function recommendRecipes($preferences) {
     curl_close($curl);
 
     $data = json_decode($response, true);
-    
+
     // Check if 'hits' contains data
     if (!isset($data['hits']) || empty($data['hits'])) {
         return ["error" => "No recipes found based on preferences"];
     }
 
-    // Select a random recipe from the 'hits' array
-    $randomRecipe = $data['hits'][array_rand($data['hits'])];
-
-    return $randomRecipe;
+    return $data;
 }
+
 
 function searchRecipe($request) {
     // Define parameters for the request, ensuring 'q' is present
