@@ -223,7 +223,11 @@ function databaseProcessor($request) {
     
             // called when no recipes exist and RMQ server requests & sends API data to insert 
             case "insertRecipe":
+                $data2 =json_decode($request, true);
+
+                foreach($data2['hits'] as $hit){
                 $time = time();
+                $recipe = $hit['recipe'];
                 $queryStatement = "INSERT INTO recipes (label, image, url, healthLabels, 
                                 ENERC_KCAL, ingredientLines, calories, cuisineType, 
                                 mealType, fat, carbs, fiber, sugars, protein, 
@@ -232,26 +236,26 @@ function databaseProcessor($request) {
                                         ?, ?, ?, ?, ?, ? )";
                 $query = $conn->prepare($queryStatement);
 
-                $recipeName = $request['label'];
-                $image = $request['image'];
-                $url = $request['url'];
-                $healthLabels = $request['healthLabels'];
-                $energy = $request['ENERC_KCAL'];
-                $ingredients = $request['ingredientLines'];
-                $calories = $request['calories'];
-                $cuisineType = $request['cuisineType'];
-                $mealType = $request['mealType'];
-                $fat = $request['FAT'];
-                $carbs = $request['carbs'];
-                $fiber = $request['fiber'];
-                $sugar = $request['sugar'];
-                $protein = $request['protein'];
-                $cholesterol = $request['cholesterol'];
-                $sodium = $request['sodium'];
-                $calcium = $request['calcium'];
-                $vitaminA = $request['vitaminA'];
-                $vitaminC = $request['vitaminC'];
-                $time = $request['time'];
+                $recipeName = $recipe['label'];
+                $image = $recipe['image'];
+                $url = $recipe['url'];
+                $healthLabels = $recipe['healthLabels'];
+                $energy = $recipe['ENERC_KCAL'];
+                $ingredients = $recipe['ingredientLines'];
+                $calories = $recipe['calories'];
+                $cuisineType = $recipe['cuisineType'];
+                $mealType = $recipe['mealType'];
+                $fat = $recipe['FAT'];
+                $carbs = $recipe['carbs'];
+                $fiber = $recipe['fiber'];
+                $sugar = $recipe['sugar'];
+                $protein = $recipe['protein'];
+                $cholesterol = $recipe['cholesterol'];
+                $sodium = $recipe['sodium'];
+                $calcium = $recipe['calcium'];
+                $vitaminA = $recipe['vitaminA'];
+                $vitaminC = $recipe['vitaminC'];
+                $time = $recipe['time'];
 
                 $query->bind_param("ssssisissiiiiiiiiiii", 
                                     $recipeName, $image, $url, $healthLabels, 
@@ -275,6 +279,7 @@ function databaseProcessor($request) {
                     // $insert = "Error: " . $conn->error;
                     return false;
                 } 
+            }
         
         default:
             return "Database Client-Server error";

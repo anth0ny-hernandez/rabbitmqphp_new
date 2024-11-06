@@ -231,7 +231,7 @@ $data2 =json_decode($data, true);
             }      
             //send api data as a array to db so it can use it to insert
             $dmzClient = new rabbitMQClient("testRabbitMQ.ini", "testServer");
-            $dmzClient->send_request($response);
+            $dmzClient->send_request($data);
             var_dump($response);
         return $response;
 //     default:
