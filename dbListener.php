@@ -6,19 +6,18 @@ require_once('get_host_info.inc');
 require_once('path.inc');
 
 function databaseProcessor($request) {
-
+$data2 =json_decode($request, true);
     echo "Received request: ";
-    var_dump($request);
+    var_dump($data2);
 
     // database connection & credential variable assignment
     $conn = new mysqli('localhost', 'testUser', '12345', 'testdb');
-    $username = $request['username'];
-    $password = $request['password'];
-
-    switch($request['type']) {
+    // $username = $data2['username'];
+    // $password = $data2['password'];
+    switch($data2['type']) {
 
         case "getUserPreferences":
-            $session_token = $request['session_token'];
+            $session_token = $data2['session_token'];
         
             // Retrieve user ID based on session token
             $userQuery = "SELECT id FROM accounts WHERE session_token = ?";
@@ -50,7 +49,7 @@ function databaseProcessor($request) {
         
 
         case "getDietRestrictions":
-            $session_token = $request['session_token'];
+            $session_token = $data2['session_token'];
         
             // Find the user ID using the session token
             $userQuery = "SELECT id FROM accounts WHERE session_token = ?";
@@ -85,10 +84,10 @@ function databaseProcessor($request) {
             echo "Processing dietary restrictions...\n";
 
             // Retrieve dietary restriction details
-            $dietaryRestrictions = is_array($request['dietaryRestrictions']) ? implode(", ", $request['dietaryRestrictions']) : $request['dietaryRestrictions'];
-            $allergyType = is_array($request['allergyType']) ? implode(", ", $request['allergyType']) : $request['allergyType'];
-            $otherRestrictions = $request['otherRestrictions'];
-            $session_token = $request['session_token'];
+            $dietaryRestrictions = is_array($data2['dietaryRestrictions']) ? implode(", ", $data2['dietaryRestrictions']) : $data2['dietaryRestrictions'];
+            $allergyType = is_array($data2['allergyType']) ? implode(", ", $data2['allergyType']) : $data2['allergyType'];
+            $otherRestrictions = $data2['otherRestrictions'];
+            $session_token = $data2['session_token'];
 
             // Find the user ID associated with the session token
             $userQuery = "SELECT id FROM accounts WHERE session_token = ?";
@@ -149,8 +148,8 @@ function databaseProcessor($request) {
                 return false;
             }
         case "login":
-            $username = $request['username'];
-            $password = $request['password'];
+            $username = $data2['username'];
+            $password = $data2['password'];
         
             echo "Processing login for $username...\n";
             echo "================================\n";
@@ -200,11 +199,11 @@ function databaseProcessor($request) {
             }
             case "searchRecipe":
                 // retrieve parameters from client request
-                $label = $request["label"];
-                $healthLabels = $request["healthLabels"];
-                $calories = $request["ENERC_KCAL"];
-                $cuisine = $request["cuisineType"];
-                $meal = $request["mealType"];
+                $label = $data2["label"];
+                $healthLabels = $data2["healthLabels"];
+                $calories = $data2["ENERC_KCAL"];
+                $cuisine = $data2["cuisineType"];
+                $meal = $data2["mealType"];
     
                 $sql = "SELECT * FROM recipes WHERE label = ? 
                         AND healthLabels = ? AND ENERC_KCAL <= ?
@@ -223,7 +222,6 @@ function databaseProcessor($request) {
     
             // called when no recipes exist and RMQ server requests & sends API data to insert 
             case "insertRecipe":
-                $data2 =json_decode($request, true);
 
                 foreach($data2['hits'] as $hit){
                 $time = time();
@@ -268,7 +266,7 @@ function databaseProcessor($request) {
                 if ($query->execute()) {
                     echo "Recipe(s) inserted successfully!\n";
                     echo "================================\n";
-                    // $recipesArray = selectRecipes($request, $conn); // uses function akin to searchRecipe case
+                    // $recipesArray = selectRecipes($data2, $conn); // uses function akin to searchRecipe case
                     // // $response['query'] = $queryStatement;
                     // // echo $response['query'];
                     // return $recipesArray;

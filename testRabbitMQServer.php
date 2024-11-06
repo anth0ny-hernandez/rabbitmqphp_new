@@ -33,7 +33,6 @@ function requestProcessor($request) {
             // Route recipe search requests to the DMZ server
             $dmzClient = new rabbitMQClient("testDB_RMQ.ini", "dbConnect");
             $result = $dmzClient->send_request($request);
-            var_dump($result);
             return $result;
 
         case "dietRestrictions":
