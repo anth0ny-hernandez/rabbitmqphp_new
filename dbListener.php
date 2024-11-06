@@ -223,34 +223,58 @@ function databaseProcessor($request) {
     
             // called when no recipes exist and RMQ server requests & sends API data to insert 
             case "insertRecipe":
+                $time = time();
                 $queryStatement = "INSERT INTO recipes (label, image, url, healthLabels, 
-                                                ENERC_KCAL, ingredientLines, calories, cuisineType, 
-                                                mealType, fat, carbs, fiber, sugars, protein, 
-                                                cholesterol, sodium, calcium, vitaminA, vitaminC, timestamp)
-                                            values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 
-                                                    ?, ?, ?, ?, ?, ? )";
+                                ENERC_KCAL, ingredientLines, calories, cuisineType, 
+                                mealType, fat, carbs, fiber, sugars, protein, 
+                                cholesterol, sodium, calcium, vitaminA, vitaminC, timestamp)
+                                values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 
+                                        ?, ?, ?, ?, ?, ? )";
                 $query = $conn->prepare($queryStatement);
+
+                $recipeName = $request['$recipeName'];
+                $image = $request['image'];
+                $url = $request['url'];
+                $healthLabels = $request['healthLabel'];
+                $energy = $request['energy'];
+                $ingredients = $request['ingredients'];
+                $calories = $request['calories'];
+                $cuisineType = $request['cuisineType'];
+                $mealType = $request['mealType'];
+                $fat = $request['fat'];
+                $carbs = $request['carbs'];
+                $fiber = $request['fibers'];
+                $sugar = $request['sugar'];
+                $protein = $request['protein'];
+                $cholesterol = $request['cholesterol'];
+                $sodium = $request['sodium'];
+                $calcium = $request['calcium'];
+                $vitaminA = $request['vitaminA'];
+                $vitaminC = $request['vitaminC'];
+                $time = $request['time'];
+
                 $query->bind_param("ssssisissiiiiiiiiiii", 
                                     $recipeName, $image, $url, $healthLabels, 
                                     $energy, $ingredients, $calories, $cuisineType, 
                                     $mealType, $fat, $carbs, $fiber, $sugar, $protein, 
                                     $cholesterol, $sodium, $calcium, $vitaminA, 
-                                    $vitaminC, $time);
-                
+                                    $vitaminC, $time
+                                );
+    
                 if ($query->execute()) {
                     echo "Recipe(s) inserted successfully!\n";
                     echo "================================\n";
-                    $recipesArray = selectRecipes($request, $conn); // uses function akin to searchRecipe case
-                    // $response['query'] = $queryStatement;
-                    // echo $response['query'];
-                    return $recipesArray;
+                    // $recipesArray = selectRecipes($request, $conn); // uses function akin to searchRecipe case
+                    // // $response['query'] = $queryStatement;
+                    // // echo $response['query'];
+                    // return $recipesArray;
                 } else {
-                    // Log and return the error
+                    //Log and return the error
                     error_log("Error in registration: " . $conn->error);
                     echo "Error: " . $conn->error . "\n";
-                    $insert = "Error: " . $conn->error;
+                    // $insert = "Error: " . $conn->error;
                     return false;
-                }  
+                } 
         
         default:
             return "Database Client-Server error";

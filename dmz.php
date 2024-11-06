@@ -4,10 +4,8 @@
 require_once('rabbitMQLib.inc');
 require_once('get_host_info.inc');
 require_once('path.inc');
-$conn = new mysqli('localhost', 'testUser', '12345', 'testdb');
 
 function dmzProcessor($request){
-    $conn = new mysqli('localhost', 'testUser', '12345', 'testdb');
 
 $response = array();
 echo "Received request: ";
@@ -179,37 +177,7 @@ $data2 =json_decode($data, true);
         $calcium = $recipe['totalNutrients']['CA']['quantity'];
         $vitaminA = $recipe['totalNutrients']['VITA_RAE']['quantity'];
         $vitaminC = $recipe['totalNutrients']['VITC']['quantity'];
-
-        $time = time();
-
-            $queryStatement = "INSERT INTO recipes (label, image, url, healthLabels, 
-            ENERC_KCAL, ingredientLines, calories, cuisineType, 
-            mealType, fat, carbs, fiber, sugars, protein, 
-            cholesterol, sodium, calcium, vitaminA, vitaminC, timestamp)
-        values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 
-                ?, ?, ?, ?, ?, ? )";
-$query = $conn->prepare($queryStatement);
-$query->bind_param("ssssisissiiiiiiiiiii", 
-$recipeName, $image, $url, $healthLabels, 
-$energy, $ingredients, $calories, $cuisineType, 
-$mealType, $fat, $carbs, $fiber, $sugar, $protein, 
-$cholesterol, $sodium, $calcium, $vitaminA, 
-$vitaminC, $time);
-
-if ($query->execute()) {
-echo "Recipe(s) inserted successfully!\n";
-echo "================================\n";
-// $recipesArray = selectRecipes($request, $conn); // uses function akin to searchRecipe case
-// // $response['query'] = $queryStatement;
-// // echo $response['query'];
-// return $recipesArray;
-} else {
-//Log and return the error
-error_log("Error in registration: " . $conn->error);
-echo "Error: " . $conn->error . "\n";
-// $insert = "Error: " . $conn->error;
-return false;
-}  
+ 
 
         //check if recipes already in db. if already, send a message. if not, do insert query 
     //     $checkQuery = "SELECT * FROM recipes  WHERE label = ?";
