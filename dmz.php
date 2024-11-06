@@ -204,7 +204,7 @@ $data2 =json_decode($data, true);
 
             // $response['query'] = $queryStatement;
             // echo $response['query'];
-
+            $time = time();
             $response['label'] = $recipeName;
             $response['image'] = $image;
             $response['url'] = $url;
@@ -224,12 +224,13 @@ $data2 =json_decode($data, true);
             $response['calcium'] = $calcium;
             $response['vitaminA'] = $vitaminA;
             $response['vitaminC'] = $vitaminC;
+            $response['time'] = $time;
             $response['type'] = "insertRecipe";
 
 
             }      
             //send api data as a array to db so it can use it to insert
-            $dmzClient = new rabbitMQClient("dmzConfig.ini", "dmzServer");
+            $dmzClient = new rabbitMQClient("testRabbitMQ.ini", "testServer");
             $dmzClient->send_request($response);
             var_dump($response);
         return $response;

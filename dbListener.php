@@ -232,18 +232,18 @@ function databaseProcessor($request) {
                                         ?, ?, ?, ?, ?, ? )";
                 $query = $conn->prepare($queryStatement);
 
-                $recipeName = $request['$recipeName'];
+                $recipeName = $request['label'];
                 $image = $request['image'];
                 $url = $request['url'];
-                $healthLabels = $request['healthLabel'];
-                $energy = $request['energy'];
-                $ingredients = $request['ingredients'];
+                $healthLabels = $request['healthLabels'];
+                $energy = $request['ENERC_KCAL'];
+                $ingredients = $request['ingredientLines'];
                 $calories = $request['calories'];
                 $cuisineType = $request['cuisineType'];
                 $mealType = $request['mealType'];
-                $fat = $request['fat'];
+                $fat = $request['FAT'];
                 $carbs = $request['carbs'];
-                $fiber = $request['fibers'];
+                $fiber = $request['fiber'];
                 $sugar = $request['sugar'];
                 $protein = $request['protein'];
                 $cholesterol = $request['cholesterol'];
