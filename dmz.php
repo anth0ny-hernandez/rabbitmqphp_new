@@ -224,11 +224,14 @@ $data2 =json_decode($data, true);
             $response['calcium'] = $calcium;
             $response['vitaminA'] = $vitaminA;
             $response['vitaminC'] = $vitaminC;
+            $response['type'] = "insertRecipe";
 
 
             }      
             //send api data as a array to db so it can use it to insert
-            
+            $dmzClient = new rabbitMQClient("dmzConfig.ini", "dmzServer");
+            $dmzClient->send_request($response);
+            var_dump($response);
         return $response;
 //     default:
 //             return "ERROR: unsupported message type";
@@ -239,8 +242,8 @@ $data2 =json_decode($data, true);
 
 dmzProcessor(array("label"=>"salad"));
 
-$dmzServer = new rabbitMQServer("testDMZ_RMQ.ini", "testDMZ");
+// $dmzServer = new rabbitMQServer("testDMZ_RMQ.ini", "testDMZ");
 echo "DMZ Server is running and waiting for requests...\n";
-$dmzServer->process_requests('dmzProcessor');
+// $dmzServer->process_requests('dmzProcessor');
 
 ?>
