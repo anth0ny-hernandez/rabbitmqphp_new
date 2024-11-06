@@ -14,7 +14,8 @@ $data2 =json_decode($request, true);
     $conn = new mysqli('localhost', 'testUser', '12345', 'testdb');
     // $username = $data2['username'];
     // $password = $data2['password'];
-    switch($data2['type']) {
+    
+    switch($data2['hits']['recipe']['type']) {
 
         case "getUserPreferences":
             $session_token = $data2['session_token'];
