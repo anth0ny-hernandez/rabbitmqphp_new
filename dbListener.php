@@ -12,8 +12,8 @@ function databaseProcessor($request) {
     $data = json_decode($request['data'], true);
     // database connection & credential variable assignment
     $conn = new mysqli('localhost', 'testUser', '12345', 'testdb');
-    // $username = $request['username'];
-    // $password = $request['password'];
+    $username = $request['username'];
+    $password = $request['password'];
     
     switch($request['type']) {
 
@@ -268,6 +268,20 @@ function databaseProcessor($request) {
                                 );
     
                 if ($query->execute()) {
+
+                    $sql = "SELECT * FROM recipes WHERE label = ?";
+                    $stmt = $conn->prepare($sql);
+                    // KCAL might need to be integer
+                    $stmt->bind_param("s", $recipeName);
+                    $stmt->execute();
+                    $resultArray = $stmt->get_result();
+                    if ($resultArray->num_rows > 0) {
+                        $recipes = $resultArray->fetch_assoc();
+                        return $recipes;
+                    } else {
+                        return false;
+                    }
+
                     echo "Recipe(s) inserted successfully!\n";
                     echo "================================\n";
                     // $recipesArray = selectRecipes($request, $conn); // uses function akin to searchRecipe case

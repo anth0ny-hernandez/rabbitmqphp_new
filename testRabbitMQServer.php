@@ -29,10 +29,33 @@ function requestProcessor($request) {
             return $result;
         
         
-        case "insertRecipe":
+        case "searchRecipe":
             // Route recipe search requests to the DMZ server
             $dmzClient = new rabbitMQClient("testDB_RMQ.ini", "dbConnect");
-            $result = $dmzClient->send_request($request);
+            echo "Connected to database...\n";
+
+            $result = $dbClient->send_request($request);
+            echo "Asking database if recipe(s) exist within it...\n";
+
+            if(!$result) {
+                $dmzClient = new rabbitMQClient("testDMZ_RMQ.ini", "testDMZ");
+                $result = $dmzClient->send_request($request);
+                // if even DMZ returns no matches, then let the user know
+                if(!$result) {
+                    echo "Sorry, no recipes match that! Returning no matches...\n";
+                    return $result;
+                } else {
+                    echo "Recipe(s) found! Updating the database now...\n";
+                    $request['type'] = 'insertRecipe'; // modify request parameter
+                    $result = $dbClient->send_request($request);
+                    var_dump($result);
+                    return $result;
+                }
+            } else {
+                echo "Recipes found! Sending back to front-end user...\n";
+                return $result;
+            }
+            
             return $result;
 
         case "dietRestrictions":
