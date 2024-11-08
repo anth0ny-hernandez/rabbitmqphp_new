@@ -7,9 +7,9 @@ if (!isset($_COOKIE['session_token'])) {
     exit();
 }
 
-// Refresh session token to extend expiration by another 30 seconds
+// Refresh session token to extend expiration by another 90 seconds
 $session_token = $_COOKIE['session_token'];
-$expire_time = time() + 30;
+$expire_time = time() + 90;
 setcookie('session_token', $session_token, $expire_time, "/");
 
 $recipeSearchResponse = null;
@@ -148,7 +148,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['searchRecipe'])) {
     setTimeout(function() {
         document.cookie = 'session_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
         window.location.href = 'login.php';
-    }, 30000); // 30 seconds
+    }, 90000); // 90 seconds
 </script>
 
 </body>
