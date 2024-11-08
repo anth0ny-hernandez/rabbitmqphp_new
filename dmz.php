@@ -205,33 +205,36 @@ $data2 =json_decode($data, true);
             // $response['query'] = $queryStatement;
             // echo $response['query'];
             $time = time();
-            $response['label'] = $recipeName;
-            $response['image'] = $image;
-            $response['url'] = $url;
-            $response['healthLabels'] = $healthLabels;
-            $response['ENERC_KCAL'] = $energy;
-            $response['ingredientLines'] = $ingredients;
-            $response['calories'] = $calories;
-            $response['cuisineType'] = $cuisineType;
-            $response['mealType'] = $mealType;
-            $response['FAT'] = $fat;
-            $response['carbs'] = $carbs;
-            $response['fiber'] = $fiber;
-            $response['sugar'] = $sugar;
-            $response['protein'] = $protein;
-            $response['cholesterol'] =  $cholesterol;
-            $response['sodium'] = $sodium;
-            $response['calcium'] = $calcium;
-            $response['vitaminA'] = $vitaminA;
-            $response['vitaminC'] = $vitaminC;
-            $response['time'] = $time;
-            $response['type'] = "insertRecipe";
-
+            // $response['label'] = $recipeName;
+            // $response['image'] = $image;
+            // $response['url'] = $url;
+            // $response['healthLabels'] = $healthLabels;
+            // $response['ENERC_KCAL'] = $energy;
+            // $response['ingredientLines'] = $ingredients;
+            // $response['calories'] = $calories;
+            // $response['cuisineType'] = $cuisineType;
+            // $response['mealType'] = $mealType;
+            // $response['FAT'] = $fat;
+            // $response['carbs'] = $carbs;
+            // $response['fiber'] = $fiber;
+            // $response['sugar'] = $sugar;
+            // $response['protein'] = $protein;
+            // $response['cholesterol'] =  $cholesterol;
+            // $response['sodium'] = $sodium;
+            // $response['calcium'] = $calcium;
+            // $response['vitaminA'] = $vitaminA;
+            // $response['vitaminC'] = $vitaminC;
+          
 
             }      
             //send api data as a array to db so it can use it to insert
+            $time = time();
+            $response['time'] = $time;
+            $response['type'] = "insertRecipe";
+            $response['data'] = $data;
+          
             $dmzClient = new rabbitMQClient("testRabbitMQ.ini", "testServer");
-            $dmzClient->send_request($data);
+            $dmzClient->send_request($response);
             var_dump($response);
         return $response;
 //     default:

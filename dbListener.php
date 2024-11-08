@@ -6,19 +6,19 @@ require_once('get_host_info.inc');
 require_once('path.inc');
 
 function databaseProcessor($request) {
-$data2 =json_decode($request, true);
+// $request =json_decode($request, true);
     echo "Received request: ";
-    var_dump($data2);
-
+    var_dump($request);
+    $data = json_decode($request['data'], true);
     // database connection & credential variable assignment
     $conn = new mysqli('localhost', 'testUser', '12345', 'testdb');
-    // $username = $data2['username'];
-    // $password = $data2['password'];
+    // $username = $request['username'];
+    // $password = $request['password'];
     
-    switch($data2['hits']['recipe']['type']) {
+    switch($request['type']) {
 
         case "getUserPreferences":
-            $session_token = $data2['session_token'];
+            $session_token = $request['session_token'];
         
             // Retrieve user ID based on session token
             $userQuery = "SELECT id FROM accounts WHERE session_token = ?";
@@ -50,7 +50,7 @@ $data2 =json_decode($request, true);
         
 
         case "getDietRestrictions":
-            $session_token = $data2['session_token'];
+            $session_token = $request['session_token'];
         
             // Find the user ID using the session token
             $userQuery = "SELECT id FROM accounts WHERE session_token = ?";
@@ -85,10 +85,10 @@ $data2 =json_decode($request, true);
             echo "Processing dietary restrictions...\n";
 
             // Retrieve dietary restriction details
-            $dietaryRestrictions = is_array($data2['dietaryRestrictions']) ? implode(", ", $data2['dietaryRestrictions']) : $data2['dietaryRestrictions'];
-            $allergyType = is_array($data2['allergyType']) ? implode(", ", $data2['allergyType']) : $data2['allergyType'];
-            $otherRestrictions = $data2['otherRestrictions'];
-            $session_token = $data2['session_token'];
+            $dietaryRestrictions = is_array($request['dietaryRestrictions']) ? implode(", ", $request['dietaryRestrictions']) : $request['dietaryRestrictions'];
+            $allergyType = is_array($request['allergyType']) ? implode(", ", $request['allergyType']) : $request['allergyType'];
+            $otherRestrictions = $request['otherRestrictions'];
+            $session_token = $request['session_token'];
 
             // Find the user ID associated with the session token
             $userQuery = "SELECT id FROM accounts WHERE session_token = ?";
@@ -149,8 +149,8 @@ $data2 =json_decode($request, true);
                 return false;
             }
         case "login":
-            $username = $data2['username'];
-            $password = $data2['password'];
+            $username = $request['username'];
+            $password = $request['password'];
         
             echo "Processing login for $username...\n";
             echo "================================\n";
@@ -200,11 +200,11 @@ $data2 =json_decode($request, true);
             }
             case "searchRecipe":
                 // retrieve parameters from client request
-                $label = $data2["label"];
-                $healthLabels = $data2["healthLabels"];
-                $calories = $data2["ENERC_KCAL"];
-                $cuisine = $data2["cuisineType"];
-                $meal = $data2["mealType"];
+                $label = $request["label"];
+                $healthLabels = $request["healthLabels"];
+                $calories = $request["ENERC_KCAL"];
+                $cuisine = $request["cuisineType"];
+                $meal = $request["mealType"];
     
                 $sql = "SELECT * FROM recipes WHERE label = ? 
                         AND healthLabels = ? AND ENERC_KCAL <= ?
@@ -224,7 +224,7 @@ $data2 =json_decode($request, true);
             // called when no recipes exist and RMQ server requests & sends API data to insert 
             case "insertRecipe":
 
-                foreach($data2['hits'] as $hit){
+                foreach($data['hits'] as $hit){
                 $time = time();
                 $recipe = $hit['recipe'];
                 $queryStatement = "INSERT INTO recipes (label, image, url, healthLabels, 
@@ -234,32 +234,35 @@ $data2 =json_decode($request, true);
                                 values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 
                                         ?, ?, ?, ?, ?, ? )";
                 $query = $conn->prepare($queryStatement);
-
                 $recipeName = $recipe['label'];
                 $image = $recipe['image'];
                 $url = $recipe['url'];
                 $healthLabels = $recipe['healthLabels'];
-                $energy = $recipe['ENERC_KCAL'];
+                $healthLabelData = implode(',', $healthLabels);
+                $energy = $recipe['totalNutrients']['ENERC_KCAL']['quantity'];
                 $ingredients = $recipe['ingredientLines'];
+                $ingredientData = implode(',', $ingredients);
                 $calories = $recipe['calories'];
                 $cuisineType = $recipe['cuisineType'];
+                $cuisineTypeData = implode(',', $cuisineType);
                 $mealType = $recipe['mealType'];
-                $fat = $recipe['FAT'];
-                $carbs = $recipe['carbs'];
-                $fiber = $recipe['fiber'];
-                $sugar = $recipe['sugar'];
-                $protein = $recipe['protein'];
-                $cholesterol = $recipe['cholesterol'];
-                $sodium = $recipe['sodium'];
-                $calcium = $recipe['calcium'];
-                $vitaminA = $recipe['vitaminA'];
-                $vitaminC = $recipe['vitaminC'];
-                $time = $recipe['time'];
+                $mealTypeData = implode(',', $mealType);
+                $fat = $recipe['totalNutrients']['FAT']['quantity'];
+                $carbs = $recipe['totalNutrients']['CHOCDF']['quantity'];
+                $fiber = $recipe['totalNutrients']['FIBTG']['quantity'];
+                $sugar = $recipe['totalNutrients']['SUGAR']['quantity'];
+                $protein = $recipe['totalNutrients']['PROCNT']['quantity'];
+                $cholesterol = $recipe['totalNutrients']['CHOLE']['quantity'];
+                $sodium = $recipe['totalNutrients']['NA']['quantity'];
+                $calcium = $recipe['totalNutrients']['CA']['quantity'];
+                $vitaminA = $recipe['totalNutrients']['VITA_RAE']['quantity'];
+                $vitaminC = $recipe['totalNutrients']['VITC']['quantity'];
+                $time = $request['time'];
 
                 $query->bind_param("ssssisissiiiiiiiiiii", 
-                                    $recipeName, $image, $url, $healthLabels, 
-                                    $energy, $ingredients, $calories, $cuisineType, 
-                                    $mealType, $fat, $carbs, $fiber, $sugar, $protein, 
+                                    $recipeName, $image, $url, $healthLabelData, 
+                                    $energy, $ingredientData, $calories, $cuisineTypeData, 
+                                    $mealTypeData, $fat, $carbs, $fiber, $sugar, $protein, 
                                     $cholesterol, $sodium, $calcium, $vitaminA, 
                                     $vitaminC, $time
                                 );
@@ -267,7 +270,7 @@ $data2 =json_decode($request, true);
                 if ($query->execute()) {
                     echo "Recipe(s) inserted successfully!\n";
                     echo "================================\n";
-                    // $recipesArray = selectRecipes($data2, $conn); // uses function akin to searchRecipe case
+                    // $recipesArray = selectRecipes($request, $conn); // uses function akin to searchRecipe case
                     // // $response['query'] = $queryStatement;
                     // // echo $response['query'];
                     // return $recipesArray;
