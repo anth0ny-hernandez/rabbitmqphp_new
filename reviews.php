@@ -7,6 +7,11 @@ if (!isset($_COOKIE['session_token'])) {
     exit();
 }
 
+// Refresh session token to extend expiration by another 30 seconds
+$session_token = $_COOKIE['session_token'];
+$expire_time = time() + 90;
+setcookie('session_token', $session_token, $expire_time, "/");
+
 // Initialize variables
 $username = "";
 $rating = "";
@@ -171,6 +176,13 @@ $reviews = $reviewsResponse['reviews'] ?? [];
         <?php endif; ?>
     </div>
 </div>
+
+<script>
+    setTimeout(function() {
+        document.cookie = 'session_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+        window.location.href = 'login.php';
+    }, 90000); // 30 seconds
+</script>
 
 </body>
 </html>

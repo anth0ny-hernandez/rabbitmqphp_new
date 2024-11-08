@@ -7,7 +7,7 @@ if (!isset($_COOKIE['session_token'])) {
 
 // Refresh session token to extend expiration by another 30 seconds
 $session_token = $_COOKIE['session_token'];
-$expire_time = time() + 30;
+$expire_time = time() + 90;
 setcookie('session_token', $session_token, $expire_time, "/");
 ?>
 
@@ -83,7 +83,7 @@ setcookie('session_token', $session_token, $expire_time, "/");
     setTimeout(function() {
         document.cookie = 'session_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
         window.location.href = 'login.php';
-    }, 30000); // 30 seconds
+    }, 90000); // 30 seconds
 </script>
 
 </body>

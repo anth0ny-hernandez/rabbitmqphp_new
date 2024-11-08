@@ -16,6 +16,20 @@ function databaseProcessor($request) {
     $password = $request['password'];
 
     switch($request['type']) {
+
+        case "logout":
+            $session_token = $request['session_token'];
+        
+            // Prepare a statement to clear the session token and expiration in the database
+            $stmt = $conn->prepare("UPDATE accounts SET session_token = NULL, session_expires = NULL WHERE session_token = ?");
+            $stmt->bind_param("s", $session_token);
+        
+            if ($stmt->execute()) {
+                return ["success" => true, "message" => "Logged out successfully"];
+            } else {
+                return ["success" => false, "message" => "Failed to log out"];
+            }
+        
         case "submitReview":
             $username = $request['username'];
             $rating = $request['rating'];
