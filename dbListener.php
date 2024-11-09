@@ -9,7 +9,6 @@ function databaseProcessor($request) {
 // $request =json_decode($request, true);
     echo "Received request: ";
     var_dump($request);
-    $data = json_decode($request['data'], true);
     // database connection & credential variable assignment
     $conn = new mysqli('localhost', 'testUser', '12345', 'testdb');
     $username = $request['username'];
@@ -223,7 +222,7 @@ function databaseProcessor($request) {
     
             // called when no recipes exist and RMQ server requests & sends API data to insert 
             case "insertRecipe":
-
+                $data = json_decode($request['data'], true);
                 foreach($data['hits'] as $hit){
                 $time = time();
                 $recipe = $hit['recipe'];

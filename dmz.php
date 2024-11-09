@@ -246,7 +246,7 @@ $data2 =json_decode($data, true);
 
 // dmzProcessor(array("label"=>"salad"));
 
-$dmzServer = new rabbitMQServer("testDMZ_RMQ.ini", "testDMZ");
+$dmzServer = new rabbitMQServer("dmzConfig.ini", "dmzServer");
 echo "DMZ Server is running and waiting for requests...\n";
 $dmzServer->process_requests('dmzProcessor');
 
