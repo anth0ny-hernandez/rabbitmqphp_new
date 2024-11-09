@@ -12,7 +12,7 @@ $session_token = $_COOKIE['session_token'];
 $expire_time = time() + 30;
 setcookie('session_token', $session_token, $expire_time, "/");
 
-$recipeSearchResponse = null;
+$recipeSearchResponses = null;
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['searchRecipe'])) {
     $client = new rabbitMQClient("testRabbitMQ.ini", "testServer");
@@ -27,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['searchRecipe'])) {
         "ENERC_KCAL" => $_POST['ENERC_KCAL'] ?? null,
     ];
 
-    $recipeSearchResponse = $client->send_request($request);
+    $recipeSearchResponses = $client->send_request($request);
 }
 ?>
 
@@ -123,23 +123,33 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['searchRecipe'])) {
     </form>
 
     <!-- Display Logic for Recipe Search Results -->
-    <?php if (isset($recipeSearchResponse['error'])): ?>
-        <p><?php echo htmlspecialchars($recipeSearchResponse['error']); ?></p>
-    <?php elseif (isset($recipeSearchResponse['hits']) && !empty($recipeSearchResponse['hits'])): ?>
-        <h3>Search Results:</h3>
-        <?php foreach ($recipeSearchResponse['hits'] as $hit): ?>
-            <div class="meal-item">
-                <strong><?php echo htmlspecialchars($hit['recipe']['label']); ?></strong><br>
-                <a href="<?php echo htmlspecialchars($hit['recipe']['url']); ?>" target="_blank">View Recipe</a><br>
-                Calories: <?php echo round($hit['recipe']['calories']); ?><br>
-                <?php if (!empty($hit['recipe']['image'])): ?>
-                    <img src="<?php echo htmlspecialchars($hit['recipe']['image']); ?>" alt="<?php echo htmlspecialchars($hit['recipe']['label']); ?>" width="100">
+    <?php 
+        if(!$recipeSearchResponses) 
+        {
+            echo  "<p> No recipe found</p>";
+        }
+                                    
+     else
+     {
+        echo "<h3>Search Results:</h3>";
+
+         foreach($recipeSearchResponses as $recipeSearchResponse)
+         {
+    ?> 
+            <div class="meal-item"> 
+                <strong><?php echo htmlspecialchars($recipeSearchResponse['label']); ?></strong><br>
+                <a href="<?php echo htmlspecialchars($recipeSearchResponse['url']); ?>" target="_blank">View Recipe</a><br>
+                Calories: <?php echo round($recipeSearchResponse['calories']); ?><br>
+                <?php if (!empty($recipeSearchResponse['image'])): ?>
+                    <img src="<?php echo htmlspecialchars($recipeSearchResponse['image']); ?>" alt="<?php echo htmlspecialchars($recipeSearchResponse['label']); ?>" width="100">
                 <?php endif; ?>
             </div>
-        <?php endforeach; ?>
-    <?php else: ?>
-        
-    <?php endif; ?>
+
+    <?php } 
+               
+    }
+               
+               ?>
 </div>
 
 <!-- JavaScript to handle automatic logout after session expiration -->

@@ -31,7 +31,7 @@ function requestProcessor($request) {
         
         case "searchRecipe":
             // Route recipe search requests to the DMZ server
-            $dmzClient = new rabbitMQClient("testDB_RMQ.ini", "dbConnect");
+            $dbClient = new rabbitMQClient("testDB_RMQ.ini", "dbConnect");
             echo "Connected to database...\n";
 
             $result = $dbClient->send_request($request);

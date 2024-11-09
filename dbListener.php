@@ -271,7 +271,6 @@ function databaseProcessor($request) {
 
                     $sql = "SELECT * FROM recipes WHERE label = ?";
                     $stmt = $conn->prepare($sql);
-                    // KCAL might need to be integer
                     $stmt->bind_param("s", $recipeName);
                     $stmt->execute();
                     $resultArray = $stmt->get_result();
