@@ -248,6 +248,6 @@ $data2 =json_decode($data, true);
 
 $dmzServer = new rabbitMQServer("testDMZ_RMQ.ini", "testDMZ");
 echo "DMZ Server is running and waiting for requests...\n";
-// $dmzServer->process_requests('dmzProcessor');
+$dmzServer->process_requests('dmzProcessor');
 
 ?>
