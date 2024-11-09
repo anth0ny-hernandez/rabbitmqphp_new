@@ -13,7 +13,7 @@ var_dump($request);
 
 
 //parameters to append to endpoint url
-$params = array(
+$params = array_filter([
 'type'=>'public'?? null,
 'q'=>$request['label'] ?? null, 
 'app_id'=>'4577783c', 
@@ -33,7 +33,9 @@ $params = array(
 'nutrients[VITA_RAE]'=>$request['vitaminA'] ?? null,
 'nutrients[VITC]'=>$request['vitaminC'] ?? null,
 'ingredientLines'=>$request['ingredients'] ?? null,
-);
+], function($value) {
+    return $value !== null;
+});
 
 // if($request['healthLabels'])
 // {

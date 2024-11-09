@@ -275,6 +275,7 @@ function databaseProcessor($request) {
                     $resultArray = $stmt->get_result();
                     if ($resultArray->num_rows > 0) {
                         $recipes = $resultArray->fetch_assoc();
+                        var_dump($recipes);
                         return $recipes;
                     } else {
                         return false;
