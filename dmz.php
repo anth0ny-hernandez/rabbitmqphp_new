@@ -154,79 +154,79 @@ $data2 =json_decode($data, true);
 // switch ($request['type']) {
     
 //     case "insertRecipe":
-        foreach($data2['hits'] as $hit)
-        {
-        $recipe = $hit['recipe'];
+    //     foreach($data2['hits'] as $hit)
+    //     {
+    //     $recipe = $hit['recipe'];
 
-        $recipeName = $recipe['label'];
-        $image = $recipe['image'];
-        $url = $recipe['url'];
-        $healthLabels = implode(',', $recipe['healthLabels']);
-        $energy = $recipe['totalNutrients']['ENERC_KCAL']['quantity'];
-        $ingredients = implode(',', $recipe['ingredientLines']);
-        $calories = $recipe['calories'];
-        $cuisineType = implode(',', $recipe['cuisineType']);
-        $mealType = implode(',', $recipe['mealType']);
-        $fat = $recipe['totalNutrients']['FAT']['quantity'];
-        $carbs = $recipe['totalNutrients']['CHOCDF']['quantity'];
-        $fiber = $recipe['totalNutrients']['FIBTG']['quantity'];
-        $sugar = $recipe['totalNutrients']['SUGAR']['quantity'];
-        $protein = $recipe['totalNutrients']['PROCNT']['quantity'];
-        $cholesterol = $recipe['totalNutrients']['CHOLE']['quantity'];
-        $sodium = $recipe['totalNutrients']['NA']['quantity'];
-        $calcium = $recipe['totalNutrients']['CA']['quantity'];
-        $vitaminA = $recipe['totalNutrients']['VITA_RAE']['quantity'];
-        $vitaminC = $recipe['totalNutrients']['VITC']['quantity'];
+    //     $recipeName = $recipe['label'];
+    //     $image = $recipe['image'];
+    //     $url = $recipe['url'];
+    //     $healthLabels = implode(',', $recipe['healthLabels']);
+    //     $energy = $recipe['totalNutrients']['ENERC_KCAL']['quantity'];
+    //     $ingredients = implode(',', $recipe['ingredientLines']);
+    //     $calories = $recipe['calories'];
+    //     $cuisineType = implode(',', $recipe['cuisineType']);
+    //     $mealType = implode(',', $recipe['mealType']);
+    //     $fat = $recipe['totalNutrients']['FAT']['quantity'];
+    //     $carbs = $recipe['totalNutrients']['CHOCDF']['quantity'];
+    //     $fiber = $recipe['totalNutrients']['FIBTG']['quantity'];
+    //     $sugar = $recipe['totalNutrients']['SUGAR']['quantity'];
+    //     $protein = $recipe['totalNutrients']['PROCNT']['quantity'];
+    //     $cholesterol = $recipe['totalNutrients']['CHOLE']['quantity'];
+    //     $sodium = $recipe['totalNutrients']['NA']['quantity'];
+    //     $calcium = $recipe['totalNutrients']['CA']['quantity'];
+    //     $vitaminA = $recipe['totalNutrients']['VITA_RAE']['quantity'];
+    //     $vitaminC = $recipe['totalNutrients']['VITC']['quantity'];
  
 
-        //check if recipes already in db. if already, send a message. if not, do insert query 
-    //     $checkQuery = "SELECT * FROM recipes  WHERE label = ?";
-    //     $stmt = $conn->prepare($checkQuery);
-    //     $stmt->bind_param("s", $recipeName);
-    //     $stmt->execute();
-    //     $ray = $stmt->get_result();
+    //     //check if recipes already in db. if already, send a message. if not, do insert query 
+    // //     $checkQuery = "SELECT * FROM recipes  WHERE label = ?";
+    // //     $stmt = $conn->prepare($checkQuery);
+    // //     $stmt->bind_param("s", $recipeName);
+    // //     $stmt->execute();
+    // //     $ray = $stmt->get_result();
             
-    //     if ($ray->num_rows > 0) 
-    //    {
-    //        $response['msg'] = "Recipes exist already. No need to insert"; 
-    //    }
+    // //     if ($ray->num_rows > 0) 
+    // //    {
+    // //        $response['msg'] = "Recipes exist already. No need to insert"; 
+    // //    }
     
 
 
 
-        //if not, insert into db
-                // $queryStatement = "INSERT INTO recipes (label, image, url, healthLabels, ENERC_KCAL, ingredientLines, calories, cuisineType, mealType, fat, carbs, fiber, sugars, protein, cholesterol, sodium, calcium, vitaminA, vitaminC, timestamp)
-                // values ($recipeName, $image, $url, $healthLabels, $energy, $ingredients, $calories, $cuisineType, $mealType, $fat, $carbs, $fiber, $sugar, $protein, $cholesterol, $sodium, $calcium, $vitaminA, $vitaminC, $time)";
-                //values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )";
-                // $query = $conn->prepare($queryStatement);
-            // $query->bind_param("ssssisissiiiiiiiiiii",  $recipeName, $image, $url, $healthLabels, $energy, $ingredients, $calories, $cuisineType, $mealType, $fat, $carbs, $fiber, $sugar, $protein, $cholesterol, $sodium, $calcium, $vitaminA, $vitaminC, $time);
-            // $query->execute();
+    //     //if not, insert into db
+    //             // $queryStatement = "INSERT INTO recipes (label, image, url, healthLabels, ENERC_KCAL, ingredientLines, calories, cuisineType, mealType, fat, carbs, fiber, sugars, protein, cholesterol, sodium, calcium, vitaminA, vitaminC, timestamp)
+    //             // values ($recipeName, $image, $url, $healthLabels, $energy, $ingredients, $calories, $cuisineType, $mealType, $fat, $carbs, $fiber, $sugar, $protein, $cholesterol, $sodium, $calcium, $vitaminA, $vitaminC, $time)";
+    //             //values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )";
+    //             // $query = $conn->prepare($queryStatement);
+    //         // $query->bind_param("ssssisissiiiiiiiiiii",  $recipeName, $image, $url, $healthLabels, $energy, $ingredients, $calories, $cuisineType, $mealType, $fat, $carbs, $fiber, $sugar, $protein, $cholesterol, $sodium, $calcium, $vitaminA, $vitaminC, $time);
+    //         // $query->execute();
 
-            // $response['query'] = $queryStatement;
-            // echo $response['query'];
-            $time = time();
-            // $response['label'] = $recipeName;
-            // $response['image'] = $image;
-            // $response['url'] = $url;
-            // $response['healthLabels'] = $healthLabels;
-            // $response['ENERC_KCAL'] = $energy;
-            // $response['ingredientLines'] = $ingredients;
-            // $response['calories'] = $calories;
-            // $response['cuisineType'] = $cuisineType;
-            // $response['mealType'] = $mealType;
-            // $response['FAT'] = $fat;
-            // $response['carbs'] = $carbs;
-            // $response['fiber'] = $fiber;
-            // $response['sugar'] = $sugar;
-            // $response['protein'] = $protein;
-            // $response['cholesterol'] =  $cholesterol;
-            // $response['sodium'] = $sodium;
-            // $response['calcium'] = $calcium;
-            // $response['vitaminA'] = $vitaminA;
-            // $response['vitaminC'] = $vitaminC;
+    //         // $response['query'] = $queryStatement;
+    //         // echo $response['query'];
+    //         $time = time();
+    //         // $response['label'] = $recipeName;
+    //         // $response['image'] = $image;
+    //         // $response['url'] = $url;
+    //         // $response['healthLabels'] = $healthLabels;
+    //         // $response['ENERC_KCAL'] = $energy;
+    //         // $response['ingredientLines'] = $ingredients;
+    //         // $response['calories'] = $calories;
+    //         // $response['cuisineType'] = $cuisineType;
+    //         // $response['mealType'] = $mealType;
+    //         // $response['FAT'] = $fat;
+    //         // $response['carbs'] = $carbs;
+    //         // $response['fiber'] = $fiber;
+    //         // $response['sugar'] = $sugar;
+    //         // $response['protein'] = $protein;
+    //         // $response['cholesterol'] =  $cholesterol;
+    //         // $response['sodium'] = $sodium;
+    //         // $response['calcium'] = $calcium;
+    //         // $response['vitaminA'] = $vitaminA;
+    //         // $response['vitaminC'] = $vitaminC;
           
 
-            }      
+    //         }      
             //send api data as a array to db so it can use it to insert
             $time = time();
             $response['time'] = $time;
