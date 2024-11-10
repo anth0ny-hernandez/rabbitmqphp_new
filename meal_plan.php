@@ -20,11 +20,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['searchRecipe'])) {
     // Collect form data for recipe search
     $request = [
         "type" => "searchRecipe",
-        "label" => $_POST['label'] ?? null,
-        "healthLabels" => $_POST['healthLabels'] ?? null,
-        "cuisineType" => $_POST['cuisineType'] ?? null,
-        "mealType" => $_POST['mealType'] ?? null,
-        "ENERC_KCAL" => $_POST['ENERC_KCAL'] ?? null,
+        "label" => !empty($_POST['label']) ? $_POST['label'] : null,
+        "healthLabels" => !empty($_POST['healthLabels']) ? $_POST['healthLabels'] : null,
+        "cuisineType" => !empty($_POST['cuisineType']) ? $_POST['cuisineType'] : null,
+        "mealType" => !empty($_POST['cuisineType']) ? $_POST['mealType'] : null,
+        "ENERC_KCAL" => !empty($_POST['cuisineType']) ? $_POST['ENERC_KCAL'] : null,
     ];
 
     $recipeSearchResponses = $client->send_request($request);
