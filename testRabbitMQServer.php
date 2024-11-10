@@ -35,13 +35,15 @@ function requestProcessor($request) {
             echo "Connected to database...\n";
 
             $result = $dbClient->send_request($request);
+            var_dump($result);
             echo "Asking database if recipe(s) exist within it...\n";
 
-            if(!$result) {
+            if($result==false) {
                 $dmzClient = new rabbitMQClient("dmzConfig.ini", "dmzServer");
                 $result = $dmzClient->send_request($request);
+                var_dump($result);
                 // if even DMZ returns no matches, then let the user know
-                if(!$result) {
+                if($result==false) {
                     echo "Sorry, no recipes match that! Returning no matches...\n";
                     return $result;
                 } else {

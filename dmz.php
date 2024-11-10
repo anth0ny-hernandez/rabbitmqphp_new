@@ -128,6 +128,8 @@ echo($url);
 curl_setopt($cu, CURLOPT_URL, "https://api.edamam.com/api/recipes/v2?". http_build_query($params));
 curl_setopt($cu, CURLOPT_RETURNTRANSFER, true);
 
+$effectiveUrl = curl_getinfo($cu, CURLINFO_EFFECTIVE_URL);
+echo($effectiveUrl);
 //alvees username header
 $headers = [
     'Edamam-Account-User: AlveeJalal',
