@@ -3,6 +3,7 @@ require_once('rabbitMQLib.inc');
 require_once('get_host_info.inc');
 require_once('path.inc');
 
+
 function recommendRecipes($preferences) {
     // Define parameters for the Edamam API request based on preferences
     $params = array(
@@ -10,6 +11,7 @@ function recommendRecipes($preferences) {
         'app_id' => '4577783c', 
         'app_key' => '2ebd6b0aa43312e5f01f2077882ca32f',
         'health' => $preferences['dietaryRestrictions'] ?? null,
+        'diet' => $preferences['allergyType'] ?? null,
         'q' => $preferences['otherRestrictions'] ?? 'recipe'  // Default query if no specific preference
     );
 
@@ -46,7 +48,6 @@ function recommendRecipes($preferences) {
     return $data;
 }
 
-
 function searchRecipe($request) {
     // Define parameters for the request, ensuring 'q' is present
     $params = array(
@@ -81,7 +82,8 @@ function searchRecipe($request) {
     curl_close($curl);
 
     $data = json_decode($response, true);
-    
+    //var_dump($data);  // Debugging output for response data
+
     // Check if 'hits' contains data
     if (!isset($data['hits']) || empty($data['hits'])) {
         return ["error" => "No recipes found"];
@@ -116,3 +118,4 @@ function requestProcessor($request) {
 $server = new rabbitMQServer("dmzConfig.ini", "dmzServer");
 echo "DMZ Server for Meal Planning and Recipe Search is running and waiting for requests...\n";
 $server->process_requests('requestProcessor');
+?>
