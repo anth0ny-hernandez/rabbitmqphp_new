@@ -89,7 +89,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['searchRecipe'])) {
 <div class="container">
     <div class="nav-buttons">
         <a href="home.php" class="button">Home</a>
-        <a href="meal_plan.php" class="button">Recipe Search</a>
+        <a href="search.php" class="button">Recipe Search</a>
         <a href="dietRestrictions.php" class="button">Diet Restrictions</a>
         <a href="recommendations.php" class="button">Recipe Recommendations</a>
         <a href="logout.php" class="button logout-button">Logout</a>
@@ -98,7 +98,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['searchRecipe'])) {
     <h2>Recipe Search</h2>
 
     <!-- Recipe Search Form -->
-    <form method="POST" action="meal_plan.php">
+    <form method="POST" action="search.php">
         <label for="label">Search for Recipes:</label>
         <input type="text" id="label" name="label" placeholder="e.g., pasta, salad" required>
         <br><br>
