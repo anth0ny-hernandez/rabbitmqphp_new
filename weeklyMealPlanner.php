@@ -2,18 +2,20 @@
 require_once('rabbitMQLib.inc');
 
 // Check if the session token cookie is set
-// if (!isset($_COOKIE['session_token'])) {
-//     header("Location: login.php");
-//     exit();
-// }
+if (!isset($_COOKIE['session_token'])) {
+    header("Location: login.php");
+    exit();
+}
 
 // // Refresh session token to extend expiration by another 90 seconds
-// $session_token = $_COOKIE['session_token'];
-// $expire_time = time() + 90;
-// setcookie('session_token', $session_token, $expire_time, "/");
+$session_token = $_COOKIE['session_token'];
+$expire_time = time() + 90;
+setcookie('session_token', $session_token, $expire_time, "/");
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-
+    header("Location: weeklyMealPlanner.php");
+    exit;
+}
     $client = new rabbitMQClient("testRabbitMQ.ini", "testServer");
 
     // Build the request with meal data
@@ -31,7 +33,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } else {
         echo "<p>Error: Unable to retrieve meal data.</p>";
     }
-}
+
 
 ?>
 

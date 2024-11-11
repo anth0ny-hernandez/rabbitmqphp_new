@@ -96,7 +96,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['searchRecipe'])) {
     </div>
 
     <h2>Recipe Search</h2>
-
+  
     <!-- Recipe Search Form -->
     <form method="POST" action="search.php">
         <label for="label">Search for Recipes:</label>
@@ -123,6 +123,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['searchRecipe'])) {
     </form>
 
     <!-- Display Logic for Recipe Search Results -->
+    <form method="POST" action="weeklyMealPlanner.php"> 
+
     <?php if (isset($recipeSearchResponse['error'])): ?>
         <p><?php echo htmlspecialchars($recipeSearchResponse['error']); ?></p>
     <?php elseif (isset($recipeSearchResponse['hits']) && !empty($recipeSearchResponse['hits'])): ?>
@@ -133,10 +135,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['searchRecipe'])) {
                 <a href="<?php echo htmlspecialchars($hit['recipe']['url']); ?>" target="_blank">View Recipe</a><br>
                 Calories: <?php echo round($hit['recipe']['calories']); ?><br>
                 <?php if (!empty($hit['recipe']['image'])): ?>
-                    <img src="<?php echo htmlspecialchars($hit['recipe']['image']); ?>" alt="<?php echo htmlspecialchars($hit['recipe']['label']); ?>" width="100">
+                    <img src="<?php echo htmlspecialchars($hit['recipe']['image']); ?>" alt="<?php echo htmlspecialchars($hit['recipe']['label']); ?>" width="100"><br>
                 <?php endif; ?>
+                <input type = "checkbox" id="<?php echo $hit['recipe']['label']?>" name="<?php echo $hit['recipe']['label']?>" value="<?php echo $hit['recipe']['label']?>"> Add to Meal Plan
             </div>
+            
         <?php endforeach; ?>
+        <input type = "submit" value="Submit Meals for Planner">
+    </form>
     <?php else: ?>
         
     <?php endif; ?>
@@ -147,7 +153,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['searchRecipe'])) {
     setTimeout(function() {
         document.cookie = 'session_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
         window.location.href = 'login.php';
-    }, 30000); // 30 seconds
+    }, 90000); // 30 seconds
 </script>
 
 </body>
