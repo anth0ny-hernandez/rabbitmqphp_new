@@ -78,13 +78,32 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['searchRecipe'])) {
 <div class="container">
     <h2>Recipe Search</h2>
 
+    <!-- Recipe Search Form -->
     <form method="POST" action="meal_plan.php">
         <label for="label">Search for Recipes:</label>
         <input type="text" id="label" name="label" placeholder="e.g., pasta, salad" required>
         <br><br>
+
+        <label for="healthLabels">Health Labels (optional):</label>
+        <input type="text" id="healthLabels" name="healthLabels" placeholder="e.g., vegan, gluten-free">
+        <br><br>
+
+        <label for="cuisineType">Cuisine Type (optional):</label>
+        <input type="text" id="cuisineType" name="cuisineType" placeholder="e.g., Italian, Indian">
+        <br><br>
+
+        <label for="mealType">Meal Type (optional):</label>
+        <input type="text" id="mealType" name="mealType" placeholder="e.g., Breakfast, Dinner">
+        <br><br>
+
+        <label for="ENERC_KCAL">Calories (optional):</label>
+        <input type="number" id="ENERC_KCAL" name="ENERC_KCAL" placeholder="Max Calories">
+        <br><br>
+
         <input type="submit" name="searchRecipe" value="Search">
     </form>
 
+    <!-- Display Logic for Recipe Search Results -->
     <?php if (isset($recipeSearchResponse['error'])): ?>
         <p><?php echo htmlspecialchars($recipeSearchResponse['error']); ?></p>
     <?php elseif (isset($recipeSearchResponse['hits']) && !empty($recipeSearchResponse['hits'])): ?>

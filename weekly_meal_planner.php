@@ -16,20 +16,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['addToPlanner']) && is
 // Get selected recipes from session
 $selected_recipes = $_SESSION['selected_recipes'] ?? [];
 
+// Fetch the user's current weekly meal plan from the database
+$client = new rabbitMQClient("testRabbitMQ.ini", "testServer");
+$request = [
+    "type" => "fetchWeeklyMealPlan",
+    "session_token" => $_COOKIE['session_token']
+];
+$response = $client->send_request($request);
+$currentMealPlan = $response['weeklyPlan'] ?? [];
+
 // Process form submission to save the weekly meal plan
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['savePlan'])) {
     $weeklyPlan = $_POST['weekly_plan'];
-    $client = new rabbitMQClient("testRabbitMQ.ini", "testServer");
-    
-    $request = [
+    $saveRequest = [
         "type" => "saveWeeklyMealPlan",
         "session_token" => $_COOKIE['session_token'],
         "weeklyPlan" => $weeklyPlan
     ];
     
-    $response = $client->send_request($request);
-
-    $message = $response['success'] ? "Weekly meal plan saved successfully!" : "Failed to save meal plan.";
+    $saveResponse = $client->send_request($saveRequest);
+    $message = $saveResponse['success'] ? "Weekly meal plan saved successfully!" : "Failed to save meal plan.";
 }
 ?>
 
@@ -43,6 +49,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['savePlan'])) {
         .container { max-width: 800px; margin: auto; padding: 20px; }
         .meal-item { border: 1px solid #ddd; padding: 10px; margin-top: 10px; text-align: left; }
         .dropdown { width: 100px; margin-left: 10px; }
+        .meal-plan-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        .meal-plan-table th, .meal-plan-table td { border: 1px solid #ddd; padding: 8px; }
+        .meal-plan-table th { background-color: #f2f2f2; }
     </style>
 </head>
 <body>
@@ -51,6 +60,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['savePlan'])) {
     <h2>Weekly Meal Planner</h2>
     <?php if (isset($message)) echo "<p>$message</p>"; ?>
 
+    <!-- Display the Current Weekly Meal Plan -->
+    <h3>Your Current Weekly Meal Plan</h3>
+    <?php if (!empty($currentMealPlan)): ?>
+        <table class="meal-plan-table">
+            <tr>
+                <th>Day</th>
+                <th>Meal</th>
+                <th>Recipe</th>
+                <th>Calories</th>
+            </tr>
+            <?php foreach ($currentMealPlan as $meal): ?>
+                <tr>
+                    <td><?php echo htmlspecialchars($meal['day']); ?></td>
+                    <td><?php echo htmlspecialchars($meal['meal_type']); ?></td>
+                    <td><a href="<?php echo htmlspecialchars($meal['url']); ?>" target="_blank"><?php echo htmlspecialchars($meal['recipe']); ?></a></td>
+                    <td><?php echo round($meal['calories']); ?></td>
+                </tr>
+            <?php endforeach; ?>
+        </table>
+    <?php else: ?>
+        <p>No meals planned yet. Add meals below to create your weekly plan.</p>
+    <?php endif; ?>
+
+    <!-- Form to Assign Recipes to Weekly Planner -->
     <form method="POST">
         <h3>Plan Your Week</h3>
         <?php foreach ($selected_recipes as $recipe): ?>

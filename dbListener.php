@@ -17,11 +17,10 @@ function databaseProcessor($request) {
 
     switch($request['type']) {
 
-        case "saveWeeklyMealPlan":
+        case "fetchWeeklyMealPlan":
             $session_token = $request['session_token'];
-            $weeklyPlan = $request['weeklyPlan'];
         
-            // Query to get user ID based on session token
+            // Get user ID based on session token
             $userQuery = "SELECT id FROM accounts WHERE session_token = ?";
             $stmt = $conn->prepare($userQuery);
             $stmt->bind_param("s", $session_token);
@@ -31,12 +30,46 @@ function databaseProcessor($request) {
         
             if ($user) {
                 $userID = $user['id'];
+                // Fetch the meal plan for the user
+                $query = "SELECT day, meal_type, recipe, url, calories FROM weekly_meal_plan WHERE user_id = ?";
+                $stmt = $conn->prepare($query);
+                $stmt->bind_param("i", $userID);
+                $stmt->execute();
+                $result = $stmt->get_result();
+                $weeklyPlan = $result->fetch_all(MYSQLI_ASSOC);
+        
+                return ["success" => true, "weeklyPlan" => $weeklyPlan];
+            } else {
+                return ["success" => false, "message" => "User not found"];
+            }
+        
+        case "saveWeeklyMealPlan":
+            $session_token = $request['session_token'];
+            $weeklyPlan = $request['weeklyPlan'];
+
+            // Get user ID based on session token
+            $userQuery = "SELECT id FROM accounts WHERE session_token = ?";
+            $stmt = $conn->prepare($userQuery);
+            $stmt->bind_param("s", $session_token);
+            $stmt->execute();
+            $userResult = $stmt->get_result();
+            $user = $userResult->fetch_assoc();
+
+            if ($user) {
+                $userID = $user['id'];
+                // Clear any existing meal plans for the user to avoid duplicates
+                $deleteQuery = "DELETE FROM weekly_meal_plan WHERE user_id = ?";
+                $deleteStmt = $conn->prepare($deleteQuery);
+                $deleteStmt->bind_param("i", $userID);
+                $deleteStmt->execute();
+
+                // Insert the new meal plan
                 foreach ($weeklyPlan as $recipe => $details) {
                     $day = $details['day'];
                     $mealType = $details['meal_type'];
                     $url = $details['url'];
                     $calories = $details['calories'];
-        
+
                     $insertQuery = "INSERT INTO weekly_meal_plan (user_id, recipe, day, meal_type, url, calories) VALUES (?, ?, ?, ?, ?, ?)";
                     $stmt = $conn->prepare($insertQuery);
                     $stmt->bind_param("issssd", $userID, $recipe, $day, $mealType, $url, $calories);
@@ -44,7 +77,7 @@ function databaseProcessor($request) {
                 }
                 return ["success" => true];
             } else {
-                return ["success" => false];
+                return ["success" => false, "message" => "User not found"];
             }
         
 

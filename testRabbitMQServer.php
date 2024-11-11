@@ -33,10 +33,16 @@ function requestProcessor($request) {
             $result = $dbClient->send_request($request);
             return $result;
         
+        case "fetchWeeklyMealPlan":
+            $dbClient = new rabbitMQClient("testDB_RMQ.ini", "dbConnect");
+            $result = $dbClient->send_request($request);
+            return $result;
+
         case "saveWeeklyMealPlan":
             $dbClient = new rabbitMQClient("testDB_RMQ.ini", "dbConnect");
             $result = $dbClient->send_request($request);
             return $result;
+
 
 
         case "submitReview":
