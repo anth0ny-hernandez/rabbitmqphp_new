@@ -2,33 +2,31 @@
 require_once('rabbitMQLib.inc');
 
 // Check if the session token cookie is set
-if (!isset($_COOKIE['session_token'])) {
-    header("Location: login.php");
-    exit();
-}
+// if (!isset($_COOKIE['session_token'])) {
+//     header("Location: login.php");
+//     exit();
+// }
 
-// Refresh session token to extend expiration by another 90 seconds
-$session_token = $_COOKIE['session_token'];
-$expire_time = time() + 90;
-setcookie('session_token', $session_token, $expire_time, "/");
+// // Refresh session token to extend expiration by another 90 seconds
+// $session_token = $_COOKIE['session_token'];
+// $expire_time = time() + 90;
+// setcookie('session_token', $session_token, $expire_time, "/");
 
 // Initialize variables to store current restrictions
-$dietaryRestrictions = [];
-$otherRestrictions = "";
+$dietRestrictions = "";
 $responseMessage = "";
 
 // Check if dietary restrictions are already saved
-$client = new rabbitMQClient("testRabbitMQ.ini", "testServer");
-$request = [
-    "type" => "getDietRestrictions",
-    "session_token" => $session_token
-];
-$response = $client->send_request($request);
+// $client = new rabbitMQClient("testRabbitMQ.ini", "testServer");
+// $request = [
+//     "type" => "getDietRestrictions",
+//     "session_token" => $session_token
+// ];
+// $response = $client->send_request($request);
 
 if ($response['success']) {
     // Populate the form fields with existing data
-    $dietaryRestrictions = explode(", ", $response['dietaryRestrictions']);
-    $otherRestrictions = $response['otherRestrictions'];
+    $dietRestrictions = $response['dietRestrictions'];
 } else {
     $responseMessage = "No dietary restrictions saved yet.";
 }
@@ -36,14 +34,13 @@ if ($response['success']) {
 // Handle form submission to save new restrictions
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['setRestrictions'])) {
     $dietType = isset($_POST['dietaryRestrictions']) ? implode(", ", $_POST['dietaryRestrictions']) : "";
-    $otherRestrictions = htmlspecialchars($_POST['otherRestrictions'] ?? "");
+    $dietRestrictions = htmlspecialchars($_POST['dietRestrictions'] ?? "");
 
     // Prepare and send request to save dietary restrictions
     $request = [
         "type" => "dietRestrictions",
         "session_token" => $session_token,
-        "dietaryRestrictions" => $dietType,
-        "otherRestrictions" => $otherRestrictions
+        "dietRestrictions" => $dietRestrictions
     ];
 
     $response = $client->send_request($request);
@@ -63,6 +60,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['setRestrictions'])) {
             text-align: center;
             margin-top: 20px;
             background-color: lightgrey;
+        }
+
+        li {
+            
         }
         .container {
             max-width: 800px;
@@ -112,37 +113,31 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['setRestrictions'])) {
             border: 1px solid #ccc;
             border-radius: 4px;
         }
+
+        .logout-button {
+            background-color: red;
+        }
+
+        .logout-button:hover {
+            background-color: darkred;
+        }
     </style>
 </head>
 <body>
     <h2>Set Your Dietary Restrictions and Concerns</h2>
+    <h2>Examples:</h2>
+    <li>vegetarian</li>
+    <li>pescatarian</li>
+    <li>pork-free</li>
+    <li>alcohol-free</li>
+    <br>
 
     <!-- Dietary Restrictions Form -->
     <form method="POST" action="">
-        <!-- Dietary Restrictions --> 
+        <!-- Diet Restrictions Section -->
         <div class="form-section">
-            <label>Dietary Restrictions (select all that apply):</label><br>
-            <?php
-            $dietary_options = [
-                "kosher",
-                "vegetarian",
-                "vegan",
-                "pescatarian",
-                "keto-friendly",
-                "pork-free",
-                "alcohol-free"
-            ];
-            foreach ($dietary_options as $diet) {
-                $checked = in_array($diet, $dietaryRestrictions) ? "checked" : "";
-                echo "<input type='checkbox' name='dietaryRestrictions[]' value='$diet' $checked> $diet<br>";
-            }
-            ?>
-        </div>
-
-        <!-- Other Restrictions Section -->
-        <div class="form-section">
-            <label for="otherRestrictions">Other Restrictions (optional):</label><br>
-            <input type="text" id="otherRestrictions" name="otherRestrictions" placeholder="e.g., low sodium, low sugar" value="<?php echo htmlspecialchars($otherRestrictions); ?>">
+            <label for="dietRestrictions">Diet Restrictions (optional):</label><br>
+            <input type="text" id="dietRestrictions" name="dietRestrictions" placeholder="e.g., low sodium, low sugar" value="<?php echo htmlspecialchars($dietRestrictions); ?>">
         </div>
 
         <input type="submit" name="setRestrictions" value="Save Restrictions" class="button">
@@ -155,21 +150,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['setRestrictions'])) {
     <?php endif; ?>
 
 <script>
-setTimeout(function() {
-    document.cookie = 'session_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-    window.location.href = 'login.php';
-}, 90000); // 90 seconds
+// setTimeout(function() {
+//     document.cookie = 'session_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+//     window.location.href = 'login.php';
+// }, 90000); // 90 seconds
 </script>
 
 </body>
 <footer>
 <div class="container">
-    <div class="button-group">
         <a href="home.php" class="button">Home</a>
-        <a href="meal_plan.php" class="button">Recipe Search</a>
-        <a href="dietRestrictions.php" class="button">Diet Restrictions</a>
-        <a href="recommendations.php" class="button">Recipe Recommendations</a>
-        <a href="reviews.php" class="button">Ratings and Reviews</a>
+        <a href="search_recipe.php" class="button">Recipe Search</a>
+        <a href="dietrestrictions.php" class="button">Diet Restrictions</a>
+        <a href="recommendations.php" class="button">Recommendations</a>
+        <a href="review.php" class="button">Rate and Review</a>
+        <a href="mealplannerform.php" class="button">Weekly Meal Planner Form</a>
+        <a href="weeklyMealPlanner.php" class="button">Weekly Meal Planner</a>
         <a href="logout.php" class="button logout-button">Logout</a>
     </div>
 </footer>

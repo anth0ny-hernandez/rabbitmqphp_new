@@ -99,6 +99,15 @@ $reviews = $reviewsResponse['reviews'] ?? [];
         .button:hover {
             background-color: #0056b3;
         }
+
+        .logout-button {
+            background-color: red;
+        }
+
+        .logout-button:hover {
+            background-color: darkred;
+        }
+
         .review-form input, .review-form select, .review-form textarea {
             width: 100%;
             margin-bottom: 10px;
@@ -129,17 +138,6 @@ $reviews = $reviewsResponse['reviews'] ?? [];
 
 <div class="container">
     <h2>Ratings and Reviews</h2>
-
-    <!-- Navigation Buttons -->
-    <div class="button-group">
-        <a href="home.php" class="button">Home</a>
-        <a href="meal_plan.php" class="button">Recipe Search</a>
-        <a href="dietRestrictions.php" class="button">Diet Restrictions</a>
-        <a href="recommendations.php" class="button">Recipe Recommendations</a>
-        <a href="reviews.php" class="button">Ratings and Reviews</a>
-        <a href="logout.php" class="button logout-button">Logout</a>
-    </div>
-
     <!-- Success or Error Messages -->
     <?php if ($successMessage): ?>
         <p class="success-message"><?php echo $successMessage; ?></p>
@@ -184,6 +182,17 @@ $reviews = $reviewsResponse['reviews'] ?? [];
         window.location.href = 'login.php';
     }, 90000); // 90 seconds
 </script>
-
 </body>
+<footer>
+<div class="container">
+        <a href="home.php" class="button">Home</a>
+        <a href="search_recipe.php" class="button">Recipe Search</a>
+        <a href="dietrestrictions.php" class="button">Diet Restrictions</a>
+        <a href="recommendations.php" class="button">Recommendations</a>
+        <a href="review.php" class="button">Rate and Review</a>
+        <a href="mealplannerform.php" class="button">Weekly Meal Planner Form</a>
+        <a href="weeklyMealPlanner.php" class="button">Weekly Meal Planner</a>
+        <a href="logout.php" class="button logout-button">Logout</a>
+    </div>
+</footer>
 </html>

@@ -2,15 +2,15 @@
 require_once('rabbitMQLib.inc');
 
 // Check if the session token cookie is set
-if (!isset($_COOKIE['session_token'])) {
-    header("Location: login.php");
-    exit();
-}
+// if (!isset($_COOKIE['session_token'])) {
+//     header("Location: login.php");
+//     exit();
+// }
 
-// Refresh session token to extend expiration by another 30 seconds
-$session_token = $_COOKIE['session_token'];
-$expire_time = time() + 30;
-setcookie('session_token', $session_token, $expire_time, "/");
+// Refresh session token to extend expiration by another 90 seconds
+// $session_token = $_COOKIE['session_token'];
+// $expire_time = time() + 90;
+// setcookie('session_token', $session_token, $expire_time, "/");
 
 $recipeSearchResponse = null;
 
@@ -37,64 +37,84 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['searchRecipe'])) {
     <meta charset="UTF-8">
     <title>Recipe Search</title>
     <style>
-        /* Basic styling */
+        /* Page styling */
         body {
             font-family: Arial, sans-serif;
             text-align: center;
             margin-top: 20px;
+            background-color: lightgrey;
         }
+
         .container {
             max-width: 800px;
             margin: auto;
             padding: 20px;
         }
+
         .nav-buttons {
             margin-bottom: 20px;
         }
+
         .button {
             display: inline-block;
             margin: 5px;
             padding: 10px 20px;
-            color: #fff;
-            background-color: #007bff;
+            color: white;
+            background-color: blue;
             border: none;
             border-radius: 4px;
             text-decoration: none;
             font-size: 16px;
             cursor: pointer;
         }
+
         .button:hover {
-            background-color: #0056b3;
+            background-color: darkblue;
         }
+        
         .logout-button {
-            background-color: #dc3545;
+            background-color: crimson;
         }
+
         .logout-button:hover {
-            background-color: #c82333;
+            background-color: firebrick;
         }
+
         .meal-item {
-            border: 1px solid #ddd;
+            border: 1px solid lightgrey;
             border-radius: 8px;
             padding: 10px;
             margin-top: 10px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0px 0px 50px lightgreen;
         }
+
+        .form-section {
+            margin-bottom: 20px;
+            font-size: 18px;
+        }
+
+        select, input[type="text"], textarea {
+            font-size: 20px;
+        }
+
+        label {
+            font-size: 20px;
+        }
+
+        select, input[type="number"], textarea {
+            font-size: 20px;
+        }
+
+        select, input[type="submit"], button {
+            font-size: 20px;
+        }
+
         h3 {
             margin-top: 0;
         }
     </style>
 </head>
 <body>
-
-<div class="container">
-    <div class="nav-buttons">
-        <a href="home.php" class="button">Home</a>
-        <a href="search_recipe.php" class="button">Recipe Search</a>
-        <a href="dietRestrictions.php" class="button">Diet Restrictions</a>
-        <a href="recommendations.php" class="button">Recipe Recommendations</a>
-        <a href="logout.php" class="button logout-button">Logout</a>
-    </div>
-
     <h2>Recipe Search</h2>
 
     <!-- Recipe Search Form -->
@@ -143,12 +163,24 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['searchRecipe'])) {
 </div>
 
 <!-- JavaScript to handle automatic logout after session expiration -->
-<script>
+<!-- <script>
     setTimeout(function() {
         document.cookie = 'session_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
         window.location.href = 'login.php';
-    }, 30000); // 30 seconds
-</script>
+    }, 90000); // 90 seconds
+</script> -->
 
 </body>
+<footer>
+<div class="container">
+        <a href="home.php" class="button">Home</a>
+        <a href="search_recipe.php" class="button">Recipe Search</a>
+        <a href="dietrestrictions.php" class="button">Diet Restrictions</a>
+        <a href="recommendations.php" class="button">Recommendations</a>
+        <a href="review.php" class="button">Rate and Review</a>
+        <a href="mealplannerform.php" class="button">Weekly Meal Planner Form</a>
+        <a href="weeklyMealPlanner.php" class="button">Weekly Meal Planner</a>
+        <a href="logout.php" class="button logout-button">Logout</a>
+    </div>
+</footer>
 </html>

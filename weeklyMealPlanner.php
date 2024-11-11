@@ -127,12 +127,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </script> -->
 </body>
 <footer>
-    <div class="button-group">
-        <a href="search.php" class="button">Recipe Search</a>
+<div class="container">
+        <a href="home.php" class="button">Home</a>
+        <a href="search_recipe.php" class="button">Recipe Search</a>
         <a href="dietrestrictions.php" class="button">Diet Restrictions</a>
         <a href="recommendations.php" class="button">Recommendations</a>
         <a href="review.php" class="button">Rate and Review</a>
-        <a href="mealplannerform.php" class="button">Weekly Meal Planner Form</Form></a>
+        <a href="mealplannerform.php" class="button">Weekly Meal Planner Form</a>
+        <a href="weeklyMealPlanner.php" class="button">Weekly Meal Planner</a>
         <a href="logout.php" class="button logout-button">Logout</a>
     </div>
 </footer>

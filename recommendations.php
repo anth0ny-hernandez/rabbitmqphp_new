@@ -70,10 +70,11 @@ if (isset($response['error'])) {
             background-color: #0056b3;
         }
         .logout-button {
-            background-color: #dc3545;
+            background-color: red;
         }
+
         .logout-button:hover {
-            background-color: #c82333;
+            background-color: darkred;
         }
         .recipe-card {
             background-color: white;
@@ -113,17 +114,6 @@ if (isset($response['error'])) {
 
 <div class="container">
     <h2>Recipe Recommendations</h2>
-
-    <!-- Navigation Buttons -->
-    <div class="button-group">
-        <a href="home.php" class="button">Home</a>
-        <a href="meal_plan.php" class="button">Recipe Search</a>
-        <a href="dietRestrictions.php" class="button">Diet Restrictions</a>
-        <a href="recommendations.php" class="button">Recipe Recommendations</a>
-        <a href="reviews.php" class="button">Ratings and Reviews</a>
-        <a href="logout.php" class="button logout-button">Logout</a>
-    </div>
-
     <?php if (isset($error_message)): ?>
         <p class="error-message"><?php echo htmlspecialchars($error_message); ?></p>
     <?php elseif (isset($recipes) && !empty($recipes)): ?>
@@ -151,4 +141,16 @@ if (isset($response['error'])) {
 </script>
 
 </body>
+<footer>
+<div class="container">
+        <a href="home.php" class="button">Home</a>
+        <a href="search_recipe.php" class="button">Recipe Search</a>
+        <a href="dietrestrictions.php" class="button">Diet Restrictions</a>
+        <a href="recommendations.php" class="button">Recommendations</a>
+        <a href="review.php" class="button">Rate and Review</a>
+        <a href="mealplannerform.php" class="button">Weekly Meal Planner Form</a>
+        <a href="weeklyMealPlanner.php" class="button">Weekly Meal Planner</a>
+        <a href="logout.php" class="button logout-button">Logout</a>
+    </div>
+</footer>
 </html>

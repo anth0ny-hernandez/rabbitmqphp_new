@@ -1,14 +1,14 @@
 <?php
-// Check if the session token cookie is set
-if (!isset($_COOKIE['session_token'])) {
-    header("Location: login.php");
-    exit();
-}
+// // Check if the session token cookie is set
+// if (!isset($_COOKIE['session_token'])) {
+//     header("Location: login.php");
+//     exit();
+// }
 
-// Refresh session token to extend expiration by another 90 seconds
-$session_token = $_COOKIE['session_token'];
-$expire_time = time() + 90;
-setcookie('session_token', $session_token, $expire_time, "/");
+// // Refresh session token to extend expiration by another 90 seconds
+// $session_token = $_COOKIE['session_token'];
+// $expire_time = time() + 90;
+// setcookie('session_token', $session_token, $expire_time, "/");
 ?>
 
 <!DOCTYPE html>
@@ -17,49 +17,66 @@ setcookie('session_token', $session_token, $expire_time, "/");
     <meta charset="UTF-8">
     <title>Home Page</title>
     <style>
-        /* Basic styling for the home page */
+        /* Page styling */
         body {
             font-family: Arial, sans-serif;
             text-align: center;
             margin-top: 50px;
+            background: lightgrey;
         }
+
         .container {
             max-width: 600px;
             margin: auto;
             padding: 20px;
-            border: 1px solid #ddd;
+            border: 1px solid black;
             border-radius: 8px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0px 0px 50px lightgreen;
+            background: white;
         }
+
         h1 {
-            color: #333;
+            color: black;
         }
+
         p {
-            color: #666;
+            color: darkslategrey;
         }
         .button-group {
             margin-top: 20px;
         }
+
         .button {
             display: inline-block;
             margin: 5px;
             padding: 10px 20px;
-            color: #fff;
-            background-color: #007bff;
+            color: white;
+            background-color: blue;
             border: none;
             border-radius: 4px;
             text-decoration: none;
             font-size: 16px;
             cursor: pointer;
         }
+
         .button:hover {
-            background-color: #0056b3;
+            background-color: darkblue;
         }
+        
         .logout-button {
-            background-color: #dc3545;
+            background-color: red;
         }
+
         .logout-button:hover {
-            background-color: #c82333;
+            background-color: darkred;
+        }
+
+        .login-button {
+            background-color: green;
+        }
+
+        .login-button:hover {
+            background-color: darkgreen;
         }
     </style>
 </head>
@@ -67,23 +84,26 @@ setcookie('session_token', $session_token, $expire_time, "/");
 
 <div class="container">
     <h1>Welcome to the Home Page!</h1>
-    <p>You are logged in. Your session will be automatically refreshed every 30 seconds to keep you logged in.</p>
+    <p>You are logged in. Your session will be automatically refreshed every 90 seconds to keep you logged in.</p>
 
     <div class="button-group">
-        <a href="meal_plan.php" class="button">Recipe Search</a>
-        <a href="dietRestrictions.php" class="button">Diet Restrictions</a>
-        <a href="recommendations.php" class="button">Recipe Recommendations</a>
-        <a href="reviews.php" class="button">Ratings and Reviews</a>
+        <a href="home.php" class="button">Home</a>
+        <a href="search_recipe.php" class="button">Recipe Search</a>
+        <a href="dietrestrictions.php" class="button">Diet Restrictions</a>
+        <a href="recommendations.php" class="button">Recommendations</a>
+        <a href="review.php" class="button">Rate and Review</a>
+        <a href="mealplannerform.php" class="button">Weekly Meal Planner Form</a>
+        <a href="weeklyMealPlanner.php" class="button">Weekly Meal Planner</a>
         <a href="logout.php" class="button logout-button">Logout</a>
     </div>
 </div>
 
 <!-- JavaScript to handle automatic logout after session expiration -->
 <script>
-    setTimeout(function() {
-        document.cookie = 'session_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-        window.location.href = 'login.php';
-    }, 90000); // 90 seconds
+    // setTimeout(function() {
+    //     document.cookie = 'session_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+    //     window.location.href = 'login.php';
+    // }, 90000); // 90 seconds
 </script>
 
 </body>
