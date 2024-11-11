@@ -17,6 +17,37 @@ function databaseProcessor($request) {
 
     switch($request['type']) {
 
+        case "saveWeeklyMealPlan":
+            $session_token = $request['session_token'];
+            $weeklyPlan = $request['weeklyPlan'];
+        
+            // Query to get user ID based on session token
+            $userQuery = "SELECT id FROM accounts WHERE session_token = ?";
+            $stmt = $conn->prepare($userQuery);
+            $stmt->bind_param("s", $session_token);
+            $stmt->execute();
+            $userResult = $stmt->get_result();
+            $user = $userResult->fetch_assoc();
+        
+            if ($user) {
+                $userID = $user['id'];
+                foreach ($weeklyPlan as $recipe => $details) {
+                    $day = $details['day'];
+                    $mealType = $details['meal_type'];
+                    $url = $details['url'];
+                    $calories = $details['calories'];
+        
+                    $insertQuery = "INSERT INTO weekly_meal_plan (user_id, recipe, day, meal_type, url, calories) VALUES (?, ?, ?, ?, ?, ?)";
+                    $stmt = $conn->prepare($insertQuery);
+                    $stmt->bind_param("issssd", $userID, $recipe, $day, $mealType, $url, $calories);
+                    $stmt->execute();
+                }
+                return ["success" => true];
+            } else {
+                return ["success" => false];
+            }
+        
+
         case "logout":
             $session_token = $request['session_token'];
         
