@@ -137,7 +137,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['searchRecipe'])) {
                 <?php if (!empty($hit['recipe']['image'])): ?>
                     <img src="<?php echo htmlspecialchars($hit['recipe']['image']); ?>" alt="<?php echo htmlspecialchars($hit['recipe']['label']); ?>" width="100"><br>
                 <?php endif; ?>
-                <input type = "checkbox" id="<?php echo $hit['recipe']['label']?>" name="<?php echo $hit['recipe']['label']?>" value="<?php echo $hit['recipe']['label']?>"> Add to Meal Plan
+                <input type = "checkbox" id="<?php echo $hit['recipe']['label']?>" name="foods[]" value="<?php echo $hit['recipe']['label']?>"> <label for ="add to meal plan"> Add to Meal Plan</label>
             </div>
             
         <?php endforeach; ?>

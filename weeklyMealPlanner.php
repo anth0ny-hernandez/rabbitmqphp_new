@@ -16,23 +16,69 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     header("Location: weeklyMealPlanner.php");
     exit;
 }
-    $client = new rabbitMQClient("testRabbitMQ.ini", "testServer");
 
-    // Build the request with meal data
-    $request = [
-        'type' => 'save_meals',
-        'session_token' => $session_token,
-        'meals' => $_POST['meals'] ?? []
-    ];
 
-    // Send the request and receive the response
-    $response = $client->send_request($request);
+//fetch the recipe names from the checkboxes in "searchrecipe". Display them 
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $_POST['foods'];
+    foreach($_POST['foods'] as $food)
+    {
+    // $client = new rabbitMQClient("testRabbitMQ.ini", "testServer");
 
-    if ($response && isset($response['meals'])) {
-        $meals = $response['meals'];
-    } else {
-        echo "<p>Error: Unable to retrieve meal data.</p>";
-    }
+    // // Collect form data for recipe search
+    // $request = [
+    //     "type" => "searchRecipe",
+    //     "label" => $food ?? null,
+    // ];
+
+    //Display recipes with dropdown to select time of day and day of week.  
+    echo "$food";?> 
+    <form action = "weeklyMealPlanner.php">
+        <select name ="day" id="day">
+            <option value = "Sunday"> Sunday </option>
+            <option value = "Monday"> Monday </option>
+            <option value = "Tuesday"> Tuesday </option>
+            <option value = "Wednesday"> Wednesday </option>
+            <option value = "Thursday"> Thursday </option>
+            <option value = "Friday"> Friday </option>
+            <option value = "Saturday"> Saturday </option>
+
+            <select name ="timeofday" id="timeofday">
+                <option value = "Breakfast"> Breakfast </option>
+                <option value = "Lunch"> Lunch </option>
+                <option value = "Dinner"> Dinner </option>
+
+        </select>
+    </form>
+    <br> <br>
+    
+    <?php //Next, display table of meals on corresponding days & timeofday
+    //. 1st column is type of meal. all other column headers is day of week with the cells below having the meals. 
+
+}
+    
+    // $recipeSearchResponse = $client->send_request($request);
+}
+
+
+
+    // $client = new rabbitMQClient("testRabbitMQ.ini", "testServer");
+
+    // // Build the request with meal data
+    // $request = [
+    //     'type' => 'save_meals',
+    //     'session_token' => $session_token,
+    //     'meals' => $_POST['meals'] ?? []
+    // ];
+
+    // // Send the request and receive the response
+    // $response = $client->send_request($request);
+
+    // if ($response && isset($response['meals'])) {
+    //     $meals = $response['meals'];
+    // } else {
+    //     echo "<p>Error: Unable to retrieve meal data.</p>";
+    // }
 
 
 ?>
