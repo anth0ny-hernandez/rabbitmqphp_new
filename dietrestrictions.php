@@ -62,14 +62,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['setRestrictions'])) {
             background-color: lightgrey;
         }
 
-        li {
-            
-        }
         .container {
             max-width: 800px;
             margin: auto;
             padding: 20px;
         }
+
         .button {
             display: inline-block;
             margin: 5px;
@@ -81,19 +79,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['setRestrictions'])) {
             font-size: 16px;
             cursor: pointer;
         }
+
         .button:hover {
             background-color: darkblue;
         }
+
         h2 {
             margin-top: 0;
+            font-size: 25px;
         }
+
         .form-section {
             margin-bottom: 20px;
-            font-size: 18px;
+            font-size: 20px;
         }
+
         select, input[type="text"], textarea {
             font-size: 20px;
         }
+
         .result {
             margin-top: 20px;
             font-size: 18px;
@@ -102,24 +106,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['setRestrictions'])) {
             border: 1px solid #ccc;
             border-radius: 4px;
         }
+
         .highlight {
             font-weight: bold;
         }
-        .response-container {
-            margin-top: 20px;
-            font-size: 18px;
-            background-color: #f3f4f6;
-            padding: 15px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
 
-        .logout-button {
-            background-color: red;
-        }
-
-        .logout-button:hover {
-            background-color: darkred;
+        li {
+            font-size: 20px;
         }
     </style>
 </head>
@@ -159,14 +152,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['setRestrictions'])) {
 </body>
 <footer>
 <div class="container">
+    <div class="nav-buttons">
         <a href="home.php" class="button">Home</a>
-        <a href="search_recipe.php" class="button">Recipe Search</a>
-        <a href="dietrestrictions.php" class="button">Diet Restrictions</a>
+        <a href="search.php" class="button">Recipe Search</a>
         <a href="recommendations.php" class="button">Recommendations</a>
         <a href="review.php" class="button">Rate and Review</a>
-        <a href="mealplannerform.php" class="button">Weekly Meal Planner Form</a>
+        <a href="mealplannerform.php" class="button">Weekly Meal Planner Form</Form></a>
         <a href="weeklyMealPlanner.php" class="button">Weekly Meal Planner</a>
-        <a href="logout.php" class="button logout-button">Logout</a>
+        <a href="logout.php" class="button" style="background-color: crimson;">Logout</a>
     </div>
 </footer>
 </html>

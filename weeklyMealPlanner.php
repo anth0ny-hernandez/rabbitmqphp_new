@@ -12,26 +12,26 @@ require_once('rabbitMQLib.inc');
 // $expire_time = time() + 90;
 // setcookie('session_token', $session_token, $expire_time, "/");
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
+// if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
-    $client = new rabbitMQClient("testRabbitMQ.ini", "testServer");
+//     $client = new rabbitMQClient("testRabbitMQ.ini", "testServer");
 
-    // Build the request with meal data
-    $request = [
-        'type' => 'save_meals',
-        'session_token' => $session_token,
-        'meals' => $_POST['meals'] ?? []
-    ];
+//     // Build the request with meal data
+//     $request = [
+//         'type' => 'save_meals',
+//         'session_token' => $session_token,
+//         'meals' => $_POST['meals'] ?? []
+//     ];
 
-    // Send the request and receive the response
-    $response = $client->send_request($request);
+//     // Send the request and receive the response
+//     $response = $client->send_request($request);
 
-    if ($response && isset($response['meals'])) {
-        $meals = $response['meals'];
-    } else {
-        echo "<p>Error: Unable to retrieve meal data.</p>";
-    }
-}
+//     if ($response && isset($response['meals'])) {
+//         $meals = $response['meals'];
+//     } else {
+//         echo "<p>Error: Unable to retrieve meal data.</p>";
+//     }
+// }
 
 ?>
 
@@ -127,14 +127,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </script> -->
 </body>
 <footer>
-<div class="container">
-        <a href="home.php" class="button">Home</a>
-        <a href="search_recipe.php" class="button">Recipe Search</a>
+    <div class="button-group">
+        <a href="search.php" class="button">Recipe Search</a>
         <a href="dietrestrictions.php" class="button">Diet Restrictions</a>
         <a href="recommendations.php" class="button">Recommendations</a>
         <a href="review.php" class="button">Rate and Review</a>
-        <a href="mealplannerform.php" class="button">Weekly Meal Planner Form</a>
-        <a href="weeklyMealPlanner.php" class="button">Weekly Meal Planner</a>
+        <a href="mealplannerform.php" class="button">Weekly Meal Planner Form</Form></a>
         <a href="logout.php" class="button logout-button">Logout</a>
     </div>
 </footer>

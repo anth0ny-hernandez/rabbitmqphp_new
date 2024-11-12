@@ -87,8 +87,7 @@
     <p>You are logged in. Your session will be automatically refreshed every 90 seconds to keep you logged in.</p>
 
     <div class="button-group">
-        <a href="home.php" class="button">Home</a>
-        <a href="search_recipe.php" class="button">Recipe Search</a>
+        <a href="search.php" class="button">Recipe Search</a>
         <a href="dietrestrictions.php" class="button">Diet Restrictions</a>
         <a href="recommendations.php" class="button">Recommendations</a>
         <a href="review.php" class="button">Rate and Review</a>

@@ -1,31 +1,31 @@
 <?php
 require_once('rabbitMQLib.inc');
 
-// Check if the session token cookie is set
-if (!isset($_COOKIE['session_token'])) {
-    header("Location: login.php");
-    exit();
-}
+// // Check if the session token cookie is set
+// if (!isset($_COOKIE['session_token'])) {
+//     header("Location: login.php");
+//     exit();
+// }
 
-// Refresh session token to extend expiration by another 90 seconds
-$session_token = $_COOKIE['session_token'];
-$expire_time = time() + 90;
-setcookie('session_token', $session_token, $expire_time, "/");
+// // Refresh session token to extend expiration by another 90 seconds
+// $session_token = $_COOKIE['session_token'];
+// $expire_time = time() + 90;
+// setcookie('session_token', $session_token, $expire_time, "/");
 
-// Send a request to get recipe recommendations
-$client = new rabbitMQClient("testRabbitMQ.ini", "testServer");
-$request = [
-    "type" => "recommendRecipes",
-    "session_token" => $session_token
-];
-$response = $client->send_request($request);
+// // Send a request to get recipe recommendations
+// $client = new rabbitMQClient("testRabbitMQ.ini", "testServer");
+// $request = [
+//     "type" => "recommendRecipes",
+//     "session_token" => $session_token
+// ];
+// $response = $client->send_request($request);
 
-// Check if there was an error in the response
-if (isset($response['error'])) {
-    $error_message = $response['error'];
-} else {
-    $recipes = $response['hits'];
-}
+// // Check if there was an error in the response
+// if (isset($response['error'])) {
+//     $error_message = $response['error'];
+// } else {
+//     $recipes = $response['hits'];
+// }
 ?>
 
 <!DOCTYPE html>
@@ -34,79 +34,68 @@ if (isset($response['error'])) {
     <meta charset="UTF-8">
     <title>Recipe Recommendations</title>
     <style>
-        /* Basic styling for the recommendations page to match the home page */
+    /* Page styling */
         body {
             font-family: Arial, sans-serif;
             text-align: center;
-            margin-top: 50px;
+            margin-top: 20px;
+            background-color: lightgrey;
         }
+
         .container {
-            max-width: 600px;
+            max-width: 800px;
             margin: auto;
             padding: 20px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
         }
-        h2 {
-            color: #333;
-        }
-        .button-group {
-            margin-top: 20px;
-        }
+
         .button {
             display: inline-block;
             margin: 5px;
             padding: 10px 20px;
-            color: #fff;
-            background-color: #007bff;
+            color: white;
+            background-color: blue;
             border: none;
             border-radius: 4px;
-            text-decoration: none;
             font-size: 16px;
             cursor: pointer;
         }
+
         .button:hover {
-            background-color: #0056b3;
-        }
-        .logout-button {
-            background-color: red;
+            background-color: darkblue;
         }
 
-        .logout-button:hover {
-            background-color: darkred;
+        h2 {
+            margin-top: 0;
         }
-        .recipe-card {
-            background-color: white;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 15px;
+
+        .form-section {
             margin-bottom: 20px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-            text-align: left;
-        }
-        .recipe-card img {
-            max-width: 100%;
-            border-radius: 8px;
-        }
-        .recipe-card h3 {
-            color: #007bff;
-            margin: 0;
-        }
-        .recipe-card p {
-            color: #555;
-        }
-        .recipe-card a {
-            color: #007bff;
-            text-decoration: none;
-        }
-        .recipe-card a:hover {
-            text-decoration: underline;
-        }
-        .error-message {
-            color: #dc3545;
             font-size: 18px;
+        }
+
+        select, input[type="text"], textarea {
+            font-size: 20px;
+        }
+
+        .result {
             margin-top: 20px;
+            font-size: 18px;
+            background-color: white;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .highlight {
+            font-weight: bold;
+        }
+        
+        li{
+            font-size: 20px;
+        }
+
+        p{
+            font-size: 20px;
         }
     </style>
 </head>
@@ -133,24 +122,24 @@ if (isset($response['error'])) {
 </div>
 
 <!-- JavaScript to handle automatic logout after session expiration -->
-<script>
+<!-- <script>
     setTimeout(function() {
         document.cookie = 'session_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
         window.location.href = 'login.php';
     }, 90000); // 90 seconds
-</script>
+</script> -->
 
 </body>
 <footer>
 <div class="container">
+    <div class="nav-buttons">
         <a href="home.php" class="button">Home</a>
-        <a href="search_recipe.php" class="button">Recipe Search</a>
+        <a href="search.php" class="button">Recipe Search</a>
         <a href="dietrestrictions.php" class="button">Diet Restrictions</a>
-        <a href="recommendations.php" class="button">Recommendations</a>
         <a href="review.php" class="button">Rate and Review</a>
-        <a href="mealplannerform.php" class="button">Weekly Meal Planner Form</a>
+        <a href="mealplannerform.php" class="button">Weekly Meal Planner Form</Form></a>
         <a href="weeklyMealPlanner.php" class="button">Weekly Meal Planner</a>
-        <a href="logout.php" class="button logout-button">Logout</a>
+        <a href="logout.php" class="button" style="background-color: crimson;">Logout</a>
     </div>
 </footer>
 </html>

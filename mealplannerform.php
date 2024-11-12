@@ -27,7 +27,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['weeklyMealPlanner'])) 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Weekly Meal Planner</title>
     <style>
-  /* Page styling */
+        /* Page styling */
         body {
             font-family: Arial, sans-serif;
             text-align: center;
@@ -107,6 +107,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['weeklyMealPlanner'])) 
 
         select, input[type="submit"], button {
             font-size: 20px;
+            margin: 15px;
         }
 
         span{
@@ -189,8 +190,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['weeklyMealPlanner'])) 
 </body>
 <footer>
 <div class="button-group">
-        <a href="home.php" class="button">Home</Form></a>
-        <a href="search_recipe.php" class="button">Recipe Search</a>
+        <a href="home.php" class="button">Home</a>
+        <a href="search.php" class="button">Recipe Search</a>
         <a href="dietrestrictions.php" class="button">Diet Restrictions</a>
         <a href="recommendations.php" class="button">Recommendations</a>
         <a href="review.php" class="button">Rate and Review</a>

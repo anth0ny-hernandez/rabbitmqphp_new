@@ -121,7 +121,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['searchRecipe'])) {
     <form method="POST" action="search_recipe.php">
         <label for="label">Search for Recipes:</label>
         <input type="text" id="label" name="label" placeholder="e.g., pasta, salad" required>
-        <br><br>search_recipe
+        <br><br>
 
         <label for="healthLabels">Health Labels (optional):</label>
         <input type="text" id="healthLabels" name="healthLabels" placeholder="e.g., vegan, gluten-free">
@@ -173,12 +173,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['searchRecipe'])) {
 </body>
 <footer>
 <div class="container">
+    <div class="nav-buttons">
         <a href="home.php" class="button">Home</a>
-        <a href="search_recipe.php" class="button">Recipe Search</a>
         <a href="dietrestrictions.php" class="button">Diet Restrictions</a>
         <a href="recommendations.php" class="button">Recommendations</a>
         <a href="review.php" class="button">Rate and Review</a>
-        <a href="mealplannerform.php" class="button">Weekly Meal Planner Form</a>
+        <a href="mealplannerform.php" class="button">Weekly Meal Planner Form</Form></a>
         <a href="weeklyMealPlanner.php" class="button">Weekly Meal Planner</a>
         <a href="logout.php" class="button logout-button">Logout</a>
     </div>
