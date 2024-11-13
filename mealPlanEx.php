@@ -10,11 +10,9 @@
             margin: 20px;
             background-color: #f8f9fa;
         }
-        /* Meal Planer Section START */
         .meal-planner {
             max-width: 900px;
             margin: 0 auto;
-            margin-top: 50px;
             /* border: 1px solid black; */
         }
         .week-header {
@@ -87,54 +85,9 @@
             font-size: 14px;
             color: #555;
         }
-        /* Meal Planner Section END */
-
-        /* CSS For NavBar Buttons */
-        .button-container {
-            max-width: 1000px;
-            margin: auto;
-            padding: 20px;
-        }
-        .nav-buttons {
-            margin-bottom: 20px;
-        }
-        .button {
-            display: inline-block;
-            margin: 5px;
-            padding: 10px 20px;
-            color: #fff;
-            background-color: #007bff;
-            border: none;
-            border-radius: 4px;
-            text-decoration: none;
-            font-size: 16px;
-            cursor: pointer;
-        }
-        .button:hover {
-            background-color: #0056b3;
-        }
-        .logout-button {
-            background-color: #dc3545;
-        }
-        .logout-button:hover {
-            background-color: #c82333;
-        }
     </style>
 </head>
 <body>
-
-<h2>Recipe Search</h2>
-
-<div class="button-container">
-    <div class="button-group">
-        <a href="home.php" class="button">Home</a>
-        <a href="meal_plan.php" class="button">Recipe Search</a>
-        <a href="dietRestrictions.php" class="button">Diet Restrictions</a>
-        <a href="recommendations.php" class="button">Recipe Recommendations</a>
-        <a href="reviews.php" class="button">Ratings and Reviews</a>
-        <a href="logout.php" class="button logout-button">Logout</a>
-    </div>
-</div>
 
 <div class="meal-planner">
     <div class="week-header">Your Meal Plan For This Week</div>
