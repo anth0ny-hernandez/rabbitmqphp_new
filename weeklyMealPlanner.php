@@ -13,10 +13,9 @@ $expire_time = time() + 90;
 setcookie('session_token', $session_token, $expire_time, "/");
 
 if ($_SERVER["REQUEST_METHOD"] == "GET") {
-    header("Location: weeklyMealPlanner.php");
-    var_dump($_POST['foods']);
-    $_POST['foods'];
-    foreach($_POST['foods'] as $food)
+    var_dump($_GET['foods']);
+    $_GET['foods'];
+    foreach($_GET['foods'] as $food)
     {
         echo "$food";?> 
         <form action = "weeklyMealPlanner.php">
