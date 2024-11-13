@@ -2,53 +2,27 @@
 require_once('rabbitMQLib.inc');
 
 // Check if the session token cookie is set
-if (!isset($_COOKIE['session_token'])) {
-    header("Location: login.php");
-    exit();
-}
+// if (!isset($_COOKIE['session_token'])) {
+//     header("Location: login.php");
+//     exit();
+// }
 
 // // Refresh session token to extend expiration by another 90 seconds
-$session_token = $_COOKIE['session_token'];
-$expire_time = time() + 90;
-setcookie('session_token', $session_token, $expire_time, "/");
+// $session_token = $_COOKIE['session_token'];
+// $expire_time = time() + 90;
+// setcookie('session_token', $session_token, $expire_time, "/");
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    header("Location: weeklyMealPlanner.php");
-
-    $_POST['foods'];
-    foreach($_POST['foods'] as $food)
-    {
-        echo "$food";?> 
-        <form action = "weeklyMealPlanner.php">
-            <select name ="day" id="day">
-                <option value = "Sunday"> Sunday </option>
-                <option value = "Monday"> Monday </option>
-                <option value = "Tuesday"> Tuesday </option>
-                <option value = "Wednesday"> Wednesday </option>
-                <option value = "Thursday"> Thursday </option>
-                <option value = "Friday"> Friday </option>
-                <option value = "Saturday"> Saturday </option>
-    
-                <select name ="timeofday" id="timeofday">
-                    <option value = "Breakfast"> Breakfast </option>
-                    <option value = "Lunch"> Lunch </option>
-                    <option value = "Dinner"> Dinner </option>
-    
-            </select>
-        </form>
-        <br> <br>
-        
-        <?php //Next, display table of meals on corresponding days & timeofday
-        //. 1st column is type of meal. all other column headers is day of week with the cells below having the meals. 
-    
-    }
-
-    exit;
-}
+// if ($_SERVER["REQUEST_METHOD"] == "POST") {
+//     header("Location: weeklyMealPlanner.php");
+//     exit;
+// }
 
 
 //fetch the recipe names from the checkboxes in "searchrecipe". Display them 
-
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $_POST['foods'];
+    foreach($_POST['foods'] as $food)
+    {
     // $client = new rabbitMQClient("testRabbitMQ.ini", "testServer");
 
     // // Collect form data for recipe search
@@ -58,10 +32,33 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // ];
 
     //Display recipes with dropdown to select time of day and day of week.  
-   
+    echo "$food";?> 
+    <form action = "weeklyMealPlanner.php">
+        <select name ="day" id="day">
+            <option value = "Sunday"> Sunday </option>
+            <option value = "Monday"> Monday </option>
+            <option value = "Tuesday"> Tuesday </option>
+            <option value = "Wednesday"> Wednesday </option>
+            <option value = "Thursday"> Thursday </option>
+            <option value = "Friday"> Friday </option>
+            <option value = "Saturday"> Saturday </option>
+
+            <select name ="timeofday" id="timeofday">
+                <option value = "Breakfast"> Breakfast </option>
+                <option value = "Lunch"> Lunch </option>
+                <option value = "Dinner"> Dinner </option>
+
+        </select>
+    </form>
+    <br> <br>
+    
+    <?php //Next, display table of meals on corresponding days & timeofday
+    //. 1st column is type of meal. all other column headers is day of week with the cells below having the meals. 
+
+}
     
     // $recipeSearchResponse = $client->send_request($request);
-
+}
 
 
 
@@ -155,7 +152,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </head>
 <body>
     <div class="container">
-        <h1>Your Weekly Meal Plan</h1>
+        <h1>Shopping Ingredients</h1>
         <?php if (!empty($meals)): ?>
             <?php foreach ($meals as $day => $mealData): ?>
                 <h2><?php echo ucfirst($day); ?></h2>
@@ -184,6 +181,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <a href="recommendations.php" class="button">Recommendations</a>
         <a href="review.php" class="button">Rate and Review</a>
         <a href="mealplannerform.php" class="button">Weekly Meal Planner Form</Form></a>
+        <a href="autoshopper.php" class="button">Autoshopper</Form></a>
         <a href="logout.php" class="button logout-button">Logout</a>
     </div>
 </footer>
