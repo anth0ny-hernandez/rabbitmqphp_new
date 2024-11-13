@@ -123,7 +123,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['searchRecipe'])) {
     </form>
 
     <!-- Display Logic for Recipe Search Results -->
-    <form method="POST" action="weeklyMealPlanner.php"> 
+    <form method="GET" action="weeklyMealPlanner.php"> 
 
     <?php if (isset($recipeSearchResponse['error'])): ?>
         <p><?php echo htmlspecialchars($recipeSearchResponse['error']); ?></p>

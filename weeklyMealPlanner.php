@@ -12,9 +12,9 @@ $session_token = $_COOKIE['session_token'];
 $expire_time = time() + 90;
 setcookie('session_token', $session_token, $expire_time, "/");
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
+if ($_SERVER["REQUEST_METHOD"] == "GET") {
     header("Location: weeklyMealPlanner.php");
-
+    var_dump($_POST['foods']);
     $_POST['foods'];
     foreach($_POST['foods'] as $food)
     {
