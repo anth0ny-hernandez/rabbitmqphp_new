@@ -27,7 +27,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
                 <option value = "Thursday"> Thursday </option>
                 <option value = "Friday"> Friday </option>
                 <option value = "Saturday"> Saturday </option>
-    
+            </select>
                 <select name ="timeofday" id="timeofday">
                     <option value = "Breakfast"> Breakfast </option>
                     <option value = "Lunch"> Lunch </option>
