@@ -18,7 +18,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
     foreach($_GET['foods'] as $food)
     {
         echo "$food";?> 
-        <form action = "weeklyMealPlanner.php">
+        <form action = "weeklyMealPlanner.php" method="POST">
             <select name ="day" id="day">
                 <option value = "Sunday"> Sunday </option>
                 <option value = "Monday"> Monday </option>
@@ -34,6 +34,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
                     <option value = "Dinner"> Dinner </option>
     
             </select>
+            <input type = "submit" name="createmealplanner" value = "Create Meal Planner">
         </form>
         <br> <br>
         
