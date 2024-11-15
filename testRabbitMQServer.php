@@ -76,6 +76,15 @@ function requestProcessor($request) {
                 return $dmzClient->send_request($randomRequest);
             }
 
+            case "fetchWeeklyMealPlan":
+                $dbClient = new rabbitMQClient("testDB_RMQ.ini", "dbConnect");
+                $result = $dbClient->send_request($request);
+                return $result;
+    
+            case "saveWeeklyMealPlan":
+                $dbClient = new rabbitMQClient("testDB_RMQ.ini", "dbConnect");
+                $result = $dbClient->send_request($request);
+                return $result;
         
 
         default:
