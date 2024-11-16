@@ -7,7 +7,7 @@ if (!isset($_COOKIE['session_token'])) {
     exit();
 }
 
-// // Refresh session token to extend expiration by another 90 seconds
+// Refresh session token to extend expiration by another 90 seconds
 $session_token = $_COOKIE['session_token'];
 $expire_time = time() + 90;
 setcookie('session_token', $session_token, $expire_time, "/");
@@ -21,8 +21,11 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
     $_GET['foods'];
     foreach($_GET['foods'] as $food)
     {
+        //fetch the recipe names from the checkboxes in "searchrecipe". Display them 
         echo "$food";?> 
         <form action = "weeklyMealPlanner.php" method="POST">
+        <!--Display recipes with dropdown to select time of day and day of week.  -->
+
             <select name ="day" id="day">
                 <option value = "Sunday"> Sunday </option>
                 <option value = "Monday"> Monday </option>
@@ -96,9 +99,7 @@ echo "<th>Meal Type</th>";
 $daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 $mealType = ["Breakfast", "Lunch", "Dinner"];
 
-// foreach ($daysOfWeek as $day) {
-//     echo "<th>$day</th>";
-//     echo "</tr>";
+
 
 
 foreach($currentMealPlan as $meal){
@@ -138,15 +139,6 @@ foreach($daysOfWeek as $day) { // Sets days of the week as the first cell in 7 r
 echo "</tr>";
 echo "</table>";
 
-    // foreach ($currentMealPlan as $meal) {
-    // echo "<tr>";
-    //     echo "<td>{$meal['meal_type']}</td>";
-    //     echo "<td>{$meal['recipe']}</td>";
-    //     echo "</tr>";
-
-
-    //                                     }
-
 
         // echo "<form method='POST' style='display:inline;'>
         //         <input type='hidden' name='recipe' value='{$meal['recipe']}'>
@@ -175,27 +167,8 @@ echo "</table>";
     
 //     $saveResponse = $client->send_request($saveRequest);
 //     $message = $saveResponse['success'] ? "Weekly meal plan updated successfully!" : "Failed to update meal plan.";
-// }
-
-
-
-//fetch the recipe names from the checkboxes in "searchrecipe". Display them 
-
-    // $client = new rabbitMQClient("testRabbitMQ.ini", "testServer");
-
-    // // Collect form data for recipe search
-    // $request = [
-    //     "type" => "searchRecipe",
-    //     "label" => $food ?? null,
-    // ];
-
-    //Display recipes with dropdown to select time of day and day of week.  
-   
+// }  
     
-    // $recipeSearchResponse = $client->send_request($request);
-
-
-
 
     // $client = new rabbitMQClient("testRabbitMQ.ini", "testServer");
 
