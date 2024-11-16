@@ -82,26 +82,70 @@ $request = [
     "type" => "fetchWeeklyMealPlan",
     "session_token" => $_COOKIE['session_token']
 ];
+
 $response = $client->send_request($request);
 $currentMealPlan = $response['weeklyPlan'] ?? [];
+$groupedRecipes = [];
+
+if(isset($currentMealPlan)){
 
 echo "<table>";
 echo "<tr>";
 echo "<th>Meal Type</th>";
 //display in table. each row has meal_type, then meals for each day. 
 $daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-foreach ($daysOfWeek as $day) {
-    echo "<th>$day</th>";
-    echo "</tr>";
+$mealType = ["Breakfast", "Lunch", "Dinner"];
 
-    foreach ($currentMealPlan as $meal) {
+// foreach ($daysOfWeek as $day) {
+//     echo "<th>$day</th>";
+//     echo "</tr>";
+
+
+foreach($currentMealPlan as $meal){
+    $day = $meal['day'];
+    $mealTime = $meal['meal_type'];
+    $recipe = $meal['recipe'];
+    $calories = $meal['calories'];
+
+    // Done so that the recipe is uniquely ID'd
+    $groupedRecipes[$day][$mealTime][] = $recipe;
+    
+                                    }
+}
+
+
+echo "<table><tr><th>Days / Meal</th>"; // Creates HTML table
+foreach($mealType as $meal) { // Sets Meal Types as table headers
+    echo "<th>$meal</th>";
+}
+echo "</tr>";
+foreach($weekdays as $day) { // Sets days of the week as the first cell in 7 rows
     echo "<tr>";
-        echo "<td>{$meal['meal_type']}</td>";
-        echo "<td>{$meal['recipe']}</td>";
-        echo "</tr>";
+    echo "<td>$day</td>";
+    foreach($mealType as $meal) {
+        echo "<td>";
+        if(isset($groupedRecipes[$day][$meal])) // Verifies that there is a recipe here
+        {
+            echo implode(" ", $groupedRecipes[$day][$meal]); // prints the recipe name
+        } else {
+            echo "No Recipe";
+        }
+        echo "</td>";
+    }
+    echo "</tr>";
+}
+
+echo "</tr>";
+echo "</table>";
+
+    // foreach ($currentMealPlan as $meal) {
+    // echo "<tr>";
+    //     echo "<td>{$meal['meal_type']}</td>";
+    //     echo "<td>{$meal['recipe']}</td>";
+    //     echo "</tr>";
 
 
-                                        }
+    //                                     }
 
 
         // echo "<form method='POST' style='display:inline;'>
@@ -110,8 +154,7 @@ foreach ($daysOfWeek as $day) {
         //         <input type='hidden' name='meal_type' value='{$meal['meal_type']}'>
         //         <button type='submit' name='removeMeal' class='remove-button'>Remove</button>
         //       </form>";
-        echo "</div>";
-    }
+
 
 //ignore lines 62-93 for now 
 // $request = [
@@ -259,7 +302,8 @@ foreach ($daysOfWeek as $day) {
         <a href="dietrestrictions.php" class="button">Diet Restrictions</a>
         <a href="recommendations.php" class="button">Recommendations</a>
         <a href="review.php" class="button">Rate and Review</a>
-        <a href="mealplannerform.php" class="button">Weekly Meal Planner Form</Form></a>
+        <a href="weeklyMealPlanner.php" class="button">Weekly Meal Planner </a>
+        <a href="autoshopper.php" class="button">Autoshopper </a>
         <a href="logout.php" class="button logout-button">Logout</a>
     </div>
 </footer>
