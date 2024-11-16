@@ -119,7 +119,7 @@ foreach($mealType as $meal) { // Sets Meal Types as table headers
     echo "<th>$meal</th>";
 }
 echo "</tr>";
-foreach($weekdays as $day) { // Sets days of the week as the first cell in 7 rows
+foreach($daysOfWeek as $day) { // Sets days of the week as the first cell in 7 rows
     echo "<tr>";
     echo "<td>$day</td>";
     foreach($mealType as $meal) {
