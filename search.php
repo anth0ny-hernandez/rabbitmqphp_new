@@ -123,8 +123,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['searchRecipe'])) {
     </form>
 
     <!-- Display Logic for Recipe Search Results -->
-    <form method="GET" action="weeklyMealPlanner.php"> 
-
+    <form method="POST" action="weeklyMealPlanner.php"> 
     <?php if (isset($recipeSearchResponse['error'])): ?>
         <p><?php echo htmlspecialchars($recipeSearchResponse['error']); ?></p>
     <?php elseif (isset($recipeSearchResponse['hits']) && !empty($recipeSearchResponse['hits'])): ?>
@@ -137,15 +136,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['searchRecipe'])) {
                 <?php if (!empty($hit['recipe']['image'])): ?>
                     <img src="<?php echo htmlspecialchars($hit['recipe']['image']); ?>" alt="<?php echo htmlspecialchars($hit['recipe']['label']); ?>" width="100"><br>
                 <?php endif; ?>
-                <input type = "checkbox" id="<?php echo $hit['recipe']['label']?>" name="foods[]" value="<?php echo $hit['recipe']['label']?>"> <label for ="add to meal plan"> Add to Meal Plan</label>
+                <input type="checkbox" name="foods[]" value='<?php echo json_encode([
+                    "label" => $hit['recipe']['label'],
+                    "url" => $hit['recipe']['url'],
+                    "calories" => $hit['recipe']['calories']
+                ]); ?>'> Add to Meal Plan
             </div>
-            
         <?php endforeach; ?>
-        <input type = "submit" value="Submit Meals for Planner">
+        <input type="submit" value="Submit Meals for Planner">
     </form>
-    <?php else: ?>
-        
     <?php endif; ?>
+
 </div>
 
 <!-- JavaScript to handle automatic logout after session expiration -->
