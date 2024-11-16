@@ -41,8 +41,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
                     <option value = "Dinner"> Dinner </option>
     
             </select>
-            <input type = "submit" name="createmealplanner" value = "Create Meal Planner">
-        </form>
+        
         <br> <br>
         
         <?php 
@@ -50,33 +49,42 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
         //send the foods to dmz to get specific info to display in mealplanner table in the database. 
 
 
-        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['createmealplanner'])) {
-            $client = new rabbitMQClient("testRabbitMQ.ini", "testServer");
-
-            $foodDetailRequest = [
-                "type" => "searchRecipe",
-                "label" => $food ?? null,
-            ];
-            //get food details from dmz
-            $foodDetails = $client->send_request($foodDetailRequest);
-            
-            $saveRequest = [
-                "type" => "saveWeeklyMealPlan",
-                "session_token" => $_COOKIE['session_token'],
-                "foodDetails" => $foodDetails,
-                "day"=> $_POST['day'],
-                "meal_type"=>$_POST['meal_type']
-            
-            ];
-            //send all the details to database for inserting
-            $saveResponse = $client->send_request($saveRequest);
-            $message = $saveResponse['success'] ? "Weekly meal plan updated successfully!" : "Failed to update meal plan.";
-        }
+        
 
 
-    }
-  
+    }?>
+    
+    <input type = "submit" name="createmealplanner" value = "Create Meal Planner">
+    </form>
+  <?php
+
+$_GET['foods'];
+    foreach($_GET['foods'] as $food)
+    {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['createmealplanner'])) {
+    $client = new rabbitMQClient("testRabbitMQ.ini", "testServer");
+
+    $foodDetailRequest = [
+        "type" => "searchRecipe",
+        "label" => $food ?? null,
+    ];
+    //get food details from dmz
+    $foodDetails = $client->send_request($foodDetailRequest);
+    
+    $saveRequest = [
+        "type" => "saveWeeklyMealPlan",
+        "session_token" => $_COOKIE['session_token'],
+        "foodDetails" => $foodDetails,
+        "day"=> $_POST['day'],
+        "meal_type"=>$_POST['meal_type']
+    
+    ];
+    //send all the details to database for inserting
+    $saveResponse = $client->send_request($saveRequest);
+    $message = $saveResponse['success'] ? "Weekly meal plan updated successfully!" : "Failed to update meal plan.";
+}
     exit;
+}
 }
 
 
