@@ -1,4 +1,8 @@
 <?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 require_once('rabbitMQLib.inc');
 
 // Redirect to login if no session token
@@ -12,9 +16,17 @@ $selected_recipes = [];
 $currentMealPlan = [];
 $message = "";
 
+// Debug: Check if data is being sent
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    error_log("POST Request Received: " . print_r($_POST, true));
+}
+
 // Check if the user is submitting selected recipes
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['selected_recipes'])) {
     $selected_recipes = array_map('json_decode', $_POST['selected_recipes'], true);
+
+    // Debug: Log the selected recipes
+    error_log("Selected Recipes: " . print_r($selected_recipes, true));
 }
 
 // Fetch the user's current weekly meal plan from the database
@@ -25,6 +37,9 @@ $mealPlanRequest = [
 ];
 $mealPlanResponse = $client->send_request($mealPlanRequest);
 $currentMealPlan = $mealPlanResponse['weeklyPlan'] ?? [];
+
+// Debug: Log the fetched meal plan
+error_log("Current Meal Plan: " . print_r($currentMealPlan, true));
 
 // Process form submission to save new additions to the weekly meal plan
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['savePlan'])) {
@@ -37,6 +52,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['savePlan'])) {
 
     $saveResponse = $client->send_request($saveRequest);
     $message = $saveResponse['success'] ? "Weekly meal plan updated successfully!" : "Failed to update meal plan.";
+
+    // Debug: Log the save response
+    error_log("Save Response: " . print_r($saveResponse, true));
 }
 
 // Process request to remove a meal from the plan
@@ -50,6 +68,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['removeMeal'])) {
     ];
     $removeResponse = $client->send_request($removeRequest);
     $message = $removeResponse['success'] ? "Meal removed successfully!" : "Failed to remove meal.";
+
+    // Debug: Log the remove response
+    error_log("Remove Response: " . print_r($removeResponse, true));
 }
 ?>
 
@@ -122,7 +143,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['removeMeal'])) {
     </style>
 </head>
 <body>
-
 <div class="container">
     <div class="button-group">
         <a href="home.php" class="button">Home</a>
@@ -133,78 +153,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['removeMeal'])) {
         <a href="weekly_meal_planner.php" class="button">Weekly Meal Planner</a>
         <a href="logout.php" class="button logout-button">Logout</a>
     </div>
-
     <h2>Weekly Meal Planner</h2>
     <?php if ($message): ?>
         <p><?php echo $message; ?></p>
     <?php endif; ?>
-
-    <!-- Display the Current Weekly Meal Plan -->
-    <h3>Your Current Weekly Meal Plan</h3>
-    <?php if (!empty($currentMealPlan)): ?>
-        <table class="meal-plan-table">
-            <tr>
-                <th>Day</th>
-                <th>Meals</th>
-            </tr>
-            <?php
-            // Organize meals by day
-            $daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-            foreach ($daysOfWeek as $day) {
-                echo "<tr><td><strong>$day</strong></td><td>";
-                foreach ($currentMealPlan as $meal) {
-                    if ($meal['day'] === $day) {
-                        echo "<div><strong>{$meal['meal_type']}</strong>: ";
-                        echo "<a href='{$meal['url']}' target='_blank'>{$meal['recipe']}</a>";
-                        echo " ({$meal['calories']} calories)";
-                        echo "<form method='POST' style='display:inline;'>
-                                <input type='hidden' name='recipe' value='{$meal['recipe']}'>
-                                <input type='hidden' name='day' value='$day'>
-                                <input type='hidden' name='meal_type' value='{$meal['meal_type']}'>
-                                <button type='submit' name='removeMeal' class='remove-button'>Remove</button>
-                              </form>";
-                        echo "</div>";
-                    }
-                }
-                echo "</td></tr>";
-            }
-            ?>
-        </table>
-    <?php else: ?>
-        <p>No meals planned yet. Add meals below to create your weekly plan.</p>
-    <?php endif; ?>
-
-    <!-- Form to Assign Recipes to Weekly Planner -->
-    <form method="POST">
-        <h3>Plan Your Week</h3>
-        <?php foreach ($selected_recipes as $recipe): ?>
-            <div class="meal-item">
-                <strong><?php echo htmlspecialchars($recipe['label']); ?></strong>
-                <input type="hidden" name="weekly_plan[<?php echo htmlspecialchars($recipe['label']); ?>][url]" value="<?php echo htmlspecialchars($recipe['url']); ?>">
-                <input type="hidden" name="weekly_plan[<?php echo htmlspecialchars($recipe['label']); ?>][calories]" value="<?php echo htmlspecialchars($recipe['calories']); ?>">
-
-                <label for="day">Day:</label>
-                <select name="weekly_plan[<?php echo htmlspecialchars($recipe['label']); ?>][day]" class="dropdown">
-                    <option value="">Select Day</option>
-                    <?php foreach ($daysOfWeek as $day): ?>
-                        <option value="<?php echo $day; ?>"><?php echo $day; ?></option>
-                    <?php endforeach; ?>
-                </select>
-
-                <label for="meal_type">Meal:</label>
-                <select name="weekly_plan[<?php echo htmlspecialchars($recipe['label']); ?>][meal_type]" class="dropdown">
-                    <option value="">Select Meal</option>
-                    <option value="Breakfast">Breakfast</option>
-                    <option value="Lunch">Lunch</option>
-                    <option value="Dinner">Dinner</option>
-                </select>
-            </div>
-        <?php endforeach; ?>
-
-        <br>
-        <input type="submit" name="savePlan" value="Save Weekly Plan" class="button">
-    </form>
 </div>
-
 </body>
 </html>
