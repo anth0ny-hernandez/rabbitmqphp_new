@@ -7,7 +7,7 @@ if (!isset($_COOKIE['session_token'])) {
     exit();
 }
 
-// Refresh session token to extend the expiration by another 30 seconds
+// Refresh session token to extend expiration by another 30 seconds
 $session_token = $_COOKIE['session_token'];
 $expire_time = time() + 90;
 setcookie('session_token', $session_token, $expire_time, "/");
@@ -48,9 +48,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['searchRecipe'])) {
             margin: auto;
             padding: 20px;
         }
-        .nav-buttons {
-            margin-bottom: 20px;
-        }
         .button {
             display: inline-block;
             margin: 5px;
@@ -66,12 +63,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['searchRecipe'])) {
         .button:hover {
             background-color: #0056b3;
         }
-        .logout-button {
-            background-color: #dc3545;
-        }
-        .logout-button:hover {
-            background-color: #c82333;
-        }
         .meal-item {
             border: 1px solid #ddd;
             border-radius: 8px;
@@ -80,24 +71,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['searchRecipe'])) {
             box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
             text-align: left;
         }
-        h3 {
-            margin-top: 0;
-        }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="button-group">
-        <a href="home.php" class="button">Home</a>
-        <a href="meal_plan.php" class="button">Recipe Search</a>
-        <a href="dietRestrictions.php" class="button">Diet Restrictions</a>
-        <a href="recommendations.php" class="button">Recipe Recommendations</a>
-        <a href="reviews.php" class="button">Ratings and Reviews</a>
-        <a href="weekly_meal_planner.php" class="button">Weekly Meal Planner</a>
-        <a href="logout.php" class="button logout-button">Logout</a>
-    </div>
-
     <h2>Recipe Search</h2>
 
     <!-- Recipe Search Form -->
@@ -145,18 +123,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['searchRecipe'])) {
             <br>
             <input type="submit" name="addToPlanner" value="Transfer to Weekly Planner" class="button">
         </form>
-    <?php else: ?>
-        
     <?php endif; ?>
 </div>
-
-<!-- JavaScript to handle automatic logout after session expiration -->
-<script>
-    setTimeout(function() {
-        document.cookie = 'session_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-        window.location.href = 'login.php';
-    }, 90000); // 30 seconds
-</script>
 
 </body>
 </html>

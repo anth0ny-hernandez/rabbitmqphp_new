@@ -32,7 +32,7 @@ function requestProcessor($request) {
             $dbClient = new rabbitMQClient("testDB_RMQ.ini", "dbConnect");
             $result = $dbClient->send_request($request);
             return $result;
-        
+
         case "fetchWeeklyMealPlan":
             $dbClient = new rabbitMQClient("testDB_RMQ.ini", "dbConnect");
             $result = $dbClient->send_request($request);
@@ -43,15 +43,6 @@ function requestProcessor($request) {
             $result = $dbClient->send_request($request);
             return $result;
 
-        case "updateWeeklyMealPlan":  // New case to add new entries without clearing
-            $dbClient = new rabbitMQClient("testDB_RMQ.ini", "dbConnect");
-            $result = $dbClient->send_request($request);
-            return $result;
-
-        case "removeMealFromPlan":  // New case for removing specific meals
-            $dbClient = new rabbitMQClient("testDB_RMQ.ini", "dbConnect");
-            $result = $dbClient->send_request($request);
-            return $result;
 
         case "submitReview":
             $dbClient = new rabbitMQClient("testDB_RMQ.ini", "dbConnect");
