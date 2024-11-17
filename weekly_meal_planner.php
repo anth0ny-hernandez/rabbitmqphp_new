@@ -16,17 +16,13 @@ $selected_recipes = [];
 $currentMealPlan = [];
 $message = "";
 
-// Debug: Check if data is being sent
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    error_log("POST Request Received: " . print_r($_POST, true));
-}
-
 // Check if the user is submitting selected recipes
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['selected_recipes'])) {
-    $selected_recipes = array_map('json_decode', $_POST['selected_recipes'], true);
-
-    // Debug: Log the selected recipes
-    error_log("Selected Recipes: " . print_r($selected_recipes, true));
+    if (is_array($_POST['selected_recipes'])) {
+        $selected_recipes = array_map('json_decode', $_POST['selected_recipes']);
+    } else {
+        error_log("selected_recipes is not an array: " . print_r($_POST['selected_recipes'], true));
+    }
 }
 
 // Fetch the user's current weekly meal plan from the database
@@ -73,7 +69,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['removeMeal'])) {
     error_log("Remove Response: " . print_r($removeResponse, true));
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -153,9 +148,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['removeMeal'])) {
         <a href="weekly_meal_planner.php" class="button">Weekly Meal Planner</a>
         <a href="logout.php" class="button logout-button">Logout</a>
     </div>
+
     <h2>Weekly Meal Planner</h2>
     <?php if ($message): ?>
         <p><?php echo $message; ?></p>
+    <?php endif; ?>
+
+    <!-- Display Weekly Meal Plan -->
+    <h3>Your Current Weekly Meal Plan</h3>
+    <?php if (!empty($currentMealPlan)): ?>
+        <table class="meal-plan-table">
+            <tr>
+                <th>Day</th>
+                <th>Meals</th>
+            </tr>
+            <?php foreach ($currentMealPlan as $day => $meals): ?>
+                <tr>
+                    <td><?php echo htmlspecialchars($day); ?></td>
+                    <td><?php echo htmlspecialchars(implode(", ", array_map(function($meal) {
+                        return $meal['recipe'];
+                    }, $meals))); ?></td>
+                </tr>
+            <?php endforeach; ?>
+        </table>
+    <?php else: ?>
+        <p>No meals planned yet.</p>
     <?php endif; ?>
 </div>
 </body>
