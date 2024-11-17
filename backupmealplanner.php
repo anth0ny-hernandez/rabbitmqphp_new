@@ -1,244 +1,152 @@
 <?php
-
 require_once('rabbitMQLib.inc');
 
-
-
 // Check if the session token cookie is set
-
 if (!isset($_COOKIE['session_token'])) {
-
     header("Location: login.php");
-
     exit();
-
 }
 
-
-
 // Refresh session token to extend expiration by another 90 seconds
-
 $session_token = $_COOKIE['session_token'];
-
 $expire_time = time() + 90;
-
 setcookie('session_token', $session_token, $expire_time, "/");
-
 $client = new rabbitMQClient("testRabbitMQ.ini", "testServer");
-
 
 
 if ($_SERVER["REQUEST_METHOD"] == "GET") {
 
     //display foods received from search page and the form to choose which day & time of day it belongs to.
-
     var_dump($_GET['foods']);
-
+    $_GET['foods'];
     foreach($_GET['foods'] as $food)
-
     {
-
         //fetch the recipe names from the checkboxes in "searchrecipe". Display them 
+        echo "$food";?> 
+        <form action = "weeklyMealPlanner.php" method="POST">
+        <!--Display recipes with dropdown to select time of day and day of week.  -->
 
-        echo "$food";
-
-        ?>
-
-        <form action="weeklyMealPlanner.php" method="POST">
-
-            <input type="hidden" name="foods[]" value="<?php echo htmlspecialchars($food); ?>">
-
-            <select name="day[]" id="day">
-
-                <option value="Sunday">Sunday</option>
-
-                <option value="Monday">Monday</option>
-
-                <option value="Tuesday">Tuesday</option>
-
-                <option value="Wednesday">Wednesday</option>
-
-                <option value="Thursday">Thursday</option>
-
-                <option value="Friday">Friday</option>
-
-                <option value="Saturday">Saturday</option>
-
+            <select name ="day" id="day">
+                <option value = "Sunday"> Sunday </option>
+                <option value = "Monday"> Monday </option>
+                <option value = "Tuesday"> Tuesday </option>
+                <option value = "Wednesday"> Wednesday </option>
+                <option value = "Thursday"> Thursday </option>
+                <option value = "Friday"> Friday </option>
+                <option value = "Saturday"> Saturday </option>
             </select>
-
-            
-
-            <select name="meal_type[]" id="meal_type">
-
-                <option value="Breakfast">Breakfast</option>
-
-                <option value="Lunch">Lunch</option>
-
-                <option value="Dinner">Dinner</option>
-
-            </select>
-
-            <br><br>
-
-        <?php
-
-    }
-
-    ?>
-
-    <input type="submit" name="createmealplanner" value="Create Meal Planner">
-
-    </form>
-
-    <?php
-
-}
-
-
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['createmealplanner'])) {
-
-    $foods = $_POST['foods'];
-
-    $days = $_POST['day'];
-
-    $meal_types = $_POST['meal_type'];
-
+                <select name ="meal_type" id="meal_type">
+                    <option value = "Breakfast"> Breakfast </option>
+                    <option value = "Lunch"> Lunch </option>
+                    <option value = "Dinner"> Dinner </option>
     
+            </select>
+        
+        <br> <br>
+        
+        <?php 
+        
+        //send the foods to dmz to get specific info to display in mealplanner table in the database. 
 
-    for ($i = 0; $i < count($foods); $i++) {
-
-        $foodDetailRequest = [
-
-            "type" => "searchRecipe",
-
-            "label" => $foods[$i] ?? null,
-
-        ];
-
-        //get food details from dmz
-
-        $foodDetails = $client->send_request($foodDetailRequest);
 
         
 
-        $saveRequest = [
 
-            "type" => "saveWeeklyMealPlan",
+    }?>
+    
+    <input type = "submit" name="createmealplanner" value = "Create Meal Planner">
+    </form>
+  <?php
 
-            "session_token" => $_COOKIE['session_token'],
+$_GET['foods'];
+    foreach($_GET['foods'] as $food)
+    {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['createmealplanner'])) {
+    $client = new rabbitMQClient("testRabbitMQ.ini", "testServer");
 
-            "foodDetails" => $foodDetails,
-
-            "day" => $days[$i],
-
-            "meal_type" => $meal_types[$i]
-
-        ];
-
-        //send all the details to database for inserting
-
-        $saveResponse = $client->send_request($saveRequest);
-
-    }
-
-    $message = isset($saveResponse['success']) && $saveResponse['success'] ? "Weekly meal plan updated successfully!" : "Failed to update meal plan.";
-
-    echo $message;
-
+    $foodDetailRequest = [
+        "type" => "searchRecipe",
+        "label" => $food ?? null,
+    ];
+    //get food details from dmz
+    $foodDetails = $client->send_request($foodDetailRequest);
+    
+    $saveRequest = [
+        "type" => "saveWeeklyMealPlan",
+        "session_token" => $_COOKIE['session_token'],
+        "foodDetails" => $foodDetails,
+        "day"=> $_POST['day'],
+        "meal_type"=>$_POST['meal_type']
+    
+    ];
+    //send all the details to database for inserting
+    $saveResponse = $client->send_request($saveRequest);
+    $message = $saveResponse['success'] ? "Weekly meal plan updated successfully!" : "Failed to update meal plan.";
 }
-
+    exit;
+}
+}
 
 
 //get meal plan info
-
 $request = [
-
     "type" => "fetchWeeklyMealPlan",
-
     "session_token" => $_COOKIE['session_token']
-
 ];
 
-
-
 $response = $client->send_request($request);
-
 $currentMealPlan = $response['weeklyPlan'] ?? [];
-
 $groupedRecipes = [];
-
-
 
 if(isset($currentMealPlan)){
 
-    foreach($currentMealPlan as $meal){
-
-        $day = $meal['day'];
-
-        $mealTime = $meal['meal_type'];
-
-        $recipe = $meal['recipe'];
-
-        $groupedRecipes[$day][$mealTime][] = $recipe;
-
-    }
-
-}
-
-
-
-// Display the meal plan table
-
+echo "<table>";
+echo "<tr>";
+echo "<th>Meal Type</th>";
+//display in table. each row has meal_type, then meals for each day. 
 $daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-
 $mealType = ["Breakfast", "Lunch", "Dinner"];
 
 
 
-echo "<table><tr><th>Days / Meal</th>";
 
-foreach($mealType as $meal) {
+foreach($currentMealPlan as $meal){
+    $day = $meal['day'];
+    $mealTime = $meal['meal_type'];
+    $recipe = $meal['recipe'];
+    $calories = $meal['calories'];
 
+    // Done so that the recipe is uniquely ID'd
+    $groupedRecipes[$day][$mealTime][] = $recipe;
+    
+                                    }
+}
+
+
+echo "<table><tr><th>Days / Meal</th>"; // Creates HTML table
+foreach($mealType as $meal) { // Sets Meal Types as table headers
     echo "<th>$meal</th>";
-
+}
+echo "</tr>";
+foreach($daysOfWeek as $day) { // Sets days of the week as the first cell in 7 rows
+    echo "<tr>";
+    echo "<td>$day</td>";
+    foreach($mealType as $meal) {
+        echo "<td>";
+        if(isset($groupedRecipes[$day][$meal])) // Verifies that there is a recipe here
+        {
+            echo implode(" ", $groupedRecipes[$day][$meal]); // prints the recipe name
+        } else {
+            echo "No Recipe";
+        }
+        echo "</td>";
+    }
+    echo "</tr>";
 }
 
 echo "</tr>";
-
-
-
-foreach($daysOfWeek as $day) {
-
-    echo "<tr>";
-
-    echo "<td>$day</td>";
-
-    foreach($mealType as $meal) {
-
-        echo "<td>";
-
-        if(isset($groupedRecipes[$day][$meal])) {
-
-            echo implode(" ", $groupedRecipes[$day][$meal]);
-
-        } else {
-
-            echo "No Recipe";
-
-        }
-
-        echo "</td>";
-
-    }
-
-    echo "</tr>";
-
-}
-
 echo "</table>";
 
-?>
 
         // echo "<form method='POST' style='display:inline;'>
         //         <input type='hidden' name='recipe' value='{$meal['recipe']}'>
