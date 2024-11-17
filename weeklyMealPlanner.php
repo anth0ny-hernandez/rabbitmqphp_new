@@ -81,68 +81,66 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
                     $message = $saveResponse['success'] ? "Weekly meal plan updated successfully!" : "Failed to update meal plan.";
                 }
             }
-
-
-                //get meal plan info
-                $request = [
-                    "type" => "fetchWeeklyMealPlan",
-                    "session_token" => $_COOKIE['session_token']
-                ];
-
-                $response = $client->send_request($request);
-                $currentMealPlan = $response['weeklyPlan'] ?? [];
-                $groupedRecipes = [];
-
-                if(isset($currentMealPlan)){
-
-                echo "<table>";
-                echo "<tr>";
-                echo "<th>Meal Type</th>";
-                //display in table. each row has meal_type, then meals for each day. 
-                $daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-                $mealType = ["Breakfast", "Lunch", "Dinner"];
-
-
-
-
-                foreach($currentMealPlan as $meal){
-                    $day = $meal['day'];
-                    $mealTime = $meal['meal_type'];
-                    $recipe = $meal['recipe'];
-                    $calories = $meal['calories'];
-
-                    // Done so that the recipe is uniquely ID'd
-                    $groupedRecipes[$day][$mealTime][] = $recipe;
-                    
-                                                    }
-                                                    
-                }
-
-
-                echo "<table><tr><th>Days / Meal</th>"; // Creates HTML table
-                foreach($mealType as $meal) { // Sets Meal Types as table headers
-                    echo "<th>$meal</th>";
-                }
-                echo "</tr>";
-                foreach($daysOfWeek as $day) { // Sets days of the week as the first cell in 7 rows
-                    echo "<tr>";
-                    echo "<td>$day</td>";
-                    foreach($mealType as $meal) {
-                        echo "<td>";
-                        if(isset($groupedRecipes[$day][$meal])) // Verifies that there is a recipe here
-                        {
-                            echo implode(" ", $groupedRecipes[$day][$meal]); // prints the recipe name
-                        } else {
-                            echo "No Recipe";
-                        }
-                        echo "</td>";
-                    }
-                    echo "</tr>";
-                }
-
-                echo "</tr>";
-                echo "</table>";
         }
+                    //get meal plan info
+            $request = [
+                "type" => "fetchWeeklyMealPlan",
+                "session_token" => $_COOKIE['session_token']
+            ];
+
+            $response = $client->send_request($request);
+            $currentMealPlan = $response['weeklyPlan'] ?? [];
+            $groupedRecipes = [];
+
+            if(isset($currentMealPlan)){
+
+            echo "<table>";
+            echo "<tr>";
+            echo "<th>Meal Type</th>";
+            //display in table. each row has meal_type, then meals for each day. 
+            $daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+            $mealType = ["Breakfast", "Lunch", "Dinner"];
+
+
+
+
+            foreach($currentMealPlan as $meal){
+                $day = $meal['day'];
+                $mealTime = $meal['meal_type'];
+                $recipe = $meal['recipe'];
+                $calories = $meal['calories'];
+
+                // Done so that the recipe is uniquely ID'd
+                $groupedRecipes[$day][$mealTime][] = $recipe;
+                
+                                                }
+            }
+
+
+            echo "<table><tr><th>Days / Meal</th>"; // Creates HTML table
+            foreach($mealType as $meal) { // Sets Meal Types as table headers
+                echo "<th>$meal</th>";
+            }
+            echo "</tr>";
+            foreach($daysOfWeek as $day) { // Sets days of the week as the first cell in 7 rows
+                echo "<tr>";
+                echo "<td>$day</td>";
+                foreach($mealType as $meal) {
+                    echo "<td>";
+                    if(isset($groupedRecipes[$day][$meal])) // Verifies that there is a recipe here
+                    {
+                        echo implode(" ", $groupedRecipes[$day][$meal]); // prints the recipe name
+                    } else {
+                        echo "No Recipe";
+                    }
+                    echo "</td>";
+                }
+                echo "</tr>";
+            }
+
+            echo "</tr>";
+            echo "</table>";
+
     }
         
 
