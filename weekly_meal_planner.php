@@ -7,23 +7,26 @@ if (!isset($_COOKIE['session_token'])) {
     exit();
 }
 
-// Fetch selected recipes from POST data
+// Initialize variables
 $selected_recipes = [];
+$currentMealPlan = [];
+$message = "";
+
+// Check if the user is submitting selected recipes
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['selected_recipes'])) {
     $selected_recipes = array_map('json_decode', $_POST['selected_recipes'], true);
 }
 
 // Fetch the user's current weekly meal plan from the database
 $client = new rabbitMQClient("testRabbitMQ.ini", "testServer");
-$request = [
+$mealPlanRequest = [
     "type" => "fetchWeeklyMealPlan",
     "session_token" => $_COOKIE['session_token']
 ];
-$response = $client->send_request($request);
-$currentMealPlan = $response['weeklyPlan'] ?? [];
+$mealPlanResponse = $client->send_request($mealPlanRequest);
+$currentMealPlan = $mealPlanResponse['weeklyPlan'] ?? [];
 
 // Process form submission to save new additions to the weekly meal plan
-$message = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['savePlan'])) {
     $weeklyPlan = $_POST['weekly_plan'];
     $saveRequest = [
