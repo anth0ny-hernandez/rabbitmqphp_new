@@ -1,5 +1,4 @@
 <?php
-session_start();
 require_once('rabbitMQLib.inc');
 
 // Redirect to login if no session token
@@ -8,13 +7,11 @@ if (!isset($_COOKIE['session_token'])) {
     exit();
 }
 
-// Store selected recipes in session if coming from recipe search page
+// Process selected recipes transferred from the search page
+$selected_recipes = [];
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['addToPlanner']) && isset($_POST['selected_recipes'])) {
-    $_SESSION['selected_recipes'] = array_map('json_decode', $_POST['selected_recipes']);
+    $selected_recipes = array_map('json_decode', $_POST['selected_recipes']);
 }
-
-// Get selected recipes from session
-$selected_recipes = $_SESSION['selected_recipes'] ?? [];
 
 // Fetch the user's current weekly meal plan from the database
 $client = new rabbitMQClient("testRabbitMQ.ini", "testServer");
