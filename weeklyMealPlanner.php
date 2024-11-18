@@ -325,7 +325,12 @@ echo "</table>";
             box-shadow: 0px 0px 50px lightgreen;
             background: white;
         }
-
+        
+        table, tr, th, td {
+            border: 1px solid black;
+            padding: 10px;
+            margin: 10px;
+        }
         .button-group {
             margin-top: 20px;
         }
