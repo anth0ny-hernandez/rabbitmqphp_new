@@ -264,9 +264,9 @@ function databaseProcessor($request) {
                 if($stmt->execute())
                 {
                     $insertQuery = "UPDATE  weekly_meal_plan SET user_id=?, recipe=?, day=?, meal_type=?, url=?, calories=?";
-                    $stmt = $conn->prepare($insertQuery);
-                    $stmt->bind_param("issssd", $userID, $recipe, $day, $meal_type, $url, $calories);
-                    $stmt->execute();
+                    $stmt2 = $conn->prepare($insertQuery);
+                    $stmt2->bind_param("issssd", $userID, $recipe, $day, $meal_type, $url, $calories);
+                    $stmt2->execute();
                    
                     return ["success" => true];
 
@@ -274,9 +274,9 @@ function databaseProcessor($request) {
                 }
                 else{
                 $insertQuery = "INSERT INTO weekly_meal_plan (user_id, recipe, day, meal_type, url, calories) VALUES (?, ?, ?, ?, ?, ?)";
-                $stmt = $conn->prepare($insertQuery);
-                $stmt->bind_param("issssd", $userID, $recipe, $day, $meal_type, $url, $calories);
-                $stmt->execute();
+                $stmt2 = $conn->prepare($insertQuery);
+                $stmt2->bind_param("issssd", $userID, $recipe, $day, $meal_type, $url, $calories);
+                $stmt2->execute();
         
                 return ["success" => true];
                 }
