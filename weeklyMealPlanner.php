@@ -127,7 +127,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['createmealplanner']))
             {
                 $foodDetailInsert['label'] = $hit['recipe']['label'];
                 $foodDetailInsert['url'] = $hit['recipe']['url'];
-                $foodDetailInsert['label'] = $hit['recipe']['calories'];
+                $foodDetailInsert['calories'] = $hit['recipe']['calories'];
 
             }
         }        
