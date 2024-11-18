@@ -73,6 +73,8 @@ setcookie('session_token', $session_token, $expire_time, "/");
         <a href="search.php" class="button">Recipe Search</a>
         <a href="dietRestrictions.php" class="button">Diet Restrictions</a>
         <a href="recommendations.php" class="button">Recipe Recommendations</a>
+        <a href="weeklyMealPlanner.php" class="button">Weekly Meal Planner </a>
+        <a href="autoshopper.php" class="button">AutoShopper</a>
         <a href="logout.php" class="button logout-button">Logout</a>
     </div>
 </div>
