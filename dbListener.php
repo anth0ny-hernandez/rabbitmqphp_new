@@ -240,7 +240,7 @@ function databaseProcessor($request) {
         //get meal plan to display
         case "saveWeeklyMealPlan":
             $session_token = $request['session_token'];
-            $foodDetails = $request['foodDetails'];
+            $foodDetailInsert = $request['foodDetailInsert'];
             $day = $request['day'];
             $meal_type = $request['meal_type'];
         
@@ -250,12 +250,13 @@ function databaseProcessor($request) {
             $stmt->execute();
             $userResult = $stmt->get_result();
             $user = $userResult->fetch_assoc();
+            
         
             if ($user) {
                 $userID = $user['id'];
-                $url = $foodDetails['url'];
-                $calories = $foodDetails['calories'];
-                $recipe = $foodDetails['label'];
+                $url = $foodDetailInsert['url'];
+                $calories = $foodDetailInsert['calories'];
+                $recipe = $foodDetailInsert['label'];
         
                 $insertQuery = "INSERT INTO weekly_meal_plan (user_id, recipe, day, meal_type, url, calories) VALUES (?, ?, ?, ?, ?, ?)";
                 $stmt = $conn->prepare($insertQuery);

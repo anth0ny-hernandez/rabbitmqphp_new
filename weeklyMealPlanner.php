@@ -121,6 +121,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['createmealplanner']))
         $foodDetails = $client->send_request($foodDetailRequest);
 
         
+        foreach($foodDetails['hits'] as $hit)
+        {
+            if($hit['recipe']['label']==$foods[$i])
+            {
+                $foodDetailInsert['label'] = $hit['recipe']['label'];
+                $foodDetailInsert['url'] = $hit['recipe']['url'];
+                $foodDetailInsert['label'] = $hit['recipe']['calories'];
+
+            }
+        }        
 
         $saveRequest = [
 
@@ -128,7 +138,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['createmealplanner']))
 
             "session_token" => $_COOKIE['session_token'],
 
-            "foodDetails" => $foodDetails,
+            "foodDetailInsert" => $foodDetailInsert,
 
             "day" => $days[$i],
 
@@ -238,7 +248,7 @@ foreach($daysOfWeek as $day) {
 
 echo "</table>";
 
-?>
+
 
         // echo "<form method='POST' style='display:inline;'>
         //         <input type='hidden' name='recipe' value='{$meal['recipe']}'>
