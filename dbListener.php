@@ -257,31 +257,14 @@ function databaseProcessor($request) {
                 $url = $foodDetailInsert['url'];
                 $calories = $foodDetailInsert['calories'];
                 $recipe = $foodDetailInsert['label'];
-                //remove lines 260-272 if it doesnt work
-                $checkQuery = "SELECT * FROM weekly_meal_plan where day =? AND meal_type =?";
-                $stmt = $conn->prepare($checkQuery);
-                $stmt->bind_param("ss", $day, $meal_type);
-                if($stmt->execute())
-                {
-                    $insertQuery = "UPDATE  weekly_meal_plan SET user_id=?, recipe=?, day=?, meal_type=?, url=?, calories=?";
-                    $stmt2 = $conn->prepare($insertQuery);
-                    $stmt2->bind_param("issssd", $userID, $recipe, $day, $meal_type, $url, $calories);
-                    $stmt2->execute();
-                   
-                    return ["success" => true];
-
-            
-                }
-                else{
+        
                 $insertQuery = "INSERT INTO weekly_meal_plan (user_id, recipe, day, meal_type, url, calories) VALUES (?, ?, ?, ?, ?, ?)";
-                $stmt2 = $conn->prepare($insertQuery);
-                $stmt2->bind_param("issssd", $userID, $recipe, $day, $meal_type, $url, $calories);
-                $stmt2->execute();
+                $stmt = $conn->prepare($insertQuery);
+                $stmt->bind_param("issssd", $userID, $recipe, $day, $meal_type, $url, $calories);
+                $stmt->execute();
         
                 return ["success" => true];
-                }
-            }
-             else {
+            } else {
                 return ["success" => false, "message" => "User not found"];
             }
         
