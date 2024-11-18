@@ -149,7 +149,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['createmealplanner']))
         //send all the details to database for inserting
 
         $saveResponse = $client->send_request($saveRequest);
-        
+
         $message = isset($saveResponse['success']) && $saveResponse['success'] ? "Weekly meal plan updated successfully!" : "Failed to update meal plan.";
 
         echo $message;
@@ -157,98 +157,98 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['createmealplanner']))
 
     }
 
-   
-
-    $request = [
-
-        "type" => "fetchWeeklyMealPlan",
-    
-        "session_token" => $_COOKIE['session_token']
-    
-    ];
-    
-    
-    
-    $response = $client->send_request($request);
-    
-    $currentMealPlan = $response['weeklyPlan'] ?? [];
-    
-    $groupedRecipes = [];
-    
-    
-    
-    if(isset($currentMealPlan)){
-    
-        foreach($currentMealPlan as $meal){
-    
-            $day = $meal['day'];
-    
-            $mealTime = $meal['meal_type'];
-    
-            $recipe = $meal['recipe'];
-    
-            $groupedRecipes[$day][$mealTime][] = $recipe;
-    
-        }
-    
-    }
-    
-    
-    
-    // Display the meal plan table
-    
-    $daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-    
-    $mealType = ["Breakfast", "Lunch", "Dinner"];
-    
-    
-    
-    echo "<table><tr><th>Days / Meal</th>";
-    
-    foreach($mealType as $meal) {
-    
-        echo "<th>$meal</th>";
-    
-    }
-    
-    echo "</tr>";
-    
-    
-    
-    foreach($daysOfWeek as $day) {
-    
-        echo "<tr>";
-    
-        echo "<td>$day</td>";
-    
-        foreach($mealType as $meal) {
-    
-            echo "<td>";
-    
-            if(isset($groupedRecipes[$day][$meal])) {
-    
-                echo implode(" ", $groupedRecipes[$day][$meal]);
-    
-            } else {
-    
-                echo "No Recipe";
-    
-            }
-    
-            echo "</td>";
-    
-        }
-    
-        echo "</tr>";
-    
-    }
-    
-    echo "</table>";
+ 
     
     
 }
 
+  
 
+$request = [
+
+    "type" => "fetchWeeklyMealPlan",
+
+    "session_token" => $_COOKIE['session_token']
+
+];
+
+
+
+$response = $client->send_request($request);
+
+$currentMealPlan = $response['weeklyPlan'] ?? [];
+
+$groupedRecipes = [];
+
+
+
+if(isset($currentMealPlan)){
+
+    foreach($currentMealPlan as $meal){
+
+        $day = $meal['day'];
+
+        $mealTime = $meal['meal_type'];
+
+        $recipe = $meal['recipe'];
+
+        $groupedRecipes[$day][$mealTime][] = $recipe;
+
+    }
+
+}
+
+
+
+// Display the meal plan table
+
+$daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+
+$mealType = ["Breakfast", "Lunch", "Dinner"];
+
+
+
+echo "<table><tr><th>Days / Meal</th>";
+
+foreach($mealType as $meal) {
+
+    echo "<th>$meal</th>";
+
+}
+
+echo "</tr>";
+
+
+
+foreach($daysOfWeek as $day) {
+
+    echo "<tr>";
+
+    echo "<td>$day</td>";
+
+    foreach($mealType as $meal) {
+
+        echo "<td>";
+
+        if(isset($groupedRecipes[$day][$meal])) {
+
+            echo implode(" ", $groupedRecipes[$day][$meal]);
+
+        } else {
+
+            echo "No Recipe";
+
+        }
+
+        echo "</td>";
+
+    }
+
+    echo "</tr>";
+
+}
+
+echo "</table>";
 
 //get meal plan info
 
