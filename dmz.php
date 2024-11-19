@@ -1,3 +1,4 @@
+#!/bin/php
 <?php
 require_once('rabbitMQLib.inc');
 require_once('get_host_info.inc');
