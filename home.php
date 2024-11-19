@@ -70,10 +70,13 @@ setcookie('session_token', $session_token, $expire_time, "/");
     <p>You are logged in. Your session will be automatically refreshed every 30 seconds to keep you logged in.</p>
 
     <div class="button-group">
-        <a href="meal_plan.php" class="button">Recipe Search</a>
-        <a href="dietRestrictions.php" class="button">Diet Restrictions</a>
-        <a href="recommendations.php" class="button">Recipe Recommendations</a>
-        <a href="reviews.php" class="button">Ratings and Reviews</a>
+        <a href="home.php" class="button">Home Page</a>
+        <a href="search.php" class="button">Recipe Search</a>
+        <a href="dietrestrictions.php" class="button">Diet Restrictions</a>
+        <a href="recommendations.php" class="button">Recommendations</a>
+        <a href="review.php" class="button">Rate and Review</a>
+        <a href="weeklyMealPlanner.php" class="button">Weekly Meal Planner </a>
+        <a href="autoshopper.php" class="button">Autoshopper </a>
         <a href="logout.php" class="button logout-button">Logout</a>
     </div>
 </div>

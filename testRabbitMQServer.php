@@ -14,6 +14,16 @@ function requestProcessor($request) {
 
     switch ($request['type']) {
         // directs the login process
+        case "fetchWeeklyMealPlan":
+            $dbClient = new rabbitMQClient("testDB_RMQ.ini", "dbConnect");
+            $result = $dbClient->send_request($request);
+            return $result;
+
+        case "saveWeeklyMealPlan":
+            $dbClient = new rabbitMQClient("testDB_RMQ.ini", "dbConnect");
+            $result = $dbClient->send_request($request);
+            return $result;
+            
         case "login":
             // creates new client to establish new connection to db's own server
             $dbClient = new rabbitMQClient("testDB_RMQ.ini", "dbConnect");
@@ -29,16 +39,6 @@ function requestProcessor($request) {
             return $result;
         
         case "logout":
-            $dbClient = new rabbitMQClient("testDB_RMQ.ini", "dbConnect");
-            $result = $dbClient->send_request($request);
-            return $result;
-
-        case "fetchWeeklyMealPlan":
-            $dbClient = new rabbitMQClient("testDB_RMQ.ini", "dbConnect");
-            $result = $dbClient->send_request($request);
-            return $result;
-
-        case "saveWeeklyMealPlan":
             $dbClient = new rabbitMQClient("testDB_RMQ.ini", "dbConnect");
             $result = $dbClient->send_request($request);
             return $result;
