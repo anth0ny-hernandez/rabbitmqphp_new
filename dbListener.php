@@ -16,8 +16,8 @@ function databaseProcessor($request) {
     $password = $request['password'];
 
     switch($request['type']) {
-
-        case "fetchIngredients":
+        
+        case "fetchWeeklyPlanRecipes":
             $session_token = $request['session_token'];
         
             // Get user ID based on session token
@@ -31,7 +31,7 @@ function databaseProcessor($request) {
             if ($user) {
                 $userID = $user['id'];
         
-                // Fetch all recipes saved in the weekly meal plan for the user
+                // Fetch recipe labels from the weekly meal plan for the user
                 $recipeQuery = "SELECT recipe FROM weekly_meal_plan WHERE user_id = ?";
                 $stmt = $conn->prepare($recipeQuery);
                 $stmt->bind_param("i", $userID);
@@ -46,70 +46,6 @@ function databaseProcessor($request) {
                 return ["success" => true, "recipes" => $recipes];
             } else {
                 return ["success" => false, "message" => "User not found"];
-            }
-        
-
-        case "getUserPreferences":
-            $session_token = $request['session_token'];
-        
-            // Retrieve user ID based on session token
-            $userQuery = "SELECT id FROM accounts WHERE session_token = ?";
-            $userStmt = $conn->prepare($userQuery);
-            $userStmt->bind_param("s", $session_token);
-            $userStmt->execute();
-            $userResult = $userStmt->get_result();
-        
-            if ($userResult->num_rows > 0) {
-                $user = $userResult->fetch_assoc();
-                $user_id = $user['id'];
-        
-                // Retrieve dietary preferences
-                $prefQuery = "SELECT dietaryRestrictions, allergyType, otherRestrictions FROM preferences WHERE id = ?";
-                $prefStmt = $conn->prepare($prefQuery);
-                $prefStmt->bind_param("i", $user_id);
-                $prefStmt->execute();
-                $prefResult = $prefStmt->get_result();
-        
-                if ($prefResult->num_rows > 0) {
-                    $preferences = $prefResult->fetch_assoc();
-                    return array_merge(["success" => true], $preferences);
-                } else {
-                    return ["success" => false, "message" => "No dietary preferences found."];
-                }
-            } else {
-                return ["success" => false, "message" => "User not found."];
-            }
-        
-
-        case "getDietRestrictions":
-            $session_token = $request['session_token'];
-        
-            // Find the user ID using the session token
-            $userQuery = "SELECT id FROM accounts WHERE session_token = ?";
-            $userStmt = $conn->prepare($userQuery);
-            $userStmt->bind_param("s", $session_token);
-            $userStmt->execute();
-            $userResult = $userStmt->get_result();
-        
-            if ($userResult->num_rows > 0) {
-                $user = $userResult->fetch_assoc();
-                $user_id = $user['id'];
-        
-                // Retrieve dietary restrictions
-                $prefQuery = "SELECT dietaryRestrictions, allergyType, otherRestrictions FROM preferences WHERE id = ?";
-                $prefStmt = $conn->prepare($prefQuery);
-                $prefStmt->bind_param("i", $user_id);
-                $prefStmt->execute();
-                $prefResult = $prefStmt->get_result();
-        
-                if ($prefResult->num_rows > 0) {
-                    $preferences = $prefResult->fetch_assoc();
-                    return array_merge(["success" => true], $preferences);
-                } else {
-                    return ["success" => false, "message" => "No dietary restrictions found."];
-                }
-            } else {
-                return ["success" => false, "message" => "User not found."];
             }
         
 

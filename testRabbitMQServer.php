@@ -14,10 +14,11 @@ function requestProcessor($request) {
 
     switch ($request['type']) {
         // directs the login process
-        case "fetchIngredients":
+        case "fetchWeeklyPlanRecipes":
             $dbClient = new rabbitMQClient("testDB_RMQ.ini", "dbConnect");
             $result = $dbClient->send_request($request);
             return $result;
+        
         
         case "fetchWeeklyMealPlan":
             $dbClient = new rabbitMQClient("testDB_RMQ.ini", "dbConnect");
