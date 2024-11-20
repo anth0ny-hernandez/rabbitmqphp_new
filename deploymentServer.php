@@ -5,9 +5,9 @@ require_once('path.inc');
 
 // Database configuration
 $dbHost = 'localhost';
-$dbName = 'deployment_system';
-$dbUser = 'root';
-$dbPassword = 'password';
+$dbName = 'testdb';
+$dbUser = 'testUser';
+$dbPassword = '12345';
 
 // Function to add a new version to the database
 function addVersionToDatabase($versionNumber, $bundlePath) {
