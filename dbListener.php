@@ -17,6 +17,38 @@ function databaseProcessor($request) {
 
     switch($request['type']) {
 
+        case "fetchIngredients":
+            $session_token = $request['session_token'];
+        
+            // Get user ID based on session token
+            $userQuery = "SELECT id FROM accounts WHERE session_token = ?";
+            $stmt = $conn->prepare($userQuery);
+            $stmt->bind_param("s", $session_token);
+            $stmt->execute();
+            $userResult = $stmt->get_result();
+            $user = $userResult->fetch_assoc();
+        
+            if ($user) {
+                $userID = $user['id'];
+        
+                // Fetch all recipes saved in the weekly meal plan for the user
+                $recipeQuery = "SELECT recipe FROM weekly_meal_plan WHERE user_id = ?";
+                $stmt = $conn->prepare($recipeQuery);
+                $stmt->bind_param("i", $userID);
+                $stmt->execute();
+                $result = $stmt->get_result();
+        
+                $recipes = [];
+                while ($row = $result->fetch_assoc()) {
+                    $recipes[] = $row['recipe'];
+                }
+        
+                return ["success" => true, "recipes" => $recipes];
+            } else {
+                return ["success" => false, "message" => "User not found"];
+            }
+        
+
         case "getUserPreferences":
             $session_token = $request['session_token'];
         

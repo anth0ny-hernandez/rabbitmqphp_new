@@ -1,39 +1,39 @@
 <?php
-session_start();
 require_once('rabbitMQLib.inc');
 
-// Redirect to login if no session token
+// Check if the session token cookie is set
 if (!isset($_COOKIE['session_token'])) {
     header("Location: login.php");
     exit();
 }
 
-// Set up RabbitMQ client to fetch weekly meal plan
-$client = new rabbitMQClient("testRabbitMQ.ini", "testServer");
-$mealPlanRequest = [
-    "type" => "fetchWeeklyMealPlan",
-    "session_token" => $_COOKIE['session_token']
-];
-$mealPlanResponse = $client->send_request($mealPlanRequest);
-$savedRecipes = $mealPlanResponse['weeklyPlan'] ?? [];
+// Refresh session token to extend expiration by another 90 seconds
+$session_token = $_COOKIE['session_token'];
+$expire_time = time() + 90;
+setcookie('session_token', $session_token, $expire_time, "/");
 
-// Set up an array to store ingredients for each recipe
+// Fetch saved recipes from the weekly meal planner
+$client = new rabbitMQClient("testRabbitMQ.ini", "testServer");
+$request = [
+    "type" => "fetchIngredients",
+    "session_token" => $session_token
+];
+$response = $client->send_request($request);
+
+$recipes = $response['recipes'] ?? [];
 $ingredientsList = [];
 
-// Fetch ingredients for each recipe in the saved weekly meal plan
-foreach ($savedRecipes as $meal) {
-    $dmzClient = new rabbitMQClient("dmzConfig.ini", "dmzServer");
-    $dmzRequest = [
+// Fetch ingredients for each recipe using the Edamam API
+foreach ($recipes as $recipeLabel) {
+    $apiRequest = [
         "type" => "searchRecipe",
-        "label" => $meal['recipe'] // Use the recipe name from saved weekly meal plan
+        "label" => $recipeLabel
     ];
-    $dmzResponse = $dmzClient->send_request($dmzRequest);
+    $apiResponse = $client->send_request($apiRequest);
 
-    // Check and add ingredients if the response is successful
-    if (isset($dmzResponse['hits'][0])) {
-        $ingredientsList[$meal['recipe']] = $dmzResponse['hits'][0]['recipe']['ingredientLines'];
-    } else {
-        $ingredientsList[$meal['recipe']] = ["Ingredients not found"];
+    if (isset($apiResponse['hits']) && !empty($apiResponse['hits'])) {
+        $recipeData = $apiResponse['hits'][0]['recipe'];
+        $ingredientsList[$recipeLabel] = $recipeData['ingredientLines'];
     }
 }
 ?>
@@ -44,19 +44,25 @@ foreach ($savedRecipes as $meal) {
     <meta charset="UTF-8">
     <title>AutoShopper</title>
     <style>
-        /* Basic styling */
+        /* Basic styling for the autoshopper page */
         body {
             font-family: Arial, sans-serif;
             text-align: center;
-            margin-top: 20px;
+            margin-top: 50px;
         }
         .container {
-            max-width: 800px;
+            max-width: 600px;
             margin: auto;
             padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            color: #333;
         }
         .button-group {
-            margin-bottom: 20px;
+            margin-top: 20px;
         }
         .button {
             display: inline-block;
@@ -79,39 +85,44 @@ foreach ($savedRecipes as $meal) {
         .logout-button:hover {
             background-color: #c82333;
         }
-        .ingredient-item {
+        .recipe-card {
             border: 1px solid #ddd;
             border-radius: 8px;
-            padding: 10px;
-            margin-top: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
             box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
             text-align: left;
         }
-        h3 {
-            margin-top: 0;
+        .recipe-card h3 {
+            color: #007bff;
+            margin: 0;
+        }
+        .recipe-card ul {
+            margin: 10px 0;
+            padding-left: 20px;
+            color: #555;
         }
     </style>
 </head>
 <body>
 
 <div class="container">
+    <h2>AutoShopper</h2>
+
+    <!-- Navigation Buttons -->
     <div class="button-group">
-        <a href="home.php" class="button">Home Page</a>
-        <a href="search.php" class="button">Recipe Search</a>
-        <a href="dietrestrictions.php" class="button">Diet Restrictions</a>
-        <a href="recommendations.php" class="button">Recommendations</a>
-        <a href="review.php" class="button">Rate and Review</a>
-        <a href="weeklyMealPlanner.php" class="button">Weekly Meal Planner </a>
-        <a href="autoshopper.php" class="button">Autoshopper </a>
+        <a href="home.php" class="button">Home</a>
+        <a href="meal_plan.php" class="button">Recipe Search</a>
+        <a href="weeklyMealPlanner.php" class="button">Weekly Meal Planner</a>
+        <a href="autoshopper.php" class="button">AutoShopper</a>
         <a href="logout.php" class="button logout-button">Logout</a>
     </div>
 
-    <h2>AutoShopper - Ingredients for Your Weekly Plan</h2>
-
+    <!-- Display Ingredients -->
     <?php if (!empty($ingredientsList)): ?>
-        <?php foreach ($ingredientsList as $recipe => $ingredients): ?>
-            <div class="ingredient-item">
-                <h3><?php echo htmlspecialchars($recipe); ?></h3>
+        <?php foreach ($ingredientsList as $recipeLabel => $ingredients): ?>
+            <div class="recipe-card">
+                <h3><?php echo htmlspecialchars($recipeLabel); ?></h3>
                 <ul>
                     <?php foreach ($ingredients as $ingredient): ?>
                         <li><?php echo htmlspecialchars($ingredient); ?></li>
@@ -120,7 +131,7 @@ foreach ($savedRecipes as $meal) {
             </div>
         <?php endforeach; ?>
     <?php else: ?>
-        <p>No recipes found in your weekly meal plan. Please add recipes to view ingredients.</p>
+        <p>No recipes saved in the weekly meal planner.</p>
     <?php endif; ?>
 </div>
 
