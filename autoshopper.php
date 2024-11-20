@@ -15,7 +15,7 @@ setcookie('session_token', $session_token, $expire_time, "/");
 // Fetch saved recipes from the weekly meal planner
 $client = new rabbitMQClient("testRabbitMQ.ini", "testServer");
 $request = [
-    "type" => "fetchIngredients",
+    "type" => "fetchWeeklyPlanRecipes",
     "session_token" => $session_token
 ];
 $response = $client->send_request($request);
@@ -23,16 +23,16 @@ $response = $client->send_request($request);
 $recipes = $response['recipes'] ?? [];
 $ingredientsList = [];
 
-// Fetch ingredients for each recipe using the Edamam API
+// Fetch ingredients for each recipe using the DMZ
 foreach ($recipes as $recipeLabel) {
-    $apiRequest = [
+    $dmzRequest = [
         "type" => "searchRecipe",
         "label" => $recipeLabel
     ];
-    $apiResponse = $client->send_request($apiRequest);
+    $dmzResponse = $client->send_request($dmzRequest);
 
-    if (isset($apiResponse['hits']) && !empty($apiResponse['hits'])) {
-        $recipeData = $apiResponse['hits'][0]['recipe'];
+    if (isset($dmzResponse['hits']) && !empty($dmzResponse['hits'])) {
+        $recipeData = $dmzResponse['hits'][0]['recipe'];
         $ingredientsList[$recipeLabel] = $recipeData['ingredientLines'];
     }
 }
@@ -44,7 +44,7 @@ foreach ($recipes as $recipeLabel) {
     <meta charset="UTF-8">
     <title>AutoShopper</title>
     <style>
-        /* Basic styling for the autoshopper page */
+        /* Basic styling for the AutoShopper page */
         body {
             font-family: Arial, sans-serif;
             text-align: center;
@@ -131,7 +131,7 @@ foreach ($recipes as $recipeLabel) {
             </div>
         <?php endforeach; ?>
     <?php else: ?>
-        <p>No recipes saved in the weekly meal planner.</p>
+        <p>No recipes found in your weekly meal planner.</p>
     <?php endif; ?>
 </div>
 
