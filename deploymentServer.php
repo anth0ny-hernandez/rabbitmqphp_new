@@ -39,18 +39,68 @@ function handleRequest($request) {
     }
 
     switch ($request['type']) {
-        case "deploy":
-            // Handle deployment
-            $versionNumber = $request['version_number'];
-            $bundlePath = $request['bundle_path'];
+        case "pullLatestVersion":
+            return getLatestVersion();
 
-            // Add the version to the database
-            return addVersionToDatabase($versionNumber, $bundlePath);
+        case "pullSpecificVersion":
+            $versionNumber = $request['version_number'];
+            return getSpecificVersion($versionNumber);
 
         default:
             return ["error" => "Unsupported request type"];
     }
 }
+
+function getLatestVersion() {
+    global $dbHost, $dbName, $dbUser, $dbPassword;
+
+    try {
+        $db = new PDO("mysql:host=$dbHost;dbname=$dbName", $dbUser, $dbPassword);
+        $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+        $stmt = $db->query("SELECT * FROM deployment_history ORDER BY id DESC LIMIT 1");
+        $latest = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($latest) {
+            return [
+                "success" => true,
+                "version_number" => $latest['version_number'],
+                "bundle_path" => $latest['bundle_path']
+            ];
+        } else {
+            return ["success" => false, "message" => "No versions found in deployment history."];
+        }
+    } catch (Exception $e) {
+        return ["success" => false, "message" => $e->getMessage()];
+    }
+}
+
+function getSpecificVersion($versionNumber) {
+    global $dbHost, $dbName, $dbUser, $dbPassword;
+
+    try {
+        $db = new PDO("mysql:host=$dbHost;dbname=$dbName", $dbUser, $dbPassword);
+        $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+        $stmt = $db->prepare("SELECT * FROM deployment_history WHERE version_number = :version");
+        $stmt->bindParam(':version', $versionNumber);
+        $stmt->execute();
+        $specific = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($specific) {
+            return [
+                "success" => true,
+                "version_number" => $specific['version_number'],
+                "bundle_path" => $specific['bundle_path']
+            ];
+        } else {
+            return ["success" => false, "message" => "Version $versionNumber not found in deployment history."];
+        }
+    } catch (Exception $e) {
+        return ["success" => false, "message" => $e->getMessage()];
+    }
+}
+
 
 $server = new rabbitMQServer("deploymentServer.ini", "deploymentServer");
 echo "Deployment Server is running...\n";
