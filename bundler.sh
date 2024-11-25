@@ -16,5 +16,5 @@ echo $newVersionNum >> "../rabbitmqphp_new/versionTracker.txt"
 tar -czf rabbitmqphp_new.${newVersionNum}.tar.gz $*
 
 #create scp command to send .tar file over to deployment server
-# scp rabbitmqphp_new.${newVersionNum}.tar.gz yashmandal@172.22.217.86:/home/yashmandal/git/deployment
-scp rabbitmqphp_new.${newVersionNum}.tar.gz alvee-jalal@172.22.87.142:/home/alvee-jalal/git/
+scp rabbitmqphp_new.${newVersionNum}.tar.gz yashmandal@172.22.217.86:/home/yashmandal/git/deployment
+#scp rabbitmqphp_new.${newVersionNum}.tar.gz alvee-jalal@172.22.87.142:/home/alvee-jalal/git/

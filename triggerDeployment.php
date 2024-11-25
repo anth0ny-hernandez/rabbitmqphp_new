@@ -18,11 +18,11 @@ if (empty($version_number)) {
 }
 
 // Define the bundle path dynamically based on the version number
-$bundlePath = "/home/yashmandal/git/myRepo-$version_number.tar.gz"; // Adjust if necessary
+$bundlePath = "/home/yashmandal/git/deployment/myRepo-$version_number.tar.gz"; // Adjust if necessary
 
 // Send a deployment request to the RabbitMQ server
 try {
-    $client = new rabbitMQClient("deploymentClient.ini", "deploymentServer");
+    $client = new rabbitMQClient("deploymentServer.ini", "deploymentServer");
 
     $request = [
         "type" => "deploy",
