@@ -3,7 +3,7 @@ require_once('rabbitMQLib.inc');
 
 // Function to pull the latest version
 function pullLatestVersion() {
-    $client = new rabbitMQClient("deploymentClient.ini", "deploymentServer");
+    $client = new rabbitMQClient("deploymentServer.ini", "deploymentServer");
 
     // Request the latest version
     $request = ["type" => "pullLatestVersion"];
@@ -15,7 +15,7 @@ function pullLatestVersion() {
 
         // Use SCP to pull the bundle
         $bundlePath = $response['bundle_path'];
-        $localPath = "/path/to/qa-or-production/"; // Update with your environment path
+        $localPath = "/home/yashmandal/git/deployment"; // Update with your environment path
 
         $command = "scp yashmandal@172.22.217.86:$bundlePath $localPath";
         exec($command, $output, $status);
@@ -32,7 +32,7 @@ function pullLatestVersion() {
 
 // Function to pull a specific version
 function pullSpecificVersion($versionNumber) {
-    $client = new rabbitMQClient("deploymentClient.ini", "deploymentServer");
+    $client = new rabbitMQClient("deploymentServer.ini", "deploymentServer");
 
     // Request a specific version
     $request = [
@@ -47,7 +47,7 @@ function pullSpecificVersion($versionNumber) {
 
         // Use SCP to pull the bundle
         $bundlePath = $response['bundle_path'];
-        $localPath = "/path/to/qa-or-production/"; // Update with your environment path
+        $localPath = "/home/yashmandal/git/deployment"; // Update with your environment path
 
         $command = "scp yashmandal@172.22.217.86:$bundlePath $localPath";
         exec($command, $output, $status);
@@ -66,7 +66,7 @@ function pullSpecificVersion($versionNumber) {
 // Uncomment one of the following to test:
 
 // Pull the latest version
-pullLatestVersion();
+//pullLatestVersion();
 
 // Pull a specific version (replace 'v1.0.0' with the actual version number)
-//pullSpecificVersion('v1.0.0');
+pullSpecificVersion('v2.0.0');
