@@ -17,17 +17,22 @@ function pullLatestVersion() {
         $bundlePath = $response['bundle_path'];
         $localPath = "/home/yashmandal/git/deployment"; // Update with your environment path
 
-        $command = "scp yashmandal@172.22.217.86:$bundlePath $localPath";
-        exec($command, $output, $status);
+        $retrieve = "scp yashmandal@172.22.217.86:$bundlePath $localPath";
+        exec($retrieve, $status);
 
+        
         if ($status === 0) {
             echo "Successfully pulled latest version.\n";
+            $install = "tar -xzvf $bundlePath -C $localPath";
+            exec($install);
         } else {
             echo "Failed to pull latest version.\n";
         }
     } else {
         echo "Error: " . $response['message'] . "\n";
     }
+        
+
 }
 
 // Function to pull a specific version
@@ -49,11 +54,14 @@ function pullSpecificVersion($versionNumber) {
         $bundlePath = $response['bundle_path'];
         $localPath = "/home/yashmandal/git/deployment"; // Update with your environment path
 
-        $command = "scp yashmandal@172.22.217.86:$bundlePath $localPath";
-        exec($command, $output, $status);
+        $retrieve = "scp yashmandal@172.22.217.86:$bundlePath $localPath";
+        exec($retrieve, $status);
 
+       
         if ($status === 0) {
             echo "Successfully pulled version $versionNumber.\n";
+            $install = "tar -xzvf $bundlePath -C $localPath";
+            exec($install);
         } else {
             echo "Failed to pull version $versionNumber.\n";
         }
@@ -69,4 +77,16 @@ function pullSpecificVersion($versionNumber) {
 //pullLatestVersion();
 
 // Pull a specific version (replace 'v1.0.0' with the actual version number)
-pullSpecificVersion('v2.0.0');
+
+$version = $argv[1];
+
+if($version)
+{
+pullSpecificVersion($version);
+}
+
+else
+{
+    pullLatestVersion();
+}
+?>
