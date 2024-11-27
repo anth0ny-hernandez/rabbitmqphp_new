@@ -1,0 +1,116 @@
+<?php
+require_once('rabbitMQLib.inc');
+
+function installerProcessor($request) {
+    echo "Received request: ";
+    var_dump($request);
+
+    if($request){
+    pullSpecificVersion($request['version_number']);
+
+    }
+
+    else
+    {
+        pullLatestVersion();
+    }
+
+}
+
+
+
+// Function to pull the latest version
+function pullLatestVersion() {
+    $client = new rabbitMQClient("deploymentServer.ini", "deploymentServer");
+
+    // Request the latest version
+    $request = ["type" => "pullLatestVersion"];
+    $response = $client->send_request($request);
+
+    if ($response['success']) {
+        echo "Latest version: " . $response['version_number'] . "\n";
+        echo "Pulling from: " . $response['bundle_path'] . "\n";
+
+        // Use SCP to pull the bundle
+        $bundlePath = $response['bundle_path'];
+        $localPath = "/home/yashmandal/git/deployment"; // Update with your environment path
+
+        $retrieve = "scp yashmandal@172.22.217.86:$bundlePath $localPath";
+        exec($retrieve, $status);
+
+        
+        if ($status === 0) {
+            echo "Successfully pulled latest version.\n";
+            $install = "tar -xzvf $bundlePath -C $localPath";
+            exec($install);
+        } else {
+            echo "Failed to pull latest version.\n";
+        }
+    } else {
+        echo "Error: " . $response['message'] . "\n";
+    }
+        
+
+}
+
+// Function to pull a specific version
+function pullSpecificVersion($versionNumber) {
+    $client = new rabbitMQClient("deploymentServer.ini", "deploymentServer");
+
+    // Request a specific version
+    $request = [
+        "type" => "pullSpecificVersion",
+        "version_number" => $versionNumber
+    ];
+    $response = $client->send_request($request);
+
+    if ($response['success']) {
+        echo "Version: " . $response['version_number'] . "\n";
+        echo "Pulling from: " . $response['bundle_path'] . "\n";
+
+        // Use SCP to pull the bundle
+        $bundlePath = $response['bundle_path'];
+        $localPath = "/home/yashmandal/git/deployment"; // Update with your environment path
+
+        $retrieve = "scp yashmandal@172.22.217.86:$bundlePath $localPath";
+        exec($retrieve, $status);
+
+       
+        if ($status === 0) {
+            echo "Successfully pulled version $versionNumber.\n";
+            $install = "tar -xzvf $bundlePath -C $localPath";
+            exec($install);
+        } else {
+            echo "Failed to pull version $versionNumber.\n";
+        }
+    } else {
+        echo "Error: " . $response['message'] . "\n";
+    }
+}
+
+// Usage example:
+// Uncomment one of the following to test:
+
+// Pull the latest version
+//pullLatestVersion();
+
+// Pull a specific version (replace 'v1.0.0' with the actual version number)
+
+// $version = $argv[1];
+
+// if($version)
+// {
+// pullSpecificVersion($version);
+// }
+
+// else
+// {
+//     pullLatestVersion();
+// }
+
+$server = new rabbitMQServer("installer.ini", "installer");
+echo "Insaller is running...\n";
+$server->process_requests('installerProcessor');
+
+
+?>

@@ -10,6 +10,7 @@ $dbUser = 'testUser';
 $dbPassword = '12345';
 
 // Function to add a new version to the database
+
 function addVersionToDatabase($versionNumber, $bundlePath) {
     global $dbHost, $dbName, $dbUser, $dbPassword;
 
@@ -24,11 +25,18 @@ function addVersionToDatabase($versionNumber, $bundlePath) {
         $stmt->bindParam(':path', $bundlePath);
         $stmt->execute();
 
+        $installer = new rabbitMQClient("insaller.ini", "installer");
+        $installer->send_request($versionNumber);
+
         return ["success" => true, "message" => "Version $versionNumber added to deployment history."];
     } catch (Exception $e) {
         return ["success" => false, "message" => $e->getMessage()];
     }
 }
+
+
+
+
 
 
 function handleRequest($request) {
@@ -47,6 +55,8 @@ function handleRequest($request) {
             $versionNumber = $request['version_number'];
             return getSpecificVersion($versionNumber);
 
+        case "deploy":
+            return addVersionToDatabase($request['version_number'], $request['bundle_path']);
         default:
             return ["error" => "Unsupported request type"];
     }
