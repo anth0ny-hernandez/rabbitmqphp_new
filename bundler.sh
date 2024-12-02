@@ -18,4 +18,4 @@ tar -czf myRepo-${newVersionNum}.tar.gz $*
 #create scp command to send .tar file over to deployment server
 scp myRepo-${newVersionNum}.tar.gz yashmandal@172.22.217.86:/home/yashmandal/git/deployment
 #scp rabbitmqphp_new.${newVersionNum}.tar.gz alvee-jalal@172.22.87.142:/home/alvee-jalal/git/
-php triggerDeployment.sh
+php triggerDeployment2.php
