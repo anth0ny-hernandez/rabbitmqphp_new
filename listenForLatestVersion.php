@@ -5,10 +5,11 @@ require_once('rabbitMQLib.inc');
 $localPath = "/home/yashmandal/git/deployment"; // Update this to the environment's directory
 $deploymentServerUser = "yashmandal";      // Deployment server username
 $deploymentServerIP = "172.22.217.86";    // Deployment server IP
+$localVersionFile = $localPath . "current_version.txt"; // File to track the current version
 
 // Function to pull the latest version using SCP
 function pullVersion($versionNumber, $bundlePath) {
-    global $localPath, $deploymentServerUser, $deploymentServerIP;
+    global $localPath, $deploymentServerUser, $deploymentServerIP, $localVersionFile;
 
     echo "Pulling version $versionNumber from $bundlePath...\n";
 
@@ -18,11 +19,23 @@ function pullVersion($versionNumber, $bundlePath) {
 
     if ($status === 0) {
         echo "Successfully pulled version $versionNumber.\n";
+        // Update the local version file
+        file_put_contents($localVersionFile, $versionNumber);
         return true;
     } else {
         echo "Failed to pull version $versionNumber.\n";
         return false;
     }
+}
+
+// Function to get the currently deployed version locally
+function getCurrentVersion() {
+    global $localVersionFile;
+
+    if (file_exists($localVersionFile)) {
+        return trim(file_get_contents($localVersionFile));
+    }
+    return null;
 }
 
 // Function to listen for the latest version deployment
@@ -38,9 +51,15 @@ function listenForLatestVersion() {
             $versionNumber = $response['version_number'];
             $bundlePath = $response['bundle_path'];
 
-            // Pull the latest version
-            if (!pullVersion($versionNumber, $bundlePath)) {
-                echo "Error: Failed to pull the latest version.\n";
+            // Check if the latest version is already deployed locally
+            $currentVersion = getCurrentVersion();
+            if ($currentVersion === $versionNumber) {
+                echo "Version $versionNumber is already deployed locally. Skipping pull.\n";
+            } else {
+                // Pull the latest version
+                if (!pullVersion($versionNumber, $bundlePath)) {
+                    echo "Error: Failed to pull the latest version.\n";
+                }
             }
         } else {
             echo "Error: " . $response['message'] . "\n";
