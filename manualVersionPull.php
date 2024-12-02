@@ -2,7 +2,7 @@
 require_once('rabbitMQLib.inc');
 
 // Configuration
-$localPath = "/path/to/qa-or-production/"; // Update this to the environment's directory
+$localPath = "/home/yashmandal/git/deployment"; // Update this to the environment's directory
 $deploymentServerUser = "yashmandal";      // Deployment server username
 $deploymentServerIP = "172.22.217.86";    // Deployment server IP
 
@@ -27,7 +27,7 @@ function pullVersion($versionNumber, $bundlePath) {
 
 // Function to pull a specific version
 function pullSpecificVersion($versionNumber) {
-    $client = new rabbitMQClient("deploymentClient.ini", "deploymentServer");
+    $client = new rabbitMQClient("deploymentServer.ini", "deploymentServer");
 
     // Request the specific version
     $request = [
