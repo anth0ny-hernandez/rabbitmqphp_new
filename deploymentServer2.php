@@ -10,6 +10,18 @@ $dbUser = 'testUser';
 $dbPassword = '12345';
 
 // Function to add a new version to the database
+// function isAnyMachineReachable($ipAddresses) {
+//     foreach ($ipAddresses as $ip) {
+//         $pingResult = exec("ping -c 1 -w 1 $ip 2>&1", $output, $status);
+//         if ($status === 0) {
+//             echo "Machine $ip is reachable.\n"; // Debugging output
+//             return true; // Return true as soon as one machine is reachable
+//         } else {
+//             echo "Machine $ip is not reachable.\n"; // Debugging output
+//         }
+//     }
+//     return false; // If none of the machines are reachable, return false
+// }
 
 function addVersionToDatabase($versionNumber, $bundlePath) {
     global $dbHost, $dbName, $dbUser, $dbPassword;
@@ -25,8 +37,30 @@ function addVersionToDatabase($versionNumber, $bundlePath) {
         $stmt->bindParam(':path', $bundlePath);
         $stmt->execute();
 
-        $installer = new rabbitMQClient("insaller.ini", "installer");
+        $installer = new rabbitMQClient("installer.ini", "installer");
+        $request = [
+            "version_number" => $versionNumber
+        ];
         $installer->send_request($versionNumber);
+
+        // List of remote machine IP addresses to check
+        // $remoteMachineIPs = [
+        //     "172.22.87.142",  // Replace with actual IPs
+        //     "192.168.1.11",
+        //     "192.168.1.12"
+        // ];
+
+        // // Check if any machine is reachable before proceeding
+        // if (isAnyMachineReachable($remoteMachineIPs)) {
+        //     // Only run these lines if at least one machine is reachable
+        //     $installer = new rabbitMQClient("installer.ini", "installer");
+        //     $request = [
+        //         "version_number" => $versionNumber
+        //     ];
+        //     $installer->send_request($versionNumber);
+        // } else {
+        //     echo "None of the remote machines are reachable. Skipping installation trigger.\n";
+        // }
 
         return ["success" => true, "message" => "Version $versionNumber added to deployment history."];
     } catch (Exception $e) {
