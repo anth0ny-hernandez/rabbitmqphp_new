@@ -37,11 +37,11 @@ function addVersionToDatabase($versionNumber, $bundlePath) {
         $stmt->bindParam(':path', $bundlePath);
         $stmt->execute();
 
-        $installer = new rabbitMQClient("installer.ini", "installer");
-        $request = [
-            "version_number" => $versionNumber
-        ];
-        $installer->send_request($versionNumber);
+        // $installer = new rabbitMQClient("installer.ini", "installer");
+        // $request = [
+        //     "version_number" => $versionNumber
+        // ];
+        // $installer->send_request($versionNumber);
 
         // List of remote machine IP addresses to check
         // $remoteMachineIPs = [

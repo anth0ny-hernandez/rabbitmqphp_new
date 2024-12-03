@@ -2,14 +2,15 @@
 require_once('rabbitMQLib.inc');
 
 // Configuration
-$localPath = "/home/yashmandal/git/deployment"; // Update this to the environment's directory
+$localPath = "/path/to/qa-or-production/"; // Update this to the environment's directory
 $deploymentServerUser = "yashmandal";      // Deployment server username
 $deploymentServerIP = "172.22.217.86";    // Deployment server IP
 $localVersionFile = $localPath . "current_version.txt"; // File to track the current version
+$versionTrackerFile = $localPath . "versionTracker.txt"; // Local version tracker file
 
 // Function to pull the latest version using SCP
 function pullVersion($versionNumber, $bundlePath) {
-    global $localPath, $deploymentServerUser, $deploymentServerIP, $localVersionFile;
+    global $localPath, $deploymentServerUser, $deploymentServerIP, $localVersionFile, $versionTrackerFile;
 
     echo "Pulling version $versionNumber from $bundlePath...\n";
 
@@ -19,8 +20,13 @@ function pullVersion($versionNumber, $bundlePath) {
 
     if ($status === 0) {
         echo "Successfully pulled version $versionNumber.\n";
+        
         // Update the local version file
         file_put_contents($localVersionFile, $versionNumber);
+
+        // Append the version number to the versionTracker.txt file
+        file_put_contents($versionTrackerFile, $versionNumber . "\n", FILE_APPEND);
+
         return true;
     } else {
         echo "Failed to pull version $versionNumber.\n";
@@ -40,7 +46,7 @@ function getCurrentVersion() {
 
 // Function to listen for the latest version deployment
 function listenForLatestVersion() {
-    $client = new rabbitMQClient("deploymentServer.ini", "deploymentServer");
+    $client = new rabbitMQClient("deploymentClient.ini", "deploymentServer");
 
     while (true) {
         // Request the latest version
@@ -56,7 +62,7 @@ function listenForLatestVersion() {
             if ($currentVersion === $versionNumber) {
                 echo "Version $versionNumber is already deployed locally. Skipping pull.\n";
             } else {
-                // Pull the latest version
+                // Pull the latest version and append to versionTracker.txt
                 if (!pullVersion($versionNumber, $bundlePath)) {
                     echo "Error: Failed to pull the latest version.\n";
                 }
