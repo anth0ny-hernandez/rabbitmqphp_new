@@ -24,20 +24,7 @@ $dbPassword = '12345';
 // }
 
 // Update deployment history status
-function updateDeploymentStatus($version, $status) {
-    $conn = connectToDB();
-    $sql = "UPDATE deployment_history SET status = :status WHERE version = :version";
 
-    try {
-        $stmt = $conn->prepare($sql);
-        $stmt->bindParam(':status', $status);
-        $stmt->bindParam(':version', $version);
-        $stmt->execute();
-        return ["success" => true, "message" => "Status updated successfully."];
-    } catch (PDOException $e) {
-        return ["success" => false, "message" => $e->getMessage()];
-    }
-}
 
 function addVersionToDatabase($versionNumber, $bundlePath) {
     global $dbHost, $dbName, $dbUser, $dbPassword;
@@ -84,7 +71,34 @@ function addVersionToDatabase($versionNumber, $bundlePath) {
     }
 }
 
+function updateDeploymentStatus($versionNumber, $status) {
+    global $dbHost, $dbName, $dbUser, $dbPassword;
 
+    try {
+        // Connect to the database
+        $db = new PDO("mysql:host=$dbHost;dbname=$dbName", $dbUser, $dbPassword);
+        $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+        // Check if the version exists
+        $checkStmt = $db->prepare("SELECT COUNT(*) FROM deployment_history WHERE version_number = :version");
+        $checkStmt->bindParam(':version', $versionNumber);
+        $checkStmt->execute();
+
+        if ($checkStmt->fetchColumn() == 0) {
+            return ["success" => false, "message" => "Version $versionNumber not found in deployment history."];
+        }
+
+        // Update the status for the specified version
+        $updateStmt = $db->prepare("UPDATE deployment_history SET status = :status WHERE version_number = :version");
+        $updateStmt->bindParam(':status', $status);
+        $updateStmt->bindParam(':version', $versionNumber);
+        $updateStmt->execute();
+
+        return ["success" => true, "message" => "Status for version $versionNumber updated to $status."];
+    } catch (Exception $e) {
+        return ["success" => false, "message" => $e->getMessage()];
+    }
+}
 
 
 
@@ -98,11 +112,12 @@ function handleRequest($request) {
     }
 
     switch ($request['type']) {
-        
-        case 'updateStatus':
-            $version = $request['version'];
+
+        case "updateStatus":
+            $versionNumber = $request['version_number'];
             $status = $request['status'];
-            return updateDeploymentStatus($version, $status);
+            return updateDeploymentStatus($versionNumber, $status);
+
 
         case "pullLatestVersion":
             return getLatestVersion();
