@@ -23,6 +23,22 @@ $dbPassword = '12345';
 //     return false; // If none of the machines are reachable, return false
 // }
 
+// Update deployment history status
+function updateDeploymentStatus($version, $status) {
+    $conn = connectToDB();
+    $sql = "UPDATE deployment_history SET status = :status WHERE version = :version";
+
+    try {
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(':status', $status);
+        $stmt->bindParam(':version', $version);
+        $stmt->execute();
+        return ["success" => true, "message" => "Status updated successfully."];
+    } catch (PDOException $e) {
+        return ["success" => false, "message" => $e->getMessage()];
+    }
+}
+
 function addVersionToDatabase($versionNumber, $bundlePath) {
     global $dbHost, $dbName, $dbUser, $dbPassword;
 
@@ -82,6 +98,12 @@ function handleRequest($request) {
     }
 
     switch ($request['type']) {
+        
+        case 'updateStatus':
+            $version = $request['version'];
+            $status = $request['status'];
+            return updateDeploymentStatus($version, $status);
+
         case "pullLatestVersion":
             return getLatestVersion();
 
