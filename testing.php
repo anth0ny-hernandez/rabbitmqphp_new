@@ -83,14 +83,34 @@ $weekdays = [
     'Friday', 
     'Saturday',  
 ];
+$formSub = [
+    'meal_planner' => [
+        ['calories' => 300, 'day' => '', 'meal' => '', 'recipe' => ''],
+        ['calories' => 600, 'day' => '', 'meal' => '', 'recipe' => ''],
+        ['calories' => 1000, 'day' => '', 'meal' => '', 'recipe' => ''],
+        ['calories' => 1000, 'day' => '', 'meal' => '', 'recipe' => ''],
+        ['calories' => 750, 'day' => '', 'meal' => '', 'recipe' => ''],
+        ['calories' => 500, 'day' => '', 'meal' => '', 'recipe' => ''],
+        ['calories' => 250, 'day' => '', 'meal' => '', 'recipe' => ''],
+    ]
+];
 
 // To separate parts of the day into meal times
-$mealType = ["Breakfast", "Lunch", "Dinner"]; // is changed within the if block vvv
-/*
+$MealType = ["Breakfast", "Lunch", "Dinner"]; // is changed within the if block vvv
+$foodDays = [];
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['createmealplanner'])) {
     $foods = $_POST['food'] ?? [];
     $days = $_POST['day'] ?? [];
     $mealTypes = $_POST['meal_type'] ?? [];
+
+    print_r($foods);
+    echo "<br>";
+    print_r($days);
+    echo "<br>";
+    print_r($mealTypes);
+    echo "<br>";
+    echo "<br>";
 
     foreach ($foods as $index => $food) {
         $day = $days[$index] ?? null;
@@ -98,46 +118,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['createmealplanner']))
 
         if ($food && $day && $mealType) {
             echo "$food is $mealType on $day<br><br>";
-            // $foodDetailRequest = [
-                // "type" => "searchRecipe",
-                // "label" => $food,
-            // ];
-            // $foodDetails = $client->send_request($foodDetailRequest);
-
-            // $saveRequest = [
-            //     "type" => "saveWeeklyMealPlan",
-            //     "session_token" => $_COOKIE['session_token'],
-            //     "foodDetails" => $foodDetails,
-            //     "day" => $day,
-            //     "meal_type" => $mealType,
-            // ];
-
-            // $saveResponse = $client->send_request($saveRequest);
-            // $message = $saveResponse['success'] ? "Weekly meal plan updated successfully!" : "Failed to update meal plan.";
+            $newFormSub['meal_planner']['day'] = $day;
+            $newFormSub['meal_planner']['meal'] = $mealType;
+            $newFormSub['meal_planner']['recipe'] = $food;
+            var_dump($newFormSub);
         } else {
             echo "Nomogus";
         }
     }
 }
-*/
+var_dump($newFormSub);
+
 // creates empty array to hold the values from the database
 $groupedRecipes = [];
 // verifies that the DB returned array is not empty
-if(isset($formSub['meal_planner'])) {
-    $recipeArray = $formSub['meal_planner'];
+// ================================================================== IMPORTANT!!!
+// if(isset($formSub['meal_planner'])) {
+//     $recipeArray = $formSub['meal_planner'];
 
-    // allows every recipe to be identifiable by day, meal type, and recipe
-    foreach($recipeArray as $entry) {
-        $day = $entry['day'];
-        $mealTime = $entry['meal'];
-        $recipe = $entry['recipe'];
-        $calories = $entry['calories'];
+//     // allows every recipe to be identifiable by day, meal type, and recipe
+//     foreach($recipeArray as $entry) {
+//         $day = $entry['day'];
+//         $mealTime = $entry['meal'];
+//         $recipe = $entry['recipe'];
+//         $calories = $entry['calories'];
 
-        // Done so that the recipe is uniquely ID'd
-        $groupedRecipes[$day][$mealTime][] = $recipe;
+//         // Done so that the recipe is uniquely ID'd
+//         $groupedRecipes[$day][$mealTime][] = $recipe;
         
-    }
-}
+//     }
+// }
+// ================================================================== IMPORTANT!!!
 
 
 ?>
@@ -298,7 +309,7 @@ if(isset($formSub['meal_planner'])) {
                 echo "<div class='meals-container'>";
                     echo "<div class='week-day'>$day</div>";
                     // Creates the cell holding ONE meal's worth of info
-                    foreach($mealType as $meal){
+                    foreach($MealType as $meal){
                         echo "<div class='meal-item'>";
                         // validates that there's a meal on this specific day for this specific meal
                         if(isset($groupedRecipes[$day][$meal]))
