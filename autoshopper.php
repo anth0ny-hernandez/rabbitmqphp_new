@@ -1,188 +1,128 @@
 <?php
+session_start();
 require_once('rabbitMQLib.inc');
 
-// Check if the session token cookie is set
-// if (!isset($_COOKIE['session_token'])) {
-//     header("Location: login.php");
-//     exit();
-// }
-
-// // Refresh session token to extend expiration by another 90 seconds
-// $session_token = $_COOKIE['session_token'];
-// $expire_time = time() + 90;
-// setcookie('session_token', $session_token, $expire_time, "/");
-
-// if ($_SERVER["REQUEST_METHOD"] == "POST") {
-//     header("Location: weeklyMealPlanner.php");
-//     exit;
-// }
-
-
-//fetch the recipe names from the checkboxes in "searchrecipe". Display them 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $_POST['foods'];
-    foreach($_POST['foods'] as $food)
-    {
-    // $client = new rabbitMQClient("testRabbitMQ.ini", "testServer");
-
-    // // Collect form data for recipe search
-    // $request = [
-    //     "type" => "searchRecipe",
-    //     "label" => $food ?? null,
-    // ];
-
-    //Display recipes with dropdown to select time of day and day of week.  
-    echo "$food";?> 
-    <form action = "weeklyMealPlanner.php">
-        <select name ="day" id="day">
-            <option value = "Sunday"> Sunday </option>
-            <option value = "Monday"> Monday </option>
-            <option value = "Tuesday"> Tuesday </option>
-            <option value = "Wednesday"> Wednesday </option>
-            <option value = "Thursday"> Thursday </option>
-            <option value = "Friday"> Friday </option>
-            <option value = "Saturday"> Saturday </option>
-
-            <select name ="timeofday" id="timeofday">
-                <option value = "Breakfast"> Breakfast </option>
-                <option value = "Lunch"> Lunch </option>
-                <option value = "Dinner"> Dinner </option>
-
-        </select>
-    </form>
-    <br> <br>
-    
-    <?php //Next, display table of meals on corresponding days & timeofday
-    //. 1st column is type of meal. all other column headers is day of week with the cells below having the meals. 
-
-}
-    
-    // $recipeSearchResponse = $client->send_request($request);
+// Redirect to login if no session token
+if (!isset($_COOKIE['session_token'])) {
+    header("Location: login.php");
+    exit();
 }
 
+// Set up RabbitMQ client to fetch weekly meal plan
+$client = new rabbitMQClient("testRabbitMQ.ini", "testServer");
+$mealPlanRequest = [
+    "type" => "fetchWeeklyMealPlan",
+    "session_token" => $_COOKIE['session_token']
+];
+$mealPlanResponse = $client->send_request($mealPlanRequest);
+$savedRecipes = $mealPlanResponse['weeklyPlan'] ?? [];
 
+// Set up an array to store ingredients for each recipe
+$ingredientsList = [];
 
-    // $client = new rabbitMQClient("testRabbitMQ.ini", "testServer");
+// Fetch ingredients for each recipe in the saved weekly meal plan
+foreach ($savedRecipes as $meal) {
+    $dmzClient = new rabbitMQClient("dmzConfig.ini", "dmzServer");
+    $dmzRequest = [
+        "type" => "searchRecipe",
+        "label" => $meal['recipe'] // Use the recipe name from saved weekly meal plan
+    ];
+    $dmzResponse = $dmzClient->send_request($dmzRequest);
 
-    // // Build the request with meal data
-    // $request = [
-    //     'type' => 'save_meals',
-    //     'session_token' => $session_token,
-    //     'meals' => $_POST['meals'] ?? []
-    // ];
-
-    // // Send the request and receive the response
-    // $response = $client->send_request($request);
-
-    // if ($response && isset($response['meals'])) {
-    //     $meals = $response['meals'];
-    // } else {
-    //     echo "<p>Error: Unable to retrieve meal data.</p>";
-    // }
-
-
+    // Check and add ingredients if the response is successful
+    if (isset($dmzResponse['hits'][0])) {
+        $ingredientsList[$meal['recipe']] = $dmzResponse['hits'][0]['recipe']['ingredientLines'];
+    } else {
+        $ingredientsList[$meal['recipe']] = ["Ingredients not found"];
+    }
+}
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weekly Meal Plan</title>
+    <title>AutoShopper</title>
     <style>
-        /* Simple Styling */
+        /* Basic styling */
         body {
             font-family: Arial, sans-serif;
             text-align: center;
-            margin-top: 50px;
-            background: lightgrey;
-        }
-
-        .container {
-            max-width: 600px;
-            margin: auto;
-            padding: 20px;
-            border: 1px solid black;
-            border-radius: 8px;
-            box-shadow: 0px 0px 50px lightgreen;
-            background: white;
-        }
-
-        .button-group {
             margin-top: 20px;
         }
-
+        .container {
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+        }
+        .button-group {
+            margin-bottom: 20px;
+        }
         .button {
             display: inline-block;
             margin: 5px;
             padding: 10px 20px;
-            color: white;
-            background-color: blue;
+            color: #fff;
+            background-color: #007bff;
             border: none;
             border-radius: 4px;
             text-decoration: none;
             font-size: 16px;
             cursor: pointer;
         }
-
         .button:hover {
-            background-color: darkblue;
+            background-color: #0056b3;
         }
-        
         .logout-button {
-            background-color: red;
+            background-color: #dc3545;
         }
-
         .logout-button:hover {
-            background-color: darkred;
+            background-color: #c82333;
         }
-
-        .login-button {
-            background-color: green;
+        .ingredient-item {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 10px;
+            margin-top: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            text-align: left;
         }
-
-        .login-button:hover {
-            background-color: darkgreen;
-        }
-
-        p {
-            font-size: 20px;
+        h3 {
+            margin-top: 0;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Shopping Ingredients</h1>
-        <?php if (!empty($meals)): ?>
-            <?php foreach ($meals as $day => $mealData): ?>
-                <h2><?php echo ucfirst($day); ?></h2>
-                <p><strong>Breakfast:</strong> <?php echo htmlspecialchars($mealData['breakfast'] ?? ''); ?></p>
-                <p><strong>Lunch:</strong> <?php echo htmlspecialchars($mealData['lunch'] ?? ''); ?></p>
-                <p><strong>Dinner:</strong> <?php echo htmlspecialchars($mealData['dinner'] ?? ''); ?></p>
-                <hr>
-            <?php endforeach; ?>
-        <?php else: ?>
-            <p>No meals were submitted.</p>
-        <?php endif; ?>
-    </div>
 
-<!-- JavaScript to handle automatic logout after session expiration -->
-<!-- <script>
-    setTimeout(function() {
-        document.cookie = 'session_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-        window.location.href = 'login.php';
-    }, 90000); // 90 seconds
-</script> -->
-</body>
-<footer>
+<div class="container">
     <div class="button-group">
-        <a href="search.php" class="button">Recipe Search</a>
-        <a href="dietrestrictions.php" class="button">Diet Restrictions</a>
-        <a href="recommendations.php" class="button">Recommendations</a>
-        <a href="review.php" class="button">Rate and Review</a>
-        <a href="mealplannerform.php" class="button">Weekly Meal Planner Form</Form></a>
-        <a href="autoshopper.php" class="button">Autoshopper</Form></a>
+        <a href="home.php" class="button">Home</a>
+        <a href="meal_plan.php" class="button">Recipe Search</a>
+        <a href="dietRestrictions.php" class="button">Diet Restrictions</a>
+        <a href="recommendations.php" class="button">Recipe Recommendations</a>
+        <a href="reviews.php" class="button">Ratings and Reviews</a>
+        <a href="weekly_meal_planner.php" class="button">Weekly Meal Planner</a>
+        <a href="autoshopper.php" class="button">AutoShopper</a>
         <a href="logout.php" class="button logout-button">Logout</a>
     </div>
-</footer>
+
+    <h2>AutoShopper - Ingredients for Your Weekly Plan</h2>
+
+    <?php if (!empty($ingredientsList)): ?>
+        <?php foreach ($ingredientsList as $recipe => $ingredients): ?>
+            <div class="ingredient-item">
+                <h3><?php echo htmlspecialchars($recipe); ?></h3>
+                <ul>
+                    <?php foreach ($ingredients as $ingredient): ?>
+                        <li><?php echo htmlspecialchars($ingredient); ?></li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
+        <?php endforeach; ?>
+    <?php else: ?>
+        <p>No recipes found in your weekly meal plan. Please add recipes to view ingredients.</p>
+    <?php endif; ?>
+</div>
+
+</body>
 </html>
