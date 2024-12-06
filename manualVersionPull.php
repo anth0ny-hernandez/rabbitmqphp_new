@@ -18,6 +18,8 @@ function pullVersion($versionNumber, $bundlePath) {
 
     if ($status === 0) {
         echo "Successfully pulled version $versionNumber.\n";
+        $install = "tar -xzvf $bundlePath -C $localPath";
+        exec($install);
         return true;
     } else {
         echo "Failed to pull version $versionNumber.\n";
