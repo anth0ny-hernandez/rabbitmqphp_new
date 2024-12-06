@@ -21,7 +21,8 @@ $conn->connect();
 $channel = new AMQPChannel($conn);
 $exchange = new AMQPExchange($channel);
 $exchange->setName($config['logExchange']);
-$exchange->setType($config['Fanout']);
+$exchange->setType('fanout');
+$exchange->setFlags(AMQP_DURABLE); // Add this line to make it durable
 $exchange->declare();
 
 // Create a unique queue for this consumer (or static queues if multiple consumers use the same queue)
