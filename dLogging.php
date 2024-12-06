@@ -22,7 +22,7 @@ $channel = new AMQPChannel($conn);
 $exchange = new AMQPExchange($channel);
 $exchange->setName($config['EXCHANGE']);
 $exchange->setType($config['EXCHANGE_TYPE']);
-$exchange->setFlags(AMQP_DURABLE); // Add this line to make it durable
+$exchange->setFlags(AMQP_DURABLE);
 $exchange->declare();
 
 // Create a unique queue for this consumer (or static queues if multiple consumers use the same queue)
@@ -41,7 +41,7 @@ function consumeLogMessages($msg) {
     // Write log to a file
     file_put_contents('errorLog.txt', $logMessage, FILE_APPEND);
 
-    $msg->ack();  // Acknowledge the message
+    $msg->ack();
 }
 
 // Start listening for error messages
@@ -64,4 +64,11 @@ sendErrorMessage();
 // Close connection (not reached if listening indefinitely)
 $channel->close();
 $conn->close();
+
+// {
+//     "error": "Test error occurred on VM 1",
+//     "timestamp": 1638429801
+// }
+
 ?>
+
