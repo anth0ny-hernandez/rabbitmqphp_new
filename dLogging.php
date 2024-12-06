@@ -20,8 +20,8 @@ $conn->connect();
 
 $channel = new AMQPChannel($conn);
 $exchange = new AMQPExchange($channel);
-$exchange->setName($config['logExchange']);
-$exchange->setType('fanout');
+$exchange->setName($config['EXCHANGE']);
+$exchange->setType($config['EXCHANGE_TYPE']);
 $exchange->setFlags(AMQP_DURABLE); // Add this line to make it durable
 $exchange->declare();
 
