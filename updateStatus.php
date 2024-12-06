@@ -27,12 +27,12 @@ function updateStatus($version, $status) {
 echo "Enter the version number to update: ";
 $version = trim(fgets(STDIN));
 
-echo "Enter the status (pass/fail): ";
+echo "Enter the status (pass/fail/new): ";
 $status = trim(fgets(STDIN));
 
 // Validate the status input
-if (!in_array($status, ['pass', 'fail'])) {
-    echo "Invalid status. Please enter 'pass' or 'fail'.\n";
+if (!in_array($status, ['pass', 'fail', 'new'])) {
+    echo "Invalid status. Please enter 'pass',  'fail', or 'new'.\n";
     exit;
 }
 

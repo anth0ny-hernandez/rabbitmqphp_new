@@ -39,7 +39,7 @@ function addVersionToDatabase($versionNumber, $bundlePath) {
         $stmt->bindParam(':version', $versionNumber);
         $stmt->bindParam(':path', $bundlePath);
         $stmt->execute();
-
+        updateDeploymentStatus($versionNumber, "new");
         // $installer = new rabbitMQClient("installer.ini", "installer");
         // $request = [
         //     "version_number" => $versionNumber
