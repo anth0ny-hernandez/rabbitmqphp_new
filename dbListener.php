@@ -12,6 +12,7 @@ function databaseProcessor($request) {
 
     // database connection & credential variable assignment
     $conn = new mysqli('localhost', 'testUser', '12345', 'testdb');
+    $email = $request['email'];
     $username = $request['username'];
     $password = $request['password'];
 
@@ -103,7 +104,7 @@ function databaseProcessor($request) {
             // link to source
             $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
 
-            $sql = "INSERT INTO accounts (username, password) VALUES ('$username', '$hashedPassword')";
+            $sql = "INSERT INTO TwoFA (email, username, password) VALUES ('$email', '$username', '$hashedPassword')";
             if ($conn->query($sql) === TRUE) {
                 echo "User $username registered successfully!\n";  // Debugging
                 echo "================================\n";
@@ -124,7 +125,7 @@ function databaseProcessor($request) {
             echo "================================\n";
         
             // Query to get the hashed password for the specified username
-            $sql = "SELECT password FROM accounts WHERE username = ?";
+            $sql = "SELECT password FROM TwoFA WHERE username = ?";
             $stmt = $conn->prepare($sql);
             $stmt->bind_param("s", $username);
             $stmt->execute();

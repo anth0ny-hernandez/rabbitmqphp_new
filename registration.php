@@ -10,10 +10,12 @@ $client = new rabbitMQClient("testRabbitMQ.ini", "testServer");
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $username = $_POST['username'];
     $password = $_POST['password'];
+    $email = $_POST['email'];
 
     // Create a registration request
     $request = array();
     $request['type'] = "register";
+    $request['email'] = $email;
     $request['username'] = $username;
     $request['password'] = $password;
 
@@ -98,10 +100,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <div class="register-container">
         <h2>Register</h2>
         <form action="registration.php" method="POST">
+            <label for="email">Email:</label>
+            <input type="text" name="email" id="email" required>
+
             <label for="username">Username:</label>
             <input type="text" name="username" id="username" required>
+
             <label for="password">Password:</label>
             <input type="password" name="password" id="password" required>
+
             <input type="submit" value="Register">
         </form>
     </div>
