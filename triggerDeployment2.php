@@ -2,7 +2,7 @@
 require_once('rabbitMQLib.inc');
 
 // Path to the version tracker file
-$versionTrackerFile = "/home/alvee-jalal/git/rabbitmqphp_new/versionTracker.txt"; // Update this path if necessary
+$versionTrackerFile = "/home/yashmandal/test/rabbitmqphp_new/versionTracker.txt"; // Update this path if necessary
 
 // Read the last line of the version tracker file to get the latest version
 $version_number = "";

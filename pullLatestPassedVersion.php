@@ -3,7 +3,7 @@ require_once('rabbitMQLib.inc');
 
 // Function to get the latest passed version
 function getLatestPassedVersion() {
-    $client = new rabbitMQClient("deploymentClient.ini", "deploymentServer");
+    $client = new rabbitMQClient("deploymentServer.ini", "deploymentServer");
 
     $request = [
         "type" => "pullLatestPassedVersion"
@@ -23,7 +23,7 @@ function getLatestPassedVersion() {
 
 // Function to pull a version
 function pullVersion($version, $bundlePath) {
-    $localPath = "/path/to/production/"; // Update to the production directory
+    $localPath = "/home/yashmandal/git/deployment"; // Update to the production directory
     $deploymentServerUser = "yashmandal";
     $deploymentServerIP = "172.22.217.86"; // Replace with actual IP
 
@@ -61,7 +61,7 @@ function listenForLatestPassedVersion() {
                     $currentVersion = $latestVersion;
 
                     // Log the pulled version locally
-                    file_put_contents("/path/to/production/versionTracker.txt", $latestVersion . PHP_EOL, FILE_APPEND);
+                    file_put_contents("/home/yashmandal/test/rabbitmqphp_new/currentPassedVersion.txt", $latestVersion . PHP_EOL, FILE_APPEND);
                 }
             } else {
                 echo "Already running the latest version ($currentVersion). No action needed.\n";

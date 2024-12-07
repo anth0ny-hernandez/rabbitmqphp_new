@@ -58,7 +58,7 @@ function getCurrentVersion() {
 
 // Function to listen for the latest version deployment
 function listenForLatestVersion() {
-    $client = new rabbitMQClient("deploymentClient.ini", "deploymentServer");
+    $client = new rabbitMQClient("deploymentServer.ini", "deploymentServer");
 
     while (true) {
         // Request the latest version
