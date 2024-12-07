@@ -43,7 +43,7 @@ try {
     exit(1);
 }
 
-// Function to log error messages
+// Function to log error messages locally
 function logErrorMessage($errorMessage, $source = null) {
     $logType = $source ? "Error Received" : "Error Sent";
     $logMessage = "{$logType}: {$errorMessage} | Timestamp: " . date('Y-m-d H:i:s') . "\n";
@@ -53,7 +53,7 @@ function logErrorMessage($errorMessage, $source = null) {
     echo "Logged: {$logMessage}\n";
 }
 
-// Function to send error messages
+// Function to send error messages to RabbitMQ
 function sendErrorMessage($errorMessage) {
     global $exchange, $vmId;
 
@@ -85,7 +85,7 @@ function consumeLogMessages($msg) {
         }
 
         $logMessage = $logData['error'];
-        logErrorMessage($logMessage, $logData['source']); // Log the received error
+        logErrorMessage($logMessage, $logData['source']); // Log the received error locally
         $logQueue->ack($msg->getDeliveryTag()); // Acknowledge message
     } catch (Exception $e) {
         echo "ERROR: Failed to process message - " . $e->getMessage() . "\n";
@@ -133,10 +133,11 @@ function performFileOperation() {
 performDatabaseOperation();
 performFileOperation();
 
-// Start the listener
+// Start the listener for error messages
 startLogListener();
 
 // Close connection (not typically reached if running indefinitely)
 $channel->close();
 $conn->disconnect();
 ?>
+
