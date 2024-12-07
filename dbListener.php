@@ -272,5 +272,4 @@ $dbServer->process_requests('databaseProcessor');
 // Close the database connection
 $conn->close();
 
-
 ?>

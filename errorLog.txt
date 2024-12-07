@@ -1,2 +1,2 @@
-Error: Test error occurred on VM 1 | Timestamp: 2021-12-02 07:23:21
-Error: Test error occurred on VM 1 | Timestamp: 2021-12-02 07:23:21
+Error Sent: Database query failed: Could not fetch data. | Timestamp: 2024-12-07 04:48:57
+Error Sent: File operation failed: File does not exist. | Timestamp: 2024-12-07 04:48:57
