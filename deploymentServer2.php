@@ -25,6 +25,33 @@ $dbPassword = '12345';
 
 // Update deployment history status
 
+function getLatestPassedVersion() {
+    global $dbHost, $dbName, $dbUser, $dbPassword;
+
+    try {
+        // Connect to the database
+        $db = new PDO("mysql:host=$dbHost;dbname=$dbName", $dbUser, $dbPassword);
+        $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+        // Query to get the latest version with `pass` status
+        $stmt = $db->query("SELECT * FROM deployment_history WHERE status = 'pass' ORDER BY id DESC LIMIT 1");
+        $latestPassed = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($latestPassed) {
+            return [
+                "success" => true,
+                "version_number" => $latestPassed['version_number'],
+                "bundle_path" => $latestPassed['bundle_path']
+            ];
+        } else {
+            return ["success" => false, "message" => "No passed versions found in deployment history."];
+        }
+    } catch (Exception $e) {
+        return ["success" => false, "message" => $e->getMessage()];
+    }
+}
+
+
 
 function addVersionToDatabase($versionNumber, $bundlePath) {
     global $dbHost, $dbName, $dbUser, $dbPassword;
@@ -112,6 +139,10 @@ function handleRequest($request) {
     }
 
     switch ($request['type']) {
+
+        case "pullLatestPassedVersion":
+            return getLatestPassedVersion();
+        
 
         case "updateStatus":
             $versionNumber = $request['version_number'];
