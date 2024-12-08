@@ -4,10 +4,8 @@ require_once __DIR__ . '/vendor/autoload.php';
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
 
-// Parse the .ini file for RabbitMQ connection settings
-$config = parse_ini_file('testLogging.ini', true); // `true` to parse sections in the INI file
+$config = parse_ini_file('testLogging.ini', true);
 
-// Extract values from the 'testLogging' section
 $broker_host = $config['testLogging']['BROKER_HOST'];
 $broker_port = $config['testLogging']['BROKER_PORT'];
 $user = $config['testLogging']['USER'];
@@ -25,20 +23,38 @@ $channel = $connection->channel();
 // Declare the fanout exchange (no routing key needed for fanout)
 $channel->exchange_declare($exchange, 'fanout', false, true, false);
 
-// Send a test log message
-$data = [
-    'log_message' => 'This is a test log message',  // You can replace this with actual log data
-    'timestamp' => date('Y-m-d H:i:s')
-];
-$msg_body = json_encode($data);
-$msg = new AMQPMessage($msg_body);
+// Function to send error messages to RabbitMQ
+function sendErrorToRabbitMQ($errorMessage) {
+    global $channel, $exchange;
+    
+    // Prepare the error message
+    $data = [
+        'errorMessage' => $errorMessage,
+        'timestamp' => date('Y-m-d H:i:s')
+    ];
+    
+    // Convert to JSON format for RabbitMQ
+    $msg_body = json_encode($data);
+    $msg = new AMQPMessage($msg_body);
 
-// Publish the message to the fanout exchange
-$channel->basic_publish($msg, $exchange);
+    // Publish the error message to RabbitMQ exchange (fanout)
+    $channel->basic_publish($msg, $exchange);
+}
 
-echo "Log message sent to all VMs.\n";
+// Function to log the error locally and send to RabbitMQ
+function logErrorAndSend($errorMessage) {
+    // Log the error to a local file (errorLog.txt)
+    $data = [
+        'errorMessage' => $errorMessage,
+        'timestamp' => date('Y-m-d H:i:s')
+    ];
+    file_put_contents('errorLog.txt', json_encode($data) . PHP_EOL, FILE_APPEND);
 
-// Close the channel and the connection
-$channel->close();
-$connection->close();
+    // Send the error to RabbitMQ
+    sendErrorToRabbitMQ($errorMessage);
+}
+
+// $channel->close();
+// $connection->close();
 ?>
+

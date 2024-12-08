@@ -3,9 +3,20 @@
 require_once('rabbitMQLib.inc');
 require_once('get_host_info.inc');
 require_once('path.inc');
+require_once 'LogProd.php';
 
+// Test an error and log it
+// $errorMessage = "Error occurred in dmz!";
+// logErrorAndSend($errorMessage);
 
+// Function to recommend recipes based on preferences
 function recommendRecipes($preferences) {
+    // Check if required preferences are provided, otherwise log an error
+    if (empty($preferences)) {
+        logErrorAndSend("Error in recommendRecipes: No preferences provided.");
+        return ["error" => "No preferences provided"];
+    }
+
     // Define parameters for the Edamam API request based on preferences
     $params = array(
         'type' => 'public',
@@ -43,17 +54,25 @@ function recommendRecipes($preferences) {
 
     // Check if 'hits' contains data
     if (!isset($data['hits']) || empty($data['hits'])) {
+        logErrorAndSend("Error in recommendRecipes: No recipes found for preferences.");
         return ["error" => "No recipes found based on preferences"];
     }
 
     return $data;
 }
 
+// Function to search recipes based on the request
 function searchRecipe($request) {
-    // Define parameters for the request, ensuring 'q' is present
+    // Check if required request parameters are missing, and log the error
+    if (!isset($request['label'])) {
+        logErrorAndSend("Error in searchRecipe: Missing label parameter.");
+        return ["error" => "Missing label parameter"];
+    }
+
+    // Define parameters for the request
     $params = array(
         'type' => 'public',
-        'q' => $request['label'] ?? null,  // Default to 'chicken' if no query provided
+        'q' => $request['label'],  // Default to 'chicken' if no query provided
         'app_id' => '4577783c', 
         'app_key' => '2ebd6b0aa43312e5f01f2077882ca32f',
         'health' => $request['healthLabels'] ?? null,
@@ -83,21 +102,24 @@ function searchRecipe($request) {
     curl_close($curl);
 
     $data = json_decode($response, true);
-    //var_dump($data);  // Debugging output for response data
 
-    // Check if 'hits' contains data
+    // Check if 'hits' contains data, log and return error if no data found
     if (!isset($data['hits']) || empty($data['hits'])) {
+        logErrorAndSend("Error in searchRecipe: No recipes found for query.");
         return ["error" => "No recipes found"];
     }
 
     return $data;
 }
 
+// Main processor function that handles requests
 function requestProcessor($request) {
     echo "Received request: ";
     var_dump($request);
 
+    // If 'type' is not set in the request, log the error
     if (!isset($request['type'])) {
+        logErrorAndSend("Error in requestProcessor: Unsupported message type.");
         return ["error" => "Unsupported message type"];
     }
 
@@ -111,6 +133,7 @@ function requestProcessor($request) {
             return recommendRecipes($request['preferences']);
 
         default:
+            logErrorAndSend("Error in requestProcessor: Unsupported message type.");
             return ["error" => "Unsupported message type"];
     }
 }
