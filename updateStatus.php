@@ -3,7 +3,7 @@ require_once('rabbitMQLib.inc');
 
 // Function to update deployment status
 function updateStatus($version, $status) {
-    $client = new rabbitMQClient("deploymentClient.ini", "deploymentServer");
+    $client = new rabbitMQClient("deploymentServer.ini", "deploymentServer");
 
     // Prepare the request
     $request = [

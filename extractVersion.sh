@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the path to the directory where bundles are stored
-BUNDLE_DIR="/home/yashmandal/git"
+BUNDLE_DIR="/home/yashmandal/git/deployment"
 
 # Function to extract a specific version
 extract_version() {
@@ -9,7 +9,7 @@ extract_version() {
     local current_dir=$(pwd)
 
     # Construct the bundle file name
-    local bundle_file="$BUNDLE_DIR/repo-version-$version.tar.gz"
+    local bundle_file="$BUNDLE_DIR/myRepo-$version.tar.gz"
 
     # Check if the file exists
     if [[ -f "$bundle_file" ]]; then
@@ -23,7 +23,7 @@ extract_version() {
 
 # Get the latest version from the versionTracker file
 get_latest_version() {
-    local version_tracker="$BUNDLE_DIR/versionTracker.txt"
+    local version_tracker="/home/yashmandal/test/rabbitmqphp_new/versionTracker.txt"
 
     # Check if the versionTracker file exists
     if [[ -f "$version_tracker" ]]; then
