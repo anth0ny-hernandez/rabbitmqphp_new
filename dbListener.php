@@ -261,6 +261,28 @@ function databaseProcessor($request) {
             } else {
                 return ["success" => false, "message" => "User not found"];
             }
+
+        case "trackCalories":
+            // $userQuery = "SELECT id FROM accounts WHERE session_token = ?";
+            // $stmt = $conn->prepare($userQuery);
+            // $stmt->bind_param("s", $session_token);
+            // $stmt->execute();
+            // $userResult = $stmt->get_result();
+            // $user = $userResult->fetch_assoc();
+            $recipe = $request['label'];
+            $day = $request['day'];
+            $date = $request['date'];
+            $time = $request['time'];
+            $goal = $request['goal'];
+            $calorieseaten = $request['calorieseaten'];
+
+            //need to finiish insert statement & binding
+            $query = "INSERT INTO calorieTracker(recipeName, day, date, time, caloriesEaten, goal)";
+            $stmt = $conn->prepare($query);
+            $stmt->bind_param("i", $userID);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $weeklyPlan = $result->fetch_all(MYSQLI_ASSOC);
     
         default:
             return "Database Client-Server error";

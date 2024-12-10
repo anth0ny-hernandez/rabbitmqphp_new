@@ -108,6 +108,11 @@ function requestProcessor($request) {
                 return $dmzClient->send_request($randomRequest);
             }
 
+        case "trackCalories":
+            // Route recipe search requests to the DMZ server
+            $dbClient = new rabbitMQClient("testDB_RMQ.ini", "dbConnect");
+            $result = $dbClient->send_request($request);
+            return $result;
         
 
         default:
