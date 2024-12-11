@@ -1,5 +1,7 @@
 <?php
 require_once('rabbitMQLib.inc');
+$trackerStart=false;
+
 
 // // Check if the session token cookie is set
 // if (!isset($_COOKIE['session_token'])) {
@@ -7,29 +9,32 @@ require_once('rabbitMQLib.inc');
 //     exit();
 // }
 
-// // Refresh session token to extend expiration by another 30 seconds
-// $session_token = $_COOKIE['session_token'];
-// $expire_time = time() + 30;
-// setcookie('session_token', $session_token, $expire_time, "/");
+// Refresh session token to extend expiration by another 30 seconds
+$session_token = $_COOKIE['session_token'];
+$expire_time = time() + 30;
+setcookie('session_token', $session_token, $expire_time, "/");
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['trackCalories'])) {
     $client = new rabbitMQClient("testRabbitMQ.ini", "testServer");
 
-    // Collect form data for recipe search
-    $request = [
-        "type" => "trackCalories",
-        "recipe" => $_POST['label'] ?? null,
-        "day" => $_POST['day'] ?? null,
-        "date" => $_POST['date'] ?? null,
-        "time" => $_POST['time'] ?? null,
-        "goal" => $_POST['goal'] ?? null,
-        "calorieseaten" => $_POST['calorieseaten'] ?? null,
+    // // Collect form data for recipe search
+    // $request = [
+    //     "type" => "trackCalories",
+    //     "recipe" => $_POST['label'] ?? null,
+    //     "day" => $_POST['day'] ?? null,
+    //     "date" => $_POST['date'] ?? null,
+    //     "time" => $_POST['time'] ?? null,
+    //     "goal" => $_POST['goal'] ?? null,
+    //     "calorieseaten" => $_POST['calorieseaten'] ?? null,
 
-    ];
+    // ];
+    $trackerStart=true;
 
-    $calorieTrackerResponse = $client->send_request($request);
+    
+
+    // $calorieTrackerResponse = $client->send_request($request);
 }
-?>
+// ?>
 
 
 
@@ -88,6 +93,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['trackCalories'])) {
 </head>
 <body>
 
+
 <div class="container">
     <div class="button-group">
         <a href="home.php" class="button">Home Page</a>
@@ -101,10 +107,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['trackCalories'])) {
         <a href="logout.php" class="button logout-button">Logout</a>
     </div>
 
+
     <h2>Daily Calorie Tracker</h2>
 
   <?php 
-  {?>
+  echo $trackerStart ? 'true' : 'false';  {?>
     <!-- Recipe Search Form -->
      <div id="tracker">
     <form method="POST" action="calorietracker.php">
@@ -132,19 +139,35 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['trackCalories'])) {
         <input type="number" id="calorieseaten" name="calorieseaten" placeholder="100">
         <br><br>
 
-        <input type="submit" name="trackCalories" value="Save For Today">  <input type="submit" name="trackCalories" value="Next Day">
+        <input type="submit" id = "trackCalories" name="trackCalories" value="Save For Today">  <input type="submit" name="nextDayCalories" value="Next Day">
   </div>
+  
     </form>
-    <?php } ?>
+    <?php }        
+?>
+    <script>
+const buttonCalories = document.getElementById("trackCalories");
+buttonCalories.addEventListener("click", function() {
+   
+    <?php 
+        echo $trackerStart ? 'true' : 'false'; 
 
+    ?>
 
-<?php $trackerStart=false;
+})
+</script>
 
+<?php 
 if($trackerStart===true) { ?>
+
  <script>
 document.getElementById("tracker").style.visibility="hidden";
+
 </script>
-<?php }?>
+<?php }
+
+?>
+
 
     <!-- Display Logic for Recipe Search Results -->
     <form method="GET" action="weeklyMealPlanner.php"> 
