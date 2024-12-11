@@ -17,21 +17,47 @@ if (empty($version_number)) {
     die("Error: Could not determine the latest version from versionTracker.txt.\n");
 }
 
-// Define the bundle path dynamically based on the version number
-$bundlePath = "/home/yashmandal/git/deployment/myRepo-$version_number.tar.gz"; // Adjust if necessary
+// Prompt the user to select the bundle type
+echo "Select the bundle type for deployment:\n";
+echo "1. frontend\n";
+echo "2. server\n";
+echo "3. dmz\n";
+$bundleType = readline("Enter the number corresponding to your choice: ");
+
+// Determine the bundle type based on the user input
+switch ($bundleType) {
+    case '1':
+        $bundleName = "frontend";
+        break;
+    case '2':
+        $bundleName = "server";
+        break;
+    case '3':
+        $bundleName = "dmz";
+        break;
+    default:
+        die("Invalid choice. Exiting...\n");
+}
+
+// Define the bundle path dynamically based on the version number and bundle type
+$bundlePath = "/home/yashmandal/git/deployment/${bundleName}-version-${version_number}.tar.gz";
+
+if (!file_exists($bundlePath)) {
+    die("Error: The specified bundle file does not exist: $bundlePath\n");
+}
 
 // Send a deployment request to the RabbitMQ server
 try {
     $client = new rabbitMQClient("deploymentServer.ini", "deploymentServer");
-    $client2 = new rabbitMQClient("deploymentServer.ini", "deploymentServer");
 
     $request = [
         "type" => "deploy",
-        "version_number" => "v$version_number", // Example: "v1.0.0"
-        "bundle_path" => $bundlePath
+        "version_number" => $version_number,
+        "bundle_path" => $bundlePath,
+        "bundle_type" => $bundleName // Adding bundle type for better tracking
     ];
 
-    echo "Sending deployment request for version $version_number...\n";
+    echo "Sending deployment request for version $version_number ($bundleName)...\n";
     $response = $client->send_request($request);
 
     if ($response['success']) {
