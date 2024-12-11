@@ -27,8 +27,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     // Send the request and get the response
     $response = $client->send_request($request);
+    var_dump($response);
 
     // Check the response from the RabbitMQ server
+    //if ($response['success']) 
     if ($response['success']) {
         // Login successful, set the session token cookie
         $session_token = $response['session_token'];

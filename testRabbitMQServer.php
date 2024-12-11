@@ -32,16 +32,21 @@ function requestProcessor($request) {
             
         case "login":
             // creates new client to establish new connection to db's own server
+            // $dbClient = new rabbitMQClient("testDB_RMQ.ini", "dbConnect");
             $dbClient = new rabbitMQClient("testDB_RMQ.ini", "dbConnect");
             $result = $dbClient->send_request($request);
+            echo "Sending back to Login Client...\n";
             var_dump($result);
             return $result;
 
           // directs register process
         case "register":
             // creates new client to establish new connection to db's own server
+            //$dbClient = new rabbitMQClient("testDB_RMQ.ini", "dbConnect");
             $dbClient = new rabbitMQClient("testDB_RMQ.ini", "dbConnect");
             $result = $dbClient->send_request($request);
+            echo "Sending back to Client...\n";
+            var_dump($result);
             return $result;
         
         case "logout":
@@ -120,6 +125,7 @@ $server = new rabbitMQServer("testRabbitMQ.ini", "testServer");
 
 echo "RabbitMQ Server is running and waiting for requests...\n";
 $server->process_requests('requestProcessor');
+//exit();
 
 // Close the database connection
 // $conn->close();

@@ -15,9 +15,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Create a registration request
     $request = array();
     $request['type'] = "register";
-    $request['email'] = $email;
     $request['username'] = $username;
     $request['password'] = $password;
+    $request['email'] = $email;
 
     // Send the registration request via RabbitMQ
     $response = $client->send_request($request);

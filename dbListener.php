@@ -12,7 +12,7 @@ function databaseProcessor($request) {
 
     // database connection & credential variable assignment
     $conn = new mysqli('localhost', 'testUser', '12345', 'testdb');
-    $email = $request['email'];
+    // $email = $request['email'];
     $username = $request['username'];
     $password = $request['password'];
 
@@ -100,15 +100,17 @@ function databaseProcessor($request) {
             echo "================================\n";
 
             // insert result
-            $insert = "";
+            // $insert = "";
             // link to source
             $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
+            $email = $request['email'];
 
-            $sql = "INSERT INTO TwoFA (email, username, password) VALUES ('$email', '$username', '$hashedPassword')";
+            $sql = "INSERT INTO twoFA (email, username, password) 
+                    VALUES ('$email', '$username', '$hashedPassword')";
             if ($conn->query($sql) === TRUE) {
                 echo "User $username registered successfully!\n";  // Debugging
                 echo "================================\n";
-                $insert = "User $username registered successfully!";
+                // $insert = "User $username registered successfully!";
                 return true;
             } else {
                 // Log and return the error
@@ -125,7 +127,7 @@ function databaseProcessor($request) {
             echo "================================\n";
         
             // Query to get the hashed password for the specified username
-            $sql = "SELECT password FROM TwoFA WHERE username = ?";
+            $sql = "SELECT password FROM twoFA WHERE username = ?";
             $stmt = $conn->prepare($sql);
             $stmt->bind_param("s", $username);
             $stmt->execute();
@@ -144,7 +146,7 @@ function databaseProcessor($request) {
                     $session_expires = time() + 30; // Set the session to expire in 30 seconds
         
                     // Update the database with the session token and expiration time
-                    $updateQuery = "UPDATE accounts SET session_token = ?, session_expires = ? WHERE username = ?";
+                    $updateQuery = "UPDATE twoFA SET session_token = ?, session_expires = ? WHERE username = ?";
                     $updateStmt = $conn->prepare($updateQuery);
                     $updateStmt->bind_param("sis", $session_token, $session_expires, $username);
                     
