@@ -1,5 +1,6 @@
 <?php
 require_once('rabbitMQLib.inc');
+//initially set tracker to false
 $trackerStart=false;
 
 
@@ -17,6 +18,7 @@ setcookie('session_token', $session_token, $expire_time, "/");
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['trackCalories'])) {
     $client = new rabbitMQClient("testRabbitMQ.ini", "testServer");
 
+    $trackerStart=true;
     // // Collect form data for recipe search
     // $request = [
     //     "type" => "trackCalories",
@@ -28,13 +30,24 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['trackCalories'])) {
     //     "calorieseaten" => $_POST['calorieseaten'] ?? null,
 
     // ];
-    $trackerStart=true;
+    //set tracker to true once form is submitted, making form disappear
 
     
 
     // $calorieTrackerResponse = $client->send_request($request);
 }
-// ?>
+// 
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['nextDayCalories'])) {
+
+    $trackerStart=false;
+
+
+
+}
+
+
+?>
 
 
 
@@ -113,7 +126,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['trackCalories'])) {
   <?php 
   echo $trackerStart ? 'true' : 'false';  {?>
     <!-- Recipe Search Form -->
-     <div id="tracker">
+     <div id="trackerTrigger">
     <form method="POST" action="calorietracker.php">
         <label for="label">Recipe Name:</label>
         <input type="text" id="label" name="label" placeholder="e.g., pasta, salad" required>
@@ -139,20 +152,53 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['trackCalories'])) {
         <input type="number" id="calorieseaten" name="calorieseaten" placeholder="100">
         <br><br>
 
-        <input type="submit" id = "trackCalories" name="trackCalories" value="Save For Today">  <input type="submit" name="nextDayCalories" value="Next Day">
-  </div>
+        <input type="submit" id = "trackCalories" name="trackCalories" value="Save For Today">  <input type="submit" name="nextDayCalories" id =nextDayCalories value="Next Day">
+    </div>
   
     </form>
+
+
+    <div id="tracker">
+    <form method="POST" action="calorietracker.php">
+    <label for="label">Recipe Name:</label>
+        <input type="text" id="label" name="label" placeholder="e.g., pasta, salad" required>
+        <br><br>
+
+        <label for="day">Day:</label>
+        <input type="text" id="day" name="day" placeholder="Friday" disabled>
+        <br><br>
+
+        <label for="date">Date:</label>
+        <input type="text" id="date" name="date" placeholder="May 20th" disabled>
+        <br><br>
+
+        <label for="time">Time:</label>
+        <input type="text" id="time" name="time" placeholder="6:00PM" >
+        <br><br>
+
+        <label for="goal">Goal:</label>
+        <input type="number" id="goal" name="goal" placeholder="1000" disabled>
+        <br><br>
+
+        <label for="calorieseaten">Calories Eaten:</label>
+        <input type="number" id="calorieseaten" name="calorieseaten" placeholder="100">
+        <br><br>
+
+        <input type="submit" id = "trackCalories" name="trackCalories" value="Save For Today">  <input type="submit" id = nextDayCalories name="nextDayCalories" value="Next Day">
+    </form>
+    </div>
+
     <?php }        
 ?>
     <script>
-const buttonCalories = document.getElementById("trackCalories");
-buttonCalories.addEventListener("click", function() {
+const buttonNextDay = document.getElementById("nextDayCalories");
+buttonNextDay.addEventListener("click", function() {
    
-    <?php 
-        echo $trackerStart ? 'true' : 'false'; 
 
-    ?>
+    trackerStart = false;
+        document.getElementById("trackerTrigger").style.visibility="view";
+
+    
 
 })
 </script>
@@ -161,10 +207,19 @@ buttonCalories.addEventListener("click", function() {
 if($trackerStart===true) { ?>
 
  <script>
-document.getElementById("tracker").style.visibility="hidden";
-
+document.getElementById("trackerTrigger").style.visibility="hidden";
+document.getElementById("tracker").style.visibility="view";
 </script>
 <?php }
+
+else{
+?>
+    <script>
+    document.getElementById("tracker").style.visibility="hidden";
+    document.getElementById("trackerTrigger").style.visibility="view";
+    </script>
+<?php
+}
 
 ?>
 
