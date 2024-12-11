@@ -109,7 +109,19 @@ function requestProcessor($request) {
             }
 
         case "trackCalories":
-            // Route recipe search requests to the DMZ server
+            //send insert request to db server for calories
+            $dbClient = new rabbitMQClient("testDB_RMQ.ini", "dbConnect");
+            $result = $dbClient->send_request($request);
+            return $result;
+
+        case "fetchTracker":
+            //send get request to db server for updated table displaying each entry
+            $dbClient = new rabbitMQClient("testDB_RMQ.ini", "dbConnect");
+            $result = $dbClient->send_request($request);
+            return $result;
+
+        case "fetchTotalCalories":
+            //send get request to db server for updated table displaying each entry
             $dbClient = new rabbitMQClient("testDB_RMQ.ini", "dbConnect");
             $result = $dbClient->send_request($request);
             return $result;

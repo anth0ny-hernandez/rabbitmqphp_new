@@ -263,12 +263,17 @@ function databaseProcessor($request) {
             }
 
         case "trackCalories":
-            // $userQuery = "SELECT id FROM accounts WHERE session_token = ?";
-            // $stmt = $conn->prepare($userQuery);
-            // $stmt->bind_param("s", $session_token);
-            // $stmt->execute();
-            // $userResult = $stmt->get_result();
-            // $user = $userResult->fetch_assoc();
+            $session_token = $request['session_token'];
+
+            $userQuery = "SELECT id FROM accounts WHERE session_token = ?";
+            $stmt = $conn->prepare($userQuery);
+            $stmt->bind_param("s", $session_token);
+            $stmt->execute();
+            $userResult = $stmt->get_result();
+            $user = $userResult->fetch_assoc();
+
+            if ($user) {
+            $userID = $user['id'];
             $recipe = $request['label'];
             $day = $request['day'];
             $date = $request['date'];
@@ -276,14 +281,44 @@ function databaseProcessor($request) {
             $goal = $request['goal'];
             $calorieseaten = $request['calorieseaten'];
 
-            //need to finiish insert statement & binding
-            $query = "INSERT INTO calorieTracker(recipeName, day, date, time, caloriesEaten, goal)";
+            $query = "INSERT INTO calorieTracker(user_id, recipeName, day, date, time, caloriesEaten, goal) VALUES(?, ?, ?, ?, ?, ?, ?)";
             $stmt = $conn->prepare($query);
-            $stmt->bind_param("i", $userID);
+            $stmt->bind_param("issssdd", $userID, $recipe, $day, $date, $time, $goal, $calorieseaten);
             $stmt->execute();
-            $result = $stmt->get_result();
-            $weeklyPlan = $result->fetch_all(MYSQLI_ASSOC);
-    
+
+            return ["success" => true];
+        } else {
+            return ["success" => false, "message" => "User not found"];
+        }
+
+
+        case "fetchTracker":
+            $date = $request['date'];
+            // $session_token = $request['session_token'];
+
+        
+            // // Get user ID based on session token
+            // $userQuery = "SELECT id FROM accounts WHERE session_token = ?";
+            // $stmt = $conn->prepare($userQuery);
+            // $stmt->bind_param("s", $session_token);
+            // $stmt->execute();
+            // $userResult = $stmt->get_result();
+            // $user = $userResult->fetch_assoc();
+
+            
+        
+            if ($date) {
+
+                $query = "SELECT * FROM calorieTracker WHERE date = ?";
+                $stmt = $conn->prepare($query);
+                $stmt->bind_param("s", $date);
+                $stmt->execute();
+                $result = $stmt->get_result();
+                $calorieEntries = $result->fetch_all(MYSQLI_ASSOC);
+
+
+                return ["success" => true, "calorieEntries" => $calorieEntries];
+            }
         default:
             return "Database Client-Server error";
     }

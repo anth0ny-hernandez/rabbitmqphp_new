@@ -102,8 +102,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['trackCalories'])) {
     </div>
 
     <h2>Daily Calorie Tracker</h2>
-  
+
+  <?php 
+  {?>
     <!-- Recipe Search Form -->
+     <div id="tracker">
     <form method="POST" action="calorietracker.php">
         <label for="label">Recipe Name:</label>
         <input type="text" id="label" name="label" placeholder="e.g., pasta, salad" required>
@@ -130,8 +133,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['trackCalories'])) {
         <br><br>
 
         <input type="submit" name="trackCalories" value="Save For Today">  <input type="submit" name="trackCalories" value="Next Day">
-
+  </div>
     </form>
+    <?php } ?>
+
+
+<?php $trackerStart=false;
+
+if($trackerStart===true) { ?>
+ <script>
+document.getElementById("tracker").style.visibility="hidden";
+</script>
+<?php }?>
 
     <!-- Display Logic for Recipe Search Results -->
     <form method="GET" action="weeklyMealPlanner.php"> 
