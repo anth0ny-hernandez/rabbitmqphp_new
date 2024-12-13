@@ -17,15 +17,17 @@ if (empty($version_number)) {
     die("Error: Could not determine the latest version from versionTracker.txt.\n");
 }
 
-// Get the bundle type from the latest tar.gz file created
-$bundleDir = "/home/yashmandal/git/deployment";
-$bundleFiles = glob("$bundleDir/*-version-$version_number.tar.gz");
+// Define the deployment directory
+$deploymentDir = "/home/yashmandal/git/deployment";
+
+// Find the tarball matching the latest version
+$bundleFiles = glob("$deploymentDir/*-version-$version_number.tar.gz");
 
 if (empty($bundleFiles)) {
-    die("Error: No bundle found for version $version_number in $bundleDir.\n");
+    die("Error: No bundle found for version $version_number in $deploymentDir.\n");
 }
 
-// Extract the bundle name (frontend, server, dmz) from the file name
+// Extract the bundle name (e.g., frontend, server, dmz) from the file name
 $bundleFileName = basename($bundleFiles[0]);
 preg_match('/^(frontend|server|dmz)-version-/', $bundleFileName, $matches);
 
@@ -34,7 +36,7 @@ if (empty($matches[1])) {
 }
 
 $bundleType = $matches[1];
-$bundlePath = "$bundleDir/$bundleFileName";
+$bundlePath = "$deploymentDir/$bundleFileName";
 
 // Send a deployment request to the RabbitMQ server
 try {
