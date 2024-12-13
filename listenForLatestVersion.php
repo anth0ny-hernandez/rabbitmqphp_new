@@ -2,16 +2,11 @@
 require_once('rabbitMQLib.inc');
 
 // Configuration
-$localPath = "/home/yashmandal/git/deployment"; // Update this to the environment's directory
-$deploymentServerUser = "yashmandal";      // Deployment server username
-$deploymentServerIP = "172.22.217.86";    // Deployment server IP
-$localVersionFile = $localPath . "/current_version.txt"; // File to track the current version
-$versionTrackerFile = "/home/yashmandal/test/rabbitmqphp_new/versionTracker.txt"; // Update to use the correct path
-
-// Function to clean up version number (remove any "v" prefix)
-function cleanVersionNumber($versionNumber) {
-    return ltrim($versionNumber, 'v');
-}
+$localPath = "/home/yashmandal/git/deployment"; // Directory for deployed files
+$deploymentServerUser = "yashmandal";          // Deployment server username
+$deploymentServerIP = "172.22.217.86";        // Deployment server IP
+$localVersionFile = $localPath . "/current_version.txt"; // File tracking current version
+$versionTrackerFile = "/home/yashmandal/test/rabbitmqphp_new/versionTracker.txt"; // Path to versionTracker
 
 // Function to pull the latest version using SCP
 function pullVersion($versionNumber, $bundlePath) {
@@ -25,7 +20,7 @@ function pullVersion($versionNumber, $bundlePath) {
 
     if ($status === 0) {
         echo "Successfully pulled version $versionNumber.\n";
-        
+
         // Update the local version file
         file_put_contents($localVersionFile, $versionNumber);
 
@@ -41,9 +36,8 @@ function updateVersionTracker($versionNumber) {
     global $versionTrackerFile;
 
     // Always update the file with the latest version
-    $cleanedVersion = cleanVersionNumber($versionNumber);
-    file_put_contents($versionTrackerFile, $cleanedVersion . "\n");
-    echo "Updated versionTracker.txt with version: $cleanedVersion\n";
+    file_put_contents($versionTrackerFile, $versionNumber . "\n", FILE_APPEND);
+    echo "Updated versionTracker.txt with version: $versionNumber\n";
 }
 
 // Function to get the currently deployed version locally
@@ -66,10 +60,10 @@ function listenForLatestVersion() {
         $response = $client->send_request($request);
 
         if ($response['success']) {
-            $versionNumber = $response['version_number'];
+            $versionNumber = $response['version_number']; // Numeric version
             $bundlePath = $response['bundle_path'];
 
-            // Always update versionTracker.txt, regardless of whether the latest version is already deployed locally
+            // Always update versionTracker.txt with the latest version
             updateVersionTracker($versionNumber);
 
             // Check if the latest version is already deployed locally
