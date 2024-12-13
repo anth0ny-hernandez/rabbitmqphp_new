@@ -17,14 +17,15 @@ if (empty($version_number)) {
     die("Error: Could not determine the latest version from versionTracker.txt.\n");
 }
 
-// Define the deployment directory
-$deploymentDir = "/home/yashmandal/git/deployment";
+// Define the directories
+$bundlingDir = "/home/yashmandal/test/bundling"; // Development machine's bundling directory
+$deploymentDir = "/home/yashmandal/git/deployment"; // Deployment machine's target directory
 
-// Find the tarball matching the latest version
-$bundleFiles = glob("$deploymentDir/*-version-$version_number.tar.gz");
+// Find the tarball matching the latest version in the bundling directory
+$bundleFiles = glob("$bundlingDir/*-version-$version_number.tar.gz");
 
 if (empty($bundleFiles)) {
-    die("Error: No bundle found for version $version_number in $deploymentDir.\n");
+    die("Error: No bundle found for version $version_number in $bundlingDir.\n");
 }
 
 // Extract the bundle name (e.g., frontend, server, dmz) from the file name
@@ -36,7 +37,16 @@ if (empty($matches[1])) {
 }
 
 $bundleType = $matches[1];
-$bundlePath = "$deploymentDir/$bundleFileName";
+$bundlePath = "$deploymentDir/$bundleFileName"; // The path where the bundle will be deployed on the deployment machine
+
+// SCP command to transfer the bundle from the development machine to the deployment machine
+echo "Transferring $bundleFileName to the deployment machine...\n";
+$scpCommand = "scp $bundlingDir/$bundleFileName yashmandal@172.22.217.86:$bundlePath";
+exec($scpCommand, $output, $result);
+
+if ($result !== 0) {
+    die("Error: Failed to transfer the bundle to the deployment machine.\n");
+}
 
 // Send a deployment request to the RabbitMQ server
 try {
