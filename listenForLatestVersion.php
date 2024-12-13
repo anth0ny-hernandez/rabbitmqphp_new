@@ -5,7 +5,7 @@ require_once('rabbitMQLib.inc');
 $localPath = "/home/yashmandal/git/deployment"; // Update this to the environment's directory
 $deploymentServerUser = "yashmandal";      // Deployment server username
 $deploymentServerIP = "172.22.217.86";    // Deployment server IP
-$localVersionFile = $localPath . "current_version.txt"; // File to track the current version
+$localVersionFile = $localPath . "/current_version.txt"; // File to track the current version
 $versionTrackerFile = "/home/yashmandal/test/rabbitmqphp_new/versionTracker.txt"; // Update to use the correct path
 
 // Function to clean up version number (remove any "v" prefix)
@@ -42,7 +42,7 @@ function updateVersionTracker($versionNumber) {
 
     // Always update the file with the latest version
     $cleanedVersion = cleanVersionNumber($versionNumber);
-    file_put_contents($versionTrackerFile, $cleanedVersion . "\n");
+    file_put_contents($versionTrackerFile, $cleanedVersion . "\n", FILE_APPEND);
     echo "Updated versionTracker.txt with version: $cleanedVersion\n";
 }
 
