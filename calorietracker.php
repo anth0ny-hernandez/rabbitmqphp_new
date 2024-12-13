@@ -4,11 +4,11 @@ require_once('rabbitMQLib.inc');
 $trackerStart=false;
 
 
-// // Check if the session token cookie is set
-// if (!isset($_COOKIE['session_token'])) {
-//     header("Location: login.php");
-//     exit();
-// }
+// Check if the session token cookie is set
+if (!isset($_COOKIE['session_token'])) {
+    header("Location: login.php");
+    exit();
+}
 
 // Refresh session token to extend expiration by another 30 seconds
 $session_token = $_COOKIE['session_token'];
@@ -19,22 +19,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['trackCalories'])) {
     $client = new rabbitMQClient("testRabbitMQ.ini", "testServer");
 
     $trackerStart=true;
-    // // Collect form data for recipe search
-    // $request = [
-    //     "type" => "trackCalories",
-    //     "recipe" => $_POST['label'] ?? null,
-    //     "day" => $_POST['day'] ?? null,
-    //     "date" => $_POST['date'] ?? null,
-    //     "time" => $_POST['time'] ?? null,
-    //     "goal" => $_POST['goal'] ?? null,
-    //     "calorieseaten" => $_POST['calorieseaten'] ?? null,
-
-    // ];
-    //set tracker to true once form is submitted, making form disappear
+    // Collect form data for recipe search
+    $request = [
+        "type" => "trackCalories",
+        "recipe" => $_POST['label'] ?? null,
+        "day" => $_POST['day'] ?? null,
+        "date" => $_POST['date'] ?? null,
+        "time" => $_POST['time'] ?? null,
+        "goal" => $_POST['goal'] ?? null,
+        "calorieseaten" => $_POST['calorieseaten'] ?? null,
+    ];
+    // set tracker to true once form is submitted, making form disappear
 
     
 
-    // $calorieTrackerResponse = $client->send_request($request);
+    $calorieTrackerResponse = $client->send_request($request);
 }
 // 
 
