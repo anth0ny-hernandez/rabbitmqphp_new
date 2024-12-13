@@ -2,10 +2,11 @@
 require_once('rabbitMQLib.inc');
 
 // Configuration
-$localPath = "/home/yashmandal/git/deployment"; // Directory to store the pulled bundles
+$localPath = "/home/yashmandal/git/deployment"; // Update this to the environment's directory
 $deploymentServerUser = "yashmandal";      // Deployment server username
 $deploymentServerIP = "172.22.217.86";    // Deployment server IP
-$versionTrackerFile = "/home/yashmandal/test/rabbitmqphp_new/versionTracker.txt"; // Path for version tracker
+$localVersionFile = $localPath . "current_version.txt"; // File to track the current version
+$versionTrackerFile = "/home/yashmandal/test/rabbitmqphp_new/versionTracker.txt"; // Update to use the correct path
 
 // Function to clean up version number (remove any "v" prefix)
 function cleanVersionNumber($versionNumber) {
@@ -14,16 +15,20 @@ function cleanVersionNumber($versionNumber) {
 
 // Function to pull the latest version using SCP
 function pullVersion($versionNumber, $bundlePath) {
-    global $localPath;
+    global $localPath, $deploymentServerUser, $deploymentServerIP, $localVersionFile;
 
     echo "Pulling version $versionNumber from $bundlePath...\n";
 
     // SCP command to fetch the file
-    $command = "scp $bundlePath $localPath";
+    $command = "scp $deploymentServerUser@$deploymentServerIP:$bundlePath $localPath";
     exec($command, $output, $status);
 
     if ($status === 0) {
         echo "Successfully pulled version $versionNumber.\n";
+        
+        // Update the local version file
+        file_put_contents($localVersionFile, $versionNumber);
+
         return true;
     } else {
         echo "Failed to pull version $versionNumber.\n";
@@ -35,10 +40,20 @@ function pullVersion($versionNumber, $bundlePath) {
 function updateVersionTracker($versionNumber) {
     global $versionTrackerFile;
 
-    // Overwrite the file with the latest version
+    // Always update the file with the latest version
     $cleanedVersion = cleanVersionNumber($versionNumber);
     file_put_contents($versionTrackerFile, $cleanedVersion . "\n");
-    echo "Replaced versionTracker.txt content with version: $cleanedVersion\n";
+    echo "Updated versionTracker.txt with version: $cleanedVersion\n";
+}
+
+// Function to get the currently deployed version locally
+function getCurrentVersion() {
+    global $localVersionFile;
+
+    if (file_exists($localVersionFile)) {
+        return trim(file_get_contents($localVersionFile));
+    }
+    return null;
 }
 
 // Function to listen for the latest version deployment
@@ -54,12 +69,18 @@ function listenForLatestVersion() {
             $versionNumber = $response['version_number'];
             $bundlePath = $response['bundle_path'];
 
-            // Update versionTracker.txt with the latest version
+            // Always update versionTracker.txt, regardless of whether the latest version is already deployed locally
             updateVersionTracker($versionNumber);
 
-            // Pull the latest version
-            if (!pullVersion($versionNumber, $bundlePath)) {
-                echo "Error: Failed to pull the latest version.\n";
+            // Check if the latest version is already deployed locally
+            $currentVersion = getCurrentVersion();
+            if ($currentVersion === $versionNumber) {
+                echo "Version $versionNumber is already deployed locally. Skipping pull.\n";
+            } else {
+                // Pull the latest version
+                if (!pullVersion($versionNumber, $bundlePath)) {
+                    echo "Error: Failed to pull the latest version.\n";
+                }
             }
         } else {
             echo "Error: " . $response['message'] . "\n";
