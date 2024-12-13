@@ -286,7 +286,7 @@ function databaseProcessor($request) {
 
             $query = "INSERT INTO calorieTracker(date, user_id, recipeName, day, time, goal, caloriesEaten, totalCaloriesEaten) VALUES(?, ?, ?, ?, ?, ?, ?)";
             $stmt = $conn->prepare($query);
-            $stmt->bind_param("sisssddd", $date, $userID, $recipe, $day, $time, $goal, $calorieseaten);
+            $stmt->bind_param("sisssdd", $date, $userID, $recipe, $day, $time, $goal, $calorieseaten);
             $stmt->execute();
 
 
