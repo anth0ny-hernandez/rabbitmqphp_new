@@ -40,10 +40,12 @@ function pullVersion($versionNumber, $bundlePath) {
 function updateVersionTracker($versionNumber) {
     global $versionTrackerFile;
 
-    // Always update the file with the latest version
+    // Clean the version number
     $cleanedVersion = cleanVersionNumber($versionNumber);
-    file_put_contents($versionTrackerFile, $cleanedVersion . "\n", FILE_APPEND);
-    echo "Updated versionTracker.txt with version: $cleanedVersion\n";
+
+    // Overwrite the file with the latest version
+    file_put_contents($versionTrackerFile, $cleanedVersion . "\n");
+    echo "Replaced versionTracker.txt content with version: $cleanedVersion\n";
 }
 
 // Function to get the currently deployed version locally
