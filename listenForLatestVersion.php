@@ -42,7 +42,7 @@ function updateVersionTracker($versionNumber) {
 
     // Always update the file with the latest version
     $cleanedVersion = cleanVersionNumber($versionNumber);
-    file_put_contents($versionTrackerFile, $cleanedVersion . "\n", FILE_APPEND);
+    file_put_contents($versionTrackerFile, $cleanedVersion . "\n");
     echo "Updated versionTracker.txt with version: $cleanedVersion\n";
 }
 
