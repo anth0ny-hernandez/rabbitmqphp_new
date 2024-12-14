@@ -3,7 +3,7 @@
 # Define the path to the directory where bundles are stored
 BUNDLE_DIR="/home/yashmandal/git/deployment"
 
-# Function to determine the bundle type from the bundle name
+# Function to detect the bundle type from the bundle name
 detect_bundle_type() {
     local bundle_file=$1
     if [[ $bundle_file == *"frontend"* ]]; then
@@ -17,7 +17,7 @@ detect_bundle_type() {
     fi
 }
 
-# Function to extract specific files from a version
+# Function to extract a specific version
 extract_version() {
     local version=$1
     local current_dir=$(pwd)
@@ -27,12 +27,19 @@ extract_version() {
 
     # Check if the file exists
     if [[ -f "$bundle_file" ]]; then
-        echo "Extracting files from $bundle_file into $current_dir..."
+        echo "Extracting $bundle_file into $current_dir..."
+        
+        # List the contents of the archive
+        tar -tzf "$bundle_file" | while read -r file; do
+            # Extract only the files (not directories) into the current directory
+            if [[ -f $file ]]; then
+                base_name=$(basename "$file")  # Get only the file name
+                tar --extract --file="$bundle_file" --strip-components=$(echo "$file" | tr -cd '/' | wc -c) --directory="$current_dir" "$file"
+                echo "Extracted: $base_name"
+            fi
+        done
 
-        # Use `--strip-components` to avoid extracting directory structure
-        tar --strip-components=1 -xzf "$bundle_file" -C "$current_dir"
-
-        echo "Version $version successfully extracted into the current directory."
+        echo "Version $version successfully extracted."
 
         # Detect the bundle type
         local bundle_type=$(detect_bundle_type "$bundle_file")
