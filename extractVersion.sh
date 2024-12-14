@@ -3,21 +3,38 @@
 # Define the path to the directory where bundles are stored
 BUNDLE_DIR="/home/yashmandal/git/deployment"
 
+# Function to determine the bundle type from the bundle name
+detect_bundle_type() {
+    local bundle_file=$1
+    if [[ $bundle_file == *"frontend"* ]]; then
+        echo "frontend"
+    elif [[ $bundle_file == *"server"* ]]; then
+        echo "server"
+    elif [[ $bundle_file == *"dmz"* ]]; then
+        echo "dmz"
+    else
+        echo "unknown"
+    fi
+}
+
 # Function to extract a specific version
 extract_version() {
     local version=$1
     local current_dir=$(pwd)
 
     # Construct the bundle file name
-    local bundle_file="$BUNDLE_DIR/$bundle_type-version-$version.tar.gz"
+    local bundle_file=$(ls "$BUNDLE_DIR"/*-version-"$version".tar.gz 2>/dev/null)
 
     # Check if the file exists
     if [[ -f "$bundle_file" ]]; then
-        echo "Extracting $bundle_type version $version into $current_dir..."
+        echo "Extracting $bundle_file into $current_dir..."
         tar -xzf "$bundle_file" -C "$current_dir"
         echo "Version $version successfully extracted."
 
-        # Restart services based on the bundle type
+        # Detect the bundle type
+        local bundle_type=$(detect_bundle_type "$bundle_file")
+
+        # Restart services based on the detected bundle type
         case "$bundle_type" in
             frontend)
                 echo "Restarting Apache service for frontend..."
@@ -31,7 +48,7 @@ extract_version() {
                 ;;
             dmz)
                 echo "Restarting DMZ services (custom logic for your application)..."
-                # Replace with actual service restart command if applicable
+                # Replace with actual DMZ service restart commands if needed
                 echo "DMZ services restarted successfully."
                 ;;
             *)
@@ -51,35 +68,12 @@ get_latest_version() {
     if [[ -f "$version_tracker" ]]; then
         tail -n 1 "$version_tracker"
     else
-        echo "Error: versionTracker.txt not found in $BUNDLE_DIR."
+        echo "Error: versionTracker.txt not found."
         exit 1
     fi
 }
 
 # Main script logic
-echo "Choose the type of bundle to extract:"
-echo "1. frontend"
-echo "2. server"
-echo "3. dmz"
-read -p "Enter the number corresponding to your choice: " bundle_choice
-
-# Map the choice to the bundle type
-case "$bundle_choice" in
-    1)
-        bundle_type="frontend"
-        ;;
-    2)
-        bundle_type="server"
-        ;;
-    3)
-        bundle_type="dmz"
-        ;;
-    *)
-        echo "Invalid choice. Exiting..."
-        exit 1
-        ;;
-esac
-
 echo "Would you like to extract the latest version (l) or a specific version (s)?"
 read -r choice
 
