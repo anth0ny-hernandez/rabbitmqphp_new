@@ -9,13 +9,35 @@ extract_version() {
     local current_dir=$(pwd)
 
     # Construct the bundle file name
-    local bundle_file="$BUNDLE_DIR/myRepo-$version.tar.gz"
+    local bundle_file="$BUNDLE_DIR/$bundle_type-version-$version.tar.gz"
 
     # Check if the file exists
     if [[ -f "$bundle_file" ]]; then
-        echo "Extracting version $version into $current_dir..."
+        echo "Extracting $bundle_type version $version into $current_dir..."
         tar -xzf "$bundle_file" -C "$current_dir"
         echo "Version $version successfully extracted."
+
+        # Restart services based on the bundle type
+        case "$bundle_type" in
+            frontend)
+                echo "Restarting Apache service for frontend..."
+                sudo systemctl restart apache2
+                echo "Apache service restarted successfully."
+                ;;
+            server)
+                echo "Restarting RabbitMQ server for backend..."
+                sudo systemctl restart rabbitmq-server
+                echo "RabbitMQ server restarted successfully."
+                ;;
+            dmz)
+                echo "Restarting DMZ services (custom logic for your application)..."
+                # Replace with actual service restart command if applicable
+                echo "DMZ services restarted successfully."
+                ;;
+            *)
+                echo "Unknown bundle type. No services restarted."
+                ;;
+        esac
     else
         echo "Error: Version $version not found in $BUNDLE_DIR."
     fi
@@ -35,6 +57,29 @@ get_latest_version() {
 }
 
 # Main script logic
+echo "Choose the type of bundle to extract:"
+echo "1. frontend"
+echo "2. server"
+echo "3. dmz"
+read -p "Enter the number corresponding to your choice: " bundle_choice
+
+# Map the choice to the bundle type
+case "$bundle_choice" in
+    1)
+        bundle_type="frontend"
+        ;;
+    2)
+        bundle_type="server"
+        ;;
+    3)
+        bundle_type="dmz"
+        ;;
+    *)
+        echo "Invalid choice. Exiting..."
+        exit 1
+        ;;
+esac
+
 echo "Would you like to extract the latest version (l) or a specific version (s)?"
 read -r choice
 
