@@ -28,6 +28,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['trackCalories'])) {
         "time" => $_POST['time'] ?? null,
         "goal" => $_POST['goal'] ?? null,
         "calorieseaten" => $_POST['calorieseaten'] ?? null,
+        "session_token" => $_COOKIE['session_token'] ?? null
+
     ];
     // set tracker to true once form is submitted, making form disappear
 
