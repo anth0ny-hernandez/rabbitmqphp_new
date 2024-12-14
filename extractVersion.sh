@@ -17,7 +17,7 @@ detect_bundle_type() {
     fi
 }
 
-# Function to extract a specific version
+# Function to extract specific files from a version
 extract_version() {
     local version=$1
     local current_dir=$(pwd)
@@ -27,9 +27,12 @@ extract_version() {
 
     # Check if the file exists
     if [[ -f "$bundle_file" ]]; then
-        echo "Extracting $bundle_file into $current_dir..."
-        tar -xzf "$bundle_file" -C "$current_dir"
-        echo "Version $version successfully extracted."
+        echo "Extracting files from $bundle_file into $current_dir..."
+
+        # Use `--strip-components` to avoid extracting directory structure
+        tar --strip-components=1 -xzf "$bundle_file" -C "$current_dir"
+
+        echo "Version $version successfully extracted into the current directory."
 
         # Detect the bundle type
         local bundle_type=$(detect_bundle_type "$bundle_file")
