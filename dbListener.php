@@ -275,7 +275,7 @@ function databaseProcessor($request) {
 
             if ($user) {
             $userID = $user['id'];
-            $recipe = $request['label'];
+            $recipe = $request['recipe'];
             $day = $request['day'];
             $date = $request['date'];
             $time = $request['time'];
@@ -284,20 +284,22 @@ function databaseProcessor($request) {
 
             
 
-            $query = "INSERT INTO calorieTracker(date, user_id, recipeName, day, time, goal, caloriesEaten) VALUES(?, ?, ?, ?, ?, ?, ?)";
+            $query = "INSERT INTO calorieTracker (date, user_id, recipeName, day, time, goal, caloriesEaten) VALUES(?, ?, ?, ?, ?, ?, ?)";
             $stmt = $conn->prepare($query);
             $stmt->bind_param("sisssdd", $date, $userID, $recipe, $day, $time, $goal, $calorieseaten);
             $stmt->execute();
 
 
-            // $totalCaloriesQuery = "SELECT totalCaloriesEaten FROM calorieTracker WHERE user_id = ? AND recipeName = ? AND date = ? AND day = ? and time = ? ";
-            // $stmt = $conn->prepare($totalCaloriesQuery);
-            // $stmt->bind_param("issss", $userID, $recipe, $date,  $day, $time );
-            // $stmt->execute();
-            // $result = $stmt->get_result();
-            // $totalCaloriesEaten = $result->fetch_assoc();
+            $totalCaloriesQuery = "SELECT totalCaloriesEaten FROM calorieTracker WHERE user_id = ? AND recipeName = ? AND date = ? AND day = ? and time = ? ";
+            $stmt = $conn->prepare($totalCaloriesQuery);
+            $stmt->bind_param("issss", $userID, $recipe, $date,  $day, $time );
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $totalCaloriesEaten = $result->fetch_assoc();
 
-            // $totalCaloriesEaten = $totalCaloriesEaten + $calorieseaten;
+            $totalCaloriesEaten = $totalCaloriesEaten + $calorieseaten;
+
+            // $updateCaloriesQuery = ""
 
             return ["success" => true];
         } else {
