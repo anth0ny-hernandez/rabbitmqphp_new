@@ -296,8 +296,9 @@ function databaseProcessor($request) {
             $stmt->execute();
             $result = $stmt->get_result();
             $totalCaloriesEaten = $result->fetch_assoc();
+            $theTotalCaloriesEateen = $totalCaloriesEaten['totalCaloriesEaten'];
 
-            $totalCaloriesEaten = $totalCaloriesEaten + $calorieseaten;
+            $totalCaloriesEaten = $theTotalCaloriesEateen + $calorieseaten;
 
             // $updateCaloriesQuery = ""
 
