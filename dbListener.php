@@ -290,17 +290,19 @@ function databaseProcessor($request) {
             $stmt->execute();
 
 
-            $totalCaloriesQuery = "SELECT totalCaloriesEaten FROM calorieTracker WHERE user_id = ? AND recipeName = ? AND date = ? AND day = ? and time = ? ";
+            $totalCaloriesQuery = "SELECT caloriesEaten FROM calorieTracker WHERE user_id = ?  AND date = ? AND day = ? ";
             $stmt = $conn->prepare($totalCaloriesQuery);
-            $stmt->bind_param("issss", $userID, $recipe, $date,  $day, $time );
+            $stmt->bind_param("iss", $userID, $date, $day);
             $stmt->execute();
             $result = $stmt->get_result();
-            $totalCaloriesEaten = $result->fetch_assoc();
-            $theTotalCaloriesEateen = $totalCaloriesEaten['totalCaloriesEaten'];
+            $allCalories = $result->fetch_all(MYSQLI_ASSOC);
+            $theTotalCaloriesEaten = array_sum($allCalories);
 
-            $totalCaloriesEaten = $theTotalCaloriesEateen + $calorieseaten;
 
-            // $updateCaloriesQuery = ""
+            $updateCaloriesQuery = "UPDATE calorieTracker SET totalCaloriesEaten = ? WHERE user_id = ? AND recipeName = ? AND date = ? AND day = ?  AND time = ?";
+            $stmt = $conn->prepare($updateCaloriesQuery);
+            $stmt->bind_param("iissss", $theTotalCaloriesEaten, $userID, $recipe, $date, $day, $time);
+            $stmt->execute();
 
             return ["success" => true];
         } else {

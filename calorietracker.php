@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['trackCalories'])) {
     $client = new rabbitMQClient("testRabbitMQ.ini", "testServer");
 
     $trackerStart=true;
-    // Collect form data for recipe search
+    // Collect form data for adding to tracker
     $request = [
         "type" => "trackCalories",
         "recipe" => $_POST['label'] ?? null,
@@ -31,13 +31,30 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['trackCalories'])) {
         "session_token" => $_COOKIE['session_token'] ?? null
 
     ];
-    // set tracker to true once form is submitted, making form disappear
 
     
 
     $calorieTrackerResponse = $client->send_request($request);
+
+    //send a request to get the tracking data
+    $fetchRequest =  [
+        "date" => $_POST['date'] ?? null,
+
+    ];
+
+    $fetchResponse = $client->send_request($fetchRequest);
+
+    //Display the data for tracking
+?>
+    <!-- <table>
+        <tr>
+ -->
+
+
+<?php
 }
 // 
+
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['nextDayCalories'])) {
 
