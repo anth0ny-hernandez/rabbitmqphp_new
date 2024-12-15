@@ -68,7 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             margin-bottom: 5px;
             text-align: left;
         }
-        input[type="text"], input[type="password"] {
+        input[type="text"], input[type="email"], input[type="password"] {
             width: 100%;
             padding: 10px;
             margin-bottom: 15px;
@@ -101,7 +101,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <h2>Register</h2>
         <form action="registration.php" method="POST">
             <label for="email">Email:</label>
-            <input type="text" name="email" id="email" required>
+            <input type="email" id="email" name="email" 
+                pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
+                title="Please enter a valid email address" required>
 
             <label for="username">Username:</label>
             <input type="text" name="username" id="username" required>

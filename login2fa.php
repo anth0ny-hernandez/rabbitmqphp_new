@@ -1,65 +1,75 @@
 <?php
 ob_start();
-unset($_COOKIE['session_token']);
+
+// Check if the session token cookie is set
+if (!isset($_COOKIE['session_token'])) {
+    header("Location: login.php");
+    exit();
+}
+
+// Refresh session token to extend expiration by another 90 seconds
+$session_token = $_COOKIE['session_token'];
+$expire_time = time() + 90;
+setcookie('session_token', $session_token, $expire_time, "/");
+
 require_once('rabbitMQLib.inc');
 require_once('get_host_info.inc');
 require_once('path.inc');
-
-if($_COOKIE['session_token']) {
-    unset($_COOKIE['session_token']);
-}
 
 // Check if the form is submitted
 $login_failed = false;
 $login_message = '';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $username = $_POST['username'];
-    $password = $_POST['password'];
+    $code = $_POST['otp'];
 
     // Create a client to send the login request to RabbitMQ
     $client = new rabbitMQClient("testRabbitMQ.ini", "testServer");
 
     // Prepare the request
     $request = array();
-    $request['type'] = "login";
-    $request['username'] = $username;
-    $request['password'] = $password;
+    $request['type'] = "verify2fa";     // Reused since logic is very similar
+    $request['otp'] = $code;
+    $request['cookieUID'] = $session_token;
 
     // Send the request and get the response
     $response = $client->send_request($request);
     var_dump($response);
 
-    // Check the response from the RabbitMQ server
-    //if ($response['success']) 
-    if ($response['success']) {
-        // Login successful, set the session token cookie
-        $session_token = $response['session_token'];
-        $expire_time = time() + 30; // Cookie expires in 30 seconds
-        setcookie('session_token', $session_token, $expire_time, "/");
-
-        // Consider also extracting boolean of whether user
-        // has opted in for 2FA
-        // If yes, redirect to home; else, redirect to enable2FA.php
-
-        // Redirect to the home page
-        // Finals update: Redirects to 2FA Authorization
-        // OR Prompts user if they want to enable 2FA
-        ob_end_flush();
-        if($response['has2faEnabled']) {
-            header("Location: login2fa.php");
+    if($response["success"]) {
+        // ie, that expiration hasnt passed and user OTP matches table OTP
+        if($response["isExpired"] && $response["codeMatch"]) {
+            header("Location: home.php");
+            ob_end_flush(); // Might work somewhere else too
             exit();
-        } else {
-            header("Location: enable2FA.php");
-            exit();
+        } 
+        elseif(!$response["isExpired"] && !$response["codeMatch"]) {
+            $otp_failed = true;
+            $mssg = "The one-time password has expired. Please request a new one.\n";
+            $login_message = "2FA verification failed: " . $mssg;
         }
-        
-    } else {
-        // Login failed, set the error message
-        $login_failed = true;
-        $login_message = "Login failed: " . htmlspecialchars($response['message']);
+        elseif(!$response["codeMatch"]) {
+            $otp_failed = true;
+            $mssg = "The passcodes do not match. Please try again.\n";
+            $login_message = "2FA verification failed: " . $mssg;
+        }
+        elseif(!$response["isExpired"]) {
+            $otp_failed = true;
+            $mssg = "The one-time password has expired. Please request a new one.\n";
+            $login_message = "2FA verification failed: " . $mssg;
+        }
+        else {
+            $otp_failed = true;
+            $mssg = "The user does not exist.\n";
+            $login_message = "2FA verification failed: " . $mssg;
+        }
+    } 
+    else {
+        $otp_failed = true;
+        $login_message = "Unexpected error, OTP doesn't exist: " . $mssg;
     }
 }
+
 ?>
 
 <!DOCTYPE html>
@@ -140,12 +150,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             </div>
         <?php endif; ?>
         
-        <form method="POST" action="login.php">
-            <label for="username">Username:</label>
-            <input type="text" name="username" id="username" required>
-            <label for="password">Password:</label>
-            <input type="password" name="password" id="password" required>
-            <input type="submit" value="Login">
+        <form method="POST" action="login2fa.php">
+            <label for="otp">One-time Password:</label>
+            <input type="text" name="otp" id="otp" required>
+            <input type="submit" value="Login2FA">
         </form>
     </div>
 </body>

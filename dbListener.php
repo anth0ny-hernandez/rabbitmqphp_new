@@ -111,6 +111,7 @@ function databaseProcessor($request) {
                 echo "User $username registered successfully!\n";  // Debugging
                 echo "================================\n";
                 // $insert = "User $username registered successfully!";
+                echo "Sending back to Server...\n";
                 return true;
             } else {
                 // Log and return the error
@@ -119,6 +120,143 @@ function databaseProcessor($request) {
                 $insert = "Error: " . $conn->error;
                 return false;
             }
+
+        case "enable2fa":
+            $answer = $request['answer'];
+            $expiration = time() + 90;
+            $code = random_int(100000, 999999); // Generates 6-digit OTP
+            $code = (string)$code; 				// Explicitly casts OTP as a string
+            $session_token = $request['cookieUID'];
+
+            if($answer === "yes") {
+                // Enabled is not set to 1 here as the user has to
+                // explicitly input their OTP to seal the deal
+                $updateQuery = "UPDATE twoFA 
+                                SET OTP = ?, Expires = ?
+                                WHERE session_token = ?";
+                $updateStmt = $conn->prepare($updateQuery);
+
+                // bind 6 digit generated OTP
+                // bind OTP expiration set 90 seconds ahead
+                $updateStmt->bind_param("sis", $code, $expiration, $session_token);
+
+                if($updateStmt->execute()) {
+                    echo "Update execution successful...\n";
+                    // Now we extract the user's email address
+                    $selectEmailSql = "SELECT email FROM twoFA 
+                                        WHERE session_token = ?";
+                    $selectEmailStmt = $conn->prepare($selectEmailSql);
+                    $selectEmailStmt->bind_param("s", $session_token);
+
+                    // Ensure that the username actually exists
+                    if($selectEmailStmt->execute()) {
+                        echo "Email selection query successful...\n";
+                        $emailRow = $selectEmailStmt->get_result();
+
+                        // Ensure that the email also exists attached to username
+                        if($emailRow->num_rows > 0) {
+                            $emailArray = $emailRow->fetch_assoc();
+                            $email = $emailArray['email'];
+                            $email = escapeshellarg($email); // may or may not do something
+                            echo "Acquired email linked to user with session token...\n";
+
+                            // Executes shell script to use sendmail package to send OTP
+                            $script = 'send_email.sh'; 	// Describes filename to execute
+                            $output = shell_exec("./$script $email $code");
+
+                            // Not sure why email is here, but replace in the future?
+                            return array("success" => true, "userEmail" => $email);
+                        } else {
+                            // No user found with the specified username
+                            echo "User with that email not found!\n";
+                            echo "================================\n";
+                            return array("success" => false, "message" => "User not found.");
+                        }
+                    }
+                } else {
+                    // No user found with the specified username
+                    echo "Failed to bind parameters to that session token!\n";
+                    echo "================================\n";
+                    return array("success" => false, "message" => "Param bind failure.");
+                }
+            } else {
+                echo "USER OPTED NO FOR TWO FACTOR AUTHENTICATION\n";
+                echo "===============================================\n";
+                // if the answer is no, don't bother basically
+                return array("success" => false, "message" => "User opted out of 2FA.");
+            }
+
+        case "verify2fa":
+            $code = $request["otp"]; // pulls inputted OTP for comparison
+            $session_token = $request["cookieUID"]; // serves as unique identifier for user
+
+            // uses Code field for UID, also gets time at which code will expire
+            $getOtp = "SELECT Expires, OTP, Enabled FROM twoFA WHERE session_token = ?";
+            $stmt = $conn->prepare($getOtp);
+            $stmt->bind_param("s", $session_token);
+
+            // Sees if inputted OTP matches stored OTP
+            if(!$stmt->execute()) {
+                echo "Error in binding OTP:" . $conn->error . "<br>";
+                return array("success" => false, "message" => "User opted out of 2FA.");
+            } 
+            else {
+                $result = $stmt->get_result();
+                if($result->num_rows > 0) {
+                    $row = $result->fetch_assoc();  // Turns results into array
+
+                    $futureTime = $row['Expires'];  // get Expiration set by table
+                    $getTableCode = $row['OTP'];    // get OTP set by table
+                    $enabledBool = $row['Enabled'];
+                    $currentTime = time();          // Time at this moment for comparison
+
+                    echo "Future time: " . $futureTime;
+                    echo "\nCurrent time: " . $currentTime;
+                    echo "\nOTP is " . $getTableCode;
+                    echo "\n================================\n";
+
+                    $isExpired = $futureTime > $currentTime;
+                    $codeMatched = $getTableCode === $code;
+
+                    // Bypasses setting the Enabled flag as it's already set
+                    if($enabledBool) {
+                        echo "2fa Path for verify2fa successfully taken!\n";
+                        echo "=============================================\n";
+                        return array(
+                            "success" => true, 
+                            "isExpired" => $isExpired, 
+                            "codeMatch" => $codeMatched
+                        );
+                    }
+
+                    // Now we set Enabled to 1 so the 2FA flag may
+                    // trigger every time users subsequently log in
+                    $updateQuery = "UPDATE twoFA 
+                                    SET Enabled = ?
+                                    WHERE session_token = ?";
+                    $updateStmt = $conn->prepare($updateQuery);
+
+                    $enabledBool = 1;
+                    $updateStmt->bind_param("is", $enabledBool, $session_token);
+                    if($updateStmt->execute()) {
+                        echo "Disabled Bool 2fa Path for verify2fa successfully taken!\n";
+                        echo "=============================================\n";
+                        // Returns a successul case, the status of the OTP
+                        // and the similarity between the inputted and stored OTPs
+                        return array(
+                                    "success" => true, 
+                                    "isExpired" => $isExpired, 
+                                    "codeMatch" => $codeMatched
+                                );
+                    }
+                    
+                } else {
+                    echo "OTP doesn't exist: " . $conn->error . "<br>";
+                    return array("success" => false, "message" => "Error fetching field with OTP.");
+                }
+            }
+        
+
         case "login":
             $username = $request['username'];
             $password = $request['password'];
@@ -127,7 +265,8 @@ function databaseProcessor($request) {
             echo "================================\n";
         
             // Query to get the hashed password for the specified username
-            $sql = "SELECT password FROM twoFA WHERE username = ?";
+            // Post-midterm Update: Also extracting 2FA 'Enabled' flag
+            $sql = "SELECT email, password, Enabled FROM twoFA WHERE username = ?";
             $stmt = $conn->prepare($sql);
             $stmt->bind_param("s", $username);
             $stmt->execute();
@@ -138,6 +277,7 @@ function databaseProcessor($request) {
                 
                 // Verify the password using password_verify
                 if (password_verify($password, $row['password'])) {
+
                     echo "Login successful for user $username!\n";
                     echo "================================\n";
         
@@ -151,12 +291,46 @@ function databaseProcessor($request) {
                     $updateStmt->bind_param("sis", $session_token, $session_expires, $username);
                     
                     if ($updateStmt->execute()) {
-                        // Set the session token cookie with a 30-second expiration
-                        
-                        
-                        // Return a successful response with the session token
-                        return array("success" => true, "session_token" => $session_token);
-                    } 
+
+                        // If 2FA-Enabled, will email user for OTP too
+                        if($row['Enabled']) {
+                            $code = random_int(100000, 999999); // Generates 6-digit OTP
+                            $code = (string)$code; 				// Explicitly casts OTP as a string
+                            $expiration = time() + 90;
+                            $email = $row['email'];
+
+                            // Executes shell script to use sendmail package to send OTP
+                            $script = 'send_email.sh'; 	// Describes filename to execute
+                            $output = shell_exec("./$script $email $code");
+                            
+                            $updateQuery = "UPDATE twoFA 
+                                            SET OTP = ?, Expires = ?
+                                            WHERE username = ?";
+                            $updateStmt = $conn->prepare($updateQuery);
+                            $updateStmt->bind_param("sis", $code, $expiration, $username);
+
+                            if($updateStmt->execute()) {
+                                echo "2FA Path Successfully Taken!\n";
+                                echo "=====================================\n";
+                                // Finals Update: Redirects to new 2FA page akin to Login
+                                return array(
+                                            "success" => true, 
+                                            "session_token" => $session_token,
+                                            "has2faEnabled" => true
+                                        );
+                            }
+                        }
+                        else {
+                            echo "NON-2FA Path Successfully Taken!\n";
+                            // Return a successful response with the session token
+                            // Finals Update: Will proceed as normal if 2FA isn't enabled
+                            return array(
+                                        "success" => true, 
+                                        "session_token" => $session_token,
+                                        "has2faEnabled" => false
+                                    );
+                        }
+                    }
                 } else {
                     // Password verification failed
                     echo "Incorrect password for user $username!\n";
