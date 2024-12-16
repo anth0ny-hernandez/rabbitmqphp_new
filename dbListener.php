@@ -166,46 +166,7 @@ function databaseProcessor($request) {
                 echo "================================\n";
                 return array("success" => false, "message" => "User not found.");
             }
-            //insert meal plan to database table
-        // case "saveWeeklyMealPlan":
-        //     $session_token = $request['session_token'];
-        //     $foodDetails = $request['foodDetails'];
-        //     $day = $request['day'];
-        //     $meal_type = $request['meal_type'];
-
-        //     // Get user ID based on session token
-        //     $userQuery = "SELECT id FROM accounts WHERE session_token = ?";
-        //     $stmt = $conn->prepare($userQuery);
-        //     $stmt->bind_param("s", $session_token);
-        //     $stmt->execute();
-        //     $userResult = $stmt->get_result();
-        //     $user = $userResult->fetch_assoc();
-
-        //     if ($user) {
-        //         $userID = $user['id'];
-        //         // Clear any existing meal plans for the user to avoid duplicates
-        //         $deleteQuery = "DELETE FROM weekly_meal_plan WHERE user_id = ?";
-        //         $deleteStmt = $conn->prepare($deleteQuery);
-        //         $deleteStmt->bind_param("i", $userID);
-        //         $deleteStmt->execute();
-
-        //         // Insert the new meal plan
-        //         foreach ($foodDetails['hits'] as $details) {
-        //             $url = $details['recipe']['url'];
-        //             $calories = $details['recipe']['calories'];
-        //             $recipe = $details['recipe']['label'];
-
-        //             $insertQuery = "INSERT INTO weekly_meal_plan (user_id, recipe, day, meal_type, url, calories) VALUES (?, ?, ?, ?, ?, ?)";
-        //             $stmt = $conn->prepare($insertQuery);
-        //             $stmt->bind_param("issssd", $userID, $recipe, $day, $meal_type, $url, $calories);
-        //             $stmt->execute();
-        //         }
-        //         return ["success" => true];
-        //     } else {
-        //         return ["success" => false, "message" => "User not found"];
-        //     }
-
-        //get meal plan to display
+         
         case "saveWeeklyMealPlan":
             $session_token = $request['session_token'];
             $foodDetailInsert = $request['foodDetailInsert'];
