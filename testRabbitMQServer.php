@@ -5,7 +5,7 @@ require_once('get_host_info.inc');
 require_once('path.inc');
 
 function requestProcessor($request) {
-    echo "Received request: ";
+    echo "Received request: \n";
     var_dump($request);
 
     if (!isset($request['type'])) {
@@ -13,7 +13,55 @@ function requestProcessor($request) {
     }
 
     switch ($request['type']) {
-        // directs the login process
+        
+        /* Cases related to Login Process START */
+        case "login":
+            // creates new client to establish new connection to db's own server
+            echo "About to connect to dbListener...\n";
+            $dbClient = new rabbitMQClient("testDB_RMQ.ini", "dbConnect");
+            $result = $dbClient->send_request($request);
+            echo "Sending back to Login Client...\n";
+            var_dump($result);
+            return $result;
+
+        // where user makes their choice on 2fa
+        // Case sent to/fro enable2fa.php
+        case "enable2fa":
+            // creates new client to establish new connection to db's own server
+            $dbClient = new rabbitMQClient("testDB_RMQ.ini", "dbConnect");
+            $result = $dbClient->send_request($request);
+            echo "Sending back to Client...\n";
+            var_dump($result);
+            return $result;
+
+        // where user verifies OTP from 2FA
+        // Case sent to/fro login2fa & codeConfirm
+        case "verify2fa":
+            // creates new client to establish new connection to db's own server
+            $dbClient = new rabbitMQClient("testDB_RMQ.ini", "dbConnect");
+            $result = $dbClient->send_request($request);
+            echo "Sending back to Client...\n";
+            var_dump($result);
+            return $result;
+
+          // directs register process
+          // Case sent to/fro registration file
+        case "register":
+            // creates new client to establish new connection to db's own server
+            $dbClient = new rabbitMQClient("testDB_RMQ.ini", "dbConnect");
+            $result = $dbClient->send_request($request);
+            echo "Sending back to Client...\n";
+            var_dump($result);
+            return $result;
+        
+        case "logout":
+            $dbClient = new rabbitMQClient("testDB_RMQ.ini", "dbConnect");
+            $result = $dbClient->send_request($request);
+            return $result;
+
+        /* Cases related to Login Process END */
+
+        /* directs the login process
         case "fetchWeeklyPlanRecipes":
             $dbClient = new rabbitMQClient("testDB_RMQ.ini", "dbConnect");
             $result = $dbClient->send_request($request);
@@ -30,50 +78,10 @@ function requestProcessor($request) {
             $result = $dbClient->send_request($request);
             return $result;
             
-        case "login":
-            // creates new client to establish new connection to db's own server
-            // $dbClient = new rabbitMQClient("testDB_RMQ.ini", "dbConnect");
-            echo "About to connect to dbListener...\n";
-            $dbClient = new rabbitMQClient("testDB_RMQ.ini", "dbConnect");
-            $result = $dbClient->send_request($request);
-            echo "Sending back to Login Client...\n";
-            var_dump($result);
-            return $result;
-
-        // where user makes their choice on 2fa
-        case "enable2fa":
-            // creates new client to establish new connection to db's own server
-            $dbClient = new rabbitMQClient("testDB_RMQ.ini", "dbConnect");
-            $result = $dbClient->send_request($request);
-            echo "Sending back to Client...\n";
-            var_dump($result);
-            return $result;
-
-        // where user verifies OTP from 2FA
-        case "verify2fa":
-            // creates new client to establish new connection to db's own server
-            $dbClient = new rabbitMQClient("testDB_RMQ.ini", "dbConnect");
-            $result = $dbClient->send_request($request);
-            echo "Sending back to Client...\n";
-            var_dump($result);
-            return $result;
-
-          // directs register process
-        case "register":
-            // creates new client to establish new connection to db's own server
-            //$dbClient = new rabbitMQClient("testDB_RMQ.ini", "dbConnect");
-            $dbClient = new rabbitMQClient("testDB_RMQ.ini", "dbConnect");
-            $result = $dbClient->send_request($request);
-            echo "Sending back to Client...\n";
-            // var_dump($result);
-            return $result;
+         Case sent to/fro login.php */
         
-        case "logout":
-            $dbClient = new rabbitMQClient("testDB_RMQ.ini", "dbConnect");
-            $result = $dbClient->send_request($request);
-            return $result;
 
-
+/*
         case "submitReview":
             $dbClient = new rabbitMQClient("testDB_RMQ.ini", "dbConnect");
             $result = $dbClient->send_request($request);
@@ -134,6 +142,8 @@ function requestProcessor($request) {
 
         
 
+        
+        */
         default:
             return "ERROR: unsupported message type";
     }
