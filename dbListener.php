@@ -1,4 +1,4 @@
-#!/bin/php
+#!/usr/bin/php
 <?php
 ob_start();
 require_once('rabbitMQLib.inc');
@@ -13,8 +13,8 @@ function databaseProcessor($request) {
     // database connection & credential variable assignment
     $conn = new mysqli('localhost', 'testUser', '12345', 'testdb');
     // $email = $request['email'];
-    $username = $request['username'];
-    $password = $request['password'];
+    // $username = $request['username'];
+    // $password = $request['password'];
 
     switch($request['type']) {
         

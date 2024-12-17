@@ -1,6 +1,6 @@
 <?php
 ob_start();
-unset($_COOKIE['session_token']);
+//unset($_COOKIE['session_token']);
 require_once('rabbitMQLib.inc');
 require_once('get_host_info.inc');
 require_once('path.inc');
