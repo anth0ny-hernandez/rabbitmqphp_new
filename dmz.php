@@ -3,6 +3,45 @@ require_once('rabbitMQLib.inc');
 require_once('get_host_info.inc');
 require_once('path.inc');
 
+function getRandomMeal() {
+    // Define API parameters
+    $params = [
+        'type' => 'public',
+        'app_id' => '4577783c',
+        'app_key' => '2ebd6b0aa43312e5f01f2077882ca32f',
+        'q' => 'meal' // Random generic search term
+    ];
+
+    $url = "https://api.edamam.com/api/recipes/v2?" . http_build_query($params);
+
+    // Set up cURL
+    $curl = curl_init();
+    curl_setopt($curl, CURLOPT_URL, $url);
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+    $headers = ['Edamam-Account-User: AlveeJalal'];
+    curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+
+    $response = curl_exec($curl);
+    curl_close($curl);
+
+    // Decode the API response
+    $data = json_decode($response, true);
+
+    // Pick a random recipe from the hits
+    if (isset($data['hits']) && !empty($data['hits'])) {
+        $randomIndex = array_rand($data['hits']);
+        $recipe = $data['hits'][$randomIndex]['recipe'];
+
+        return [
+            "success" => true,
+            "recipe" => $recipe['label'],
+            "url" => $recipe['url']
+        ];
+    }
+
+    return ["success" => false, "message" => "No recipes found"];
+}
+
 function recommendRecipes($preferences) {
     // Define parameters for the Edamam API request based on preferences
     $params = array(
@@ -99,6 +138,9 @@ function requestProcessor($request) {
     }
 
     switch ($request['type']) {
+
+        case "getRandomMeal":
+            return getRandomMeal();
 
         case "searchRecipe":
             return searchRecipe($request);  // Pass the entire request array to searchRecipe

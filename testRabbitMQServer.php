@@ -14,6 +14,12 @@ function requestProcessor($request) {
 
     switch ($request['type']) {
         // directs the login process
+        case "getRandomMeal":
+            // Forward the request to DMZ
+            $dmzClient = new rabbitMQClient("dmzConfig.ini", "dmzServer");
+            return $dmzClient->send_request(["type" => "getRandomMeal"]);
+        
+
         case "fetchWeeklyPlanRecipes":
             $dbClient = new rabbitMQClient("testDB_RMQ.ini", "dbConnect");
             $result = $dbClient->send_request($request);

@@ -5,6 +5,12 @@ if (!isset($_COOKIE['session_token'])) {
     exit();
 }
 
+// Fetch random meal from testRabbitMQServer
+$client = new rabbitMQClient("testRabbitMQ.ini", "testServer");
+$request = ["type" => "getRandomMeal"];
+$response = $client->send_request($request);
+$randomMeal = $response['success'] ? $response : null;
+
 // Refresh session token to extend expiration by another 30 seconds
 $session_token = $_COOKIE['session_token'];
 $expire_time = time() + 90;
@@ -62,6 +68,16 @@ setcookie('session_token', $session_token, $expire_time, "/");
             background-color: #c82333;
         }
     </style>
+    <script>
+        // Function to display the notification
+        function showNotification() {
+            const notification = document.getElementById("notification");
+            notification.style.display = "block";
+        }
+
+        // Trigger notification on page load
+        window.onload = showNotification;
+    </script>
 </head>
 <body>
 
@@ -81,6 +97,15 @@ setcookie('session_token', $session_token, $expire_time, "/");
     </div>
 </div>
 
+<!-- Random Meal Notification -->
+<?php if ($randomMeal): ?>
+        <div id="notification" class="notification" onclick="window.location.href='<?php echo htmlspecialchars($randomMeal['url']); ?>'">
+            🎉 <strong>Meal of the Day:</strong> <?php echo htmlspecialchars($randomMeal['recipe']); ?> (Click here for details!)
+        </div>
+    <?php else: ?>
+        <div>No meal available at the moment.</div>
+    <?php endif; ?>
+    
 <!-- JavaScript to handle automatic logout after session expiration -->
 <script>
     setTimeout(function() {
