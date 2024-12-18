@@ -32,6 +32,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_entry'])) {
     ];
 
     $response = $client->send_request($request);
+    var_dump($response);
+    die();
 
     if ($response['success']) {
         $successMessage = "Food entry added successfully!";
