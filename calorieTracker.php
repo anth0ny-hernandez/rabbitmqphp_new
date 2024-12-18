@@ -7,123 +7,91 @@ if (!isset($_COOKIE['session_token'])) {
     exit();
 }
 
-// Refresh session token to extend expiration by another 30 seconds
+// Refresh session token
 $session_token = $_COOKIE['session_token'];
 $expire_time = time() + 90;
 setcookie('session_token', $session_token, $expire_time, "/");
 
-// Variables for calorie tracker
-$user_id = 1; // Replace with session-based user ID
-$date = date('Y-m-d');
-$calories = 0;
-$goal = 2000; // Default daily calorie goal
-$message = "";
+// Initialize variables
+$errorMessage = "";
+$successMessage = "";
 
-// Fetch current daily calories and goal
+// Handle form submission
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_entry'])) {
+    $client = new rabbitMQClient("testRabbitMQ.ini", "testServer");
+    $request = [
+        "type" => "addCalorieEntry",
+        "user_id" => $_SESSION['user_id'],  // Assuming user ID is stored in session
+        "date" => $_POST['date'],
+        "time" => $_POST['time'],
+        "food_name" => $_POST['food_name'],
+        "calories" => (int)$_POST['calories'],
+    ];
+
+    $response = $client->send_request($request);
+
+    if ($response['success']) {
+        $successMessage = "Food entry added successfully!";
+    } else {
+        $errorMessage = $response['message'] ?? "Failed to add entry.";
+    }
+}
+
+// Fetch all calorie entries for the user
 $client = new rabbitMQClient("testRabbitMQ.ini", "testServer");
-$request = [
-    "type" => "getDailyCalories",
-    "user_id" => $user_id,
-    "date" => $date
+$fetchRequest = [
+    "type" => "getCalorieEntries",
+    "user_id" => $_SESSION['user_id']  // Assuming user ID is stored in session
 ];
-$response = $client->send_request($request);
-
-if ($response['success'] && isset($response['data'])) {
-    $calories = $response['data']['calories'] ?? 0;
-    $goal = $response['data']['goal'] ?? $goal;
-}
-
-// Handle form submissions
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_POST['logCalories'])) {
-        $mealCalories = (int)$_POST['calories'];
-
-        $logRequest = [
-            "type" => "logCalories",
-            "user_id" => $user_id,
-            "calories" => $mealCalories
-        ];
-        $logResponse = $client->send_request($logRequest);
-        $message = $logResponse['message'];
-        header("Location: calorieTracker.php");
-        exit();
-    }
-
-    if (isset($_POST['updateGoal'])) {
-        $newGoal = (int)$_POST['goal'];
-
-        $goalRequest = [
-            "type" => "updateCalorieGoal",
-            "user_id" => $user_id,
-            "goal" => $newGoal
-        ];
-        $goalResponse = $client->send_request($goalRequest);
-        $message = $goalResponse['message'];
-        header("Location: calorieTracker.php");
-        exit();
-    }
-}
+$entriesResponse = $client->send_request($fetchRequest);
+$entries = $entriesResponse['data'] ?? [];
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calorie Tracker</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f9f9f9;
-            text-align: center;
-            margin: 0;
-            padding: 0;
+            margin: 20px;
         }
-        .container {
+        .form-container {
+            max-width: 600px;
+            margin: auto;
+        }
+        .chart-container {
             max-width: 800px;
             margin: auto;
+            margin-top: 20px;
+        }
+        .form-container, .chart-container {
             padding: 20px;
             border: 1px solid #ddd;
             border-radius: 8px;
-            background-color: #fff;
             box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-            margin-top: 50px;
+            background-color: #f9f9f9;
         }
-        .form-section {
-            margin-bottom: 20px;
+        .success-message {
+            color: #28a745;
+            margin-bottom: 10px;
         }
-        .form-section input, .form-section button {
-            padding: 10px;
-            font-size: 16px;
-            margin: 10px 0;
+        .error-message {
+            color: #dc3545;
+            margin-bottom: 10px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
             border: 1px solid #ddd;
-            border-radius: 5px;
+            padding: 8px;
+            text-align: center;
         }
-        .form-section button {
-            background-color: #007bff;
-            color: #fff;
-            border: none;
-            cursor: pointer;
-        }
-        .form-section button:hover {
-            background-color: #0056b3;
-        }
-        .summary {
-            margin-bottom: 20px;
-        }
-        .summary h2 {
-            color: #333;
-        }
-        .summary p {
-            color: #555;
-        }
-        .message {
-            color: green;
-            margin-bottom: 20px;
-        }
-        .error {
-            color: red;
-            margin-bottom: 20px;
+        th {
+            background-color: #f2f2f2;
         }
         .button-group {
             margin-top: 20px;
@@ -143,51 +111,74 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .button:hover {
             background-color: #0056b3;
         }
-        .logout-button {
-            background-color: #dc3545;
-        }
-        .logout-button:hover {
-            background-color: #c82333;
-        }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="button-group">
-        <a href="home.php" class="button">Home</a>
-        <a href="calorieTracker.php" class="button">Calorie Tracker</a>
-        <a href="logout.php" class="button logout-button">Logout</a>
-    </div>
+<div class="button-group">
+    <a href="home.php" class="button">Home</a>
+    <a href="meal_plan.php" class="button">Recipe Search</a>
+    <a href="dietRestrictions.php" class="button">Diet Restrictions</a>
+    <a href="recommendations.php" class="button">Recipe Recommendations</a>
+    <a href="reviews.php" class="button">Ratings and Reviews</a>
+    <a href="calorie_tracker.php" class="button">Calorie Tracker</a>
+    <a href="logout.php" class="button logout-button">Logout</a>
+</div>
 
-    <h1>Calorie Tracker</h1>
-
-    <?php if (!empty($message)): ?>
-        <p class="message"><?php echo htmlspecialchars($message); ?></p>
+<div class="form-container">
+    <h2>Calorie Tracker</h2>
+    <?php if ($successMessage): ?>
+        <p class="success-message"><?php echo $successMessage; ?></p>
+    <?php elseif ($errorMessage): ?>
+        <p class="error-message"><?php echo $errorMessage; ?></p>
     <?php endif; ?>
+    <form method="POST">
+        <label for="date">Date:</label>
+        <input type="date" id="date" name="date" required>
+        <br><br>
+        <label for="time">Time:</label>
+        <input type="time" id="time" name="time" required>
+        <br><br>
+        <label for="food_name">Food Name:</label>
+        <input type="text" id="food_name" name="food_name" required>
+        <br><br>
+        <label for="calories">Calories:</label>
+        <input type="number" id="calories" name="calories" required>
+        <br><br>
+        <button type="submit" name="add_entry">Add Entry</button>
+    </form>
+</div>
 
-    <div class="summary">
-        <h2>Today's Calorie Summary</h2>
-        <p><strong>Calories Consumed:</strong> <?php echo $calories; ?> kcal</p>
-        <p><strong>Calorie Goal:</strong> <?php echo $goal; ?> kcal</p>
-        <p><strong>Remaining:</strong> <?php echo max($goal - $calories, 0); ?> kcal</p>
-    </div>
-
-    <div class="form-section">
-        <h3>Log a Meal</h3>
-        <form method="POST">
-            <input type="number" name="calories" placeholder="Enter meal calories" required>
-            <button type="submit" name="logCalories">Log Calories</button>
-        </form>
-    </div>
-
-    <div class="form-section">
-        <h3>Update Calorie Goal</h3>
-        <form method="POST">
-            <input type="number" name="goal" placeholder="Enter new calorie goal" value="<?php echo $goal; ?>" required>
-            <button type="submit" name="updateGoal">Update Goal</button>
-        </form>
-    </div>
+<div class="chart-container">
+    <h2>Your Calorie Log</h2>
+    <?php if (!empty($entries)): ?>
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Food Items</th>
+                    <th>Total Calories</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($entries as $date => $data): ?>
+                    <tr>
+                        <td><?php echo htmlspecialchars($date); ?></td>
+                        <td>
+                            <ul>
+                                <?php foreach ($data['items'] as $item): ?>
+                                    <li><?php echo htmlspecialchars($item['time'] . " - " . $item['food_name'] . " (" . $item['calories'] . " cal)"); ?></li>
+                                <?php endforeach; ?>
+                            </ul>
+                        </td>
+                        <td><?php echo htmlspecialchars($data['total_calories']); ?> cal</td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    <?php else: ?>
+        <p>No calorie entries yet. Start logging your meals!</p>
+    <?php endif; ?>
 </div>
 
 </body>

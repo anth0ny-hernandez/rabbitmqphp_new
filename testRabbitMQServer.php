@@ -14,20 +14,15 @@ function requestProcessor($request) {
 
     switch ($request['type']) {
 
-        case "logCalories":
+        case "addCalorieEntry":
+            // Route the request to the database listener
             $dbClient = new rabbitMQClient("testDB_RMQ.ini", "dbConnect");
-            $result = $dbClient->send_request($request);
-            return $result;
+            return $dbClient->send_request($request);
 
-        case "updateCalorieGoal":
+        case "getCalorieEntries":
+            // Route the request to the database listener
             $dbClient = new rabbitMQClient("testDB_RMQ.ini", "dbConnect");
-            $result = $dbClient->send_request($request);
-            return $result;
-
-        case "getDailyCalories":
-            $dbClient = new rabbitMQClient("testDB_RMQ.ini", "dbConnect");
-            $result = $dbClient->send_request($request);
-            return $result;
+            return $dbClient->send_request($request);
 
 
         // directs the login process
