@@ -7,10 +7,10 @@ if (!isset($_COOKIE['session_token'])) {
 }
 
 // Fetch random meal from testRabbitMQServer
-$client = new rabbitMQClient("testRabbitMQ.ini", "testServer");
-$request = ["type" => "getRandomMeal"];
-$response = $client->send_request($request);
-$randomMeal = $response['success'] ? $response : null;
+// $client = new rabbitMQClient("testRabbitMQ.ini", "testServer");
+// $request = ["type" => "getRandomMeal"];
+// $response = $client->send_request($request);
+// $randomMeal = $response['success'] ? $response : null;
 
 // Refresh session token to extend expiration by another 30 seconds
 $session_token = $_COOKIE['session_token'];

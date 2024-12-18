@@ -47,7 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_entry'])) {
 $client = new rabbitMQClient("testRabbitMQ.ini", "testServer");
 $fetchRequest = [
     "type" => "getCalorieEntries",
-    "user_id" => $_SESSION['user_id']  // Assuming user ID is stored in session
+    "session_token" => $_COOKIE['session_token']  // Use session token from cookies
 ];
 $entriesResponse = $client->send_request($fetchRequest);
 $entries = $entriesResponse['data'] ?? [];

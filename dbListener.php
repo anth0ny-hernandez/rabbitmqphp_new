@@ -49,41 +49,48 @@ function databaseProcessor($request) {
             } else {
                 return ["success" => false, "message" => "Invalid session token."];
             }
-        
-        
-        
+
         case "getCalorieEntries":
-            // Fetch all calorie entries for a user
-            $stmt = $db->prepare("
-                SELECT date, time, food_name, calories
-                FROM calorie_tracker
-                WHERE user_id = :user_id
-                ORDER BY date, time
-            ");
-            $stmt->bindParam(':user_id', $request['user_id']);
+            $session_token = $request['session_token'];
+
+            // Retrieve the user ID based on the session token
+            $userQuery = "SELECT id FROM accounts WHERE session_token = ?";
+            $stmt = $conn->prepare($userQuery);
+            $stmt->bind_param("s", $session_token);
             $stmt->execute();
-            $entries = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        
-            // Group entries by date
-            $groupedEntries = [];
-            foreach ($entries as $entry) {
-                $date = $entry['date'];
-                if (!isset($groupedEntries[$date])) {
-                    $groupedEntries[$date] = [
-                        'items' => [],
-                        'total_calories' => 0,
+            $result = $stmt->get_result();
+
+            if ($result->num_rows > 0) {
+                $row = $result->fetch_assoc();
+                $user_id = $row['id'];
+
+                // Fetch all calorie entries for the user
+                $calorieQuery = "SELECT date, time, food_name, calories 
+                                FROM calorie_tracker 
+                                WHERE user_id = ?
+                                ORDER BY date, time";
+                $stmt = $conn->prepare($calorieQuery);
+                $stmt->bind_param("i", $user_id);
+                $stmt->execute();
+                $entriesResult = $stmt->get_result();
+
+                $entries = [];
+                while ($row = $entriesResult->fetch_assoc()) {
+                    $date = $row['date'];
+                    $entries[$date]['items'][] = [
+                        "time" => $row['time'],
+                        "food_name" => $row['food_name'],
+                        "calories" => $row['calories']
                     ];
+                    $entries[$date]['total_calories'] = ($entries[$date]['total_calories'] ?? 0) + $row['calories'];
                 }
-                $groupedEntries[$date]['items'][] = [
-                    'time' => $entry['time'],
-                    'food_name' => $entry['food_name'],
-                    'calories' => $entry['calories'],
-                ];
-                $groupedEntries[$date]['total_calories'] += $entry['calories'];
+
+                $response = ["success" => true, "data" => $entries];
+            } else {
+                $response = ["success" => false, "message" => "Invalid session token."];
             }
-        
-            return ["success" => true, "data" => $groupedEntries];
-        
+            return $response;
+
         case "logout":
             $session_token = $request['session_token'];
 
