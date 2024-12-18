@@ -44,7 +44,7 @@ $fetchRequest = [
     "user_id" => $_SESSION['user_id']  // Assuming user ID is stored in session
 ];
 $entriesResponse = $client->send_request($fetchRequest);
-$entries = $entriesResponse['data'] ?? [];
+$entries = isset($entriesResponse['data']) && is_array($entriesResponse['data']) ? $entriesResponse['data'] : [];
 ?>
 
 <!DOCTYPE html>
@@ -166,12 +166,18 @@ $entries = $entriesResponse['data'] ?? [];
                         <td><?php echo htmlspecialchars($date); ?></td>
                         <td>
                             <ul>
-                                <?php foreach ($data['items'] as $item): ?>
-                                    <li><?php echo htmlspecialchars($item['time'] . " - " . $item['food_name'] . " (" . $item['calories'] . " cal)"); ?></li>
-                                <?php endforeach; ?>
+                                <?php if (isset($data['items']) && is_array($data['items'])): ?>
+                                    <?php foreach ($data['items'] as $item): ?>
+                                        <li>
+                                            <?php echo htmlspecialchars($item['time'] . " - " . $item['food_name'] . " (" . $item['calories'] . " cal)"); ?>
+                                        </li>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <li>No items available</li>
+                                <?php endif; ?>
                             </ul>
                         </td>
-                        <td><?php echo htmlspecialchars($data['total_calories']); ?> cal</td>
+                        <td><?php echo isset($data['total_calories']) ? htmlspecialchars($data['total_calories']) . " cal" : "N/A"; ?></td>
                     </tr>
                 <?php endforeach; ?>
             </tbody>
