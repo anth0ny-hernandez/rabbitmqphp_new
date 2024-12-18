@@ -1,4 +1,5 @@
 <?php
+require_once('rabbitMQLib.inc');
 // Check if the session token cookie is set
 if (!isset($_COOKIE['session_token'])) {
     header("Location: login.php");
@@ -57,6 +58,21 @@ setcookie('session_token', $session_token, $expire_time, "/");
             text-decoration: none;
             font-size: 16px;
             cursor: pointer;
+        }
+        .notification {
+            display: none;
+            background-color: #007bff;
+            color: white;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 5px;
+            position: relative;
+            animation: fadeout 10s forwards;
+        }
+        @keyframes fadeout {
+            0% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { opacity: 0; display: none; }
         }
         .button:hover {
             background-color: #0056b3;
