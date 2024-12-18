@@ -1,6 +1,7 @@
 <?php
 require_once('rabbitMQLib.inc');
 
+
 // Check if the session token cookie is set
 if (!isset($_COOKIE['session_token'])) {
     header("Location: login.php");
@@ -19,9 +20,11 @@ $successMessage = "";
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_entry'])) {
     $client = new rabbitMQClient("testRabbitMQ.ini", "testServer");
+    $session_token = $_COOKIE['session_token'];
+
     $request = [
         "type" => "addCalorieEntry",
-        "user_id" => $_SESSION['user_id'],  // Assuming user ID is stored in session
+        "session_token" => $session_token,
         "date" => $_POST['date'],
         "time" => $_POST['time'],
         "food_name" => $_POST['food_name'],
@@ -36,6 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_entry'])) {
         $errorMessage = $response['message'] ?? "Failed to add entry.";
     }
 }
+
 
 // Fetch all calorie entries for the user
 $client = new rabbitMQClient("testRabbitMQ.ini", "testServer");

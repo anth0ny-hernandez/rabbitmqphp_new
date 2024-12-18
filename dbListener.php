@@ -18,19 +18,39 @@ function databaseProcessor($request) {
     switch($request['type']) {
 
         case "addCalorieEntry":
-            // Add a calorie entry for a user
-            $stmt = $db->prepare("
-                INSERT INTO calorie_tracker (user_id, date, time, food_name, calories)
-                VALUES (:user_id, :date, :time, :food_name, :calories)
-            ");
-            $stmt->bindParam(':user_id', $request['user_id']);
-            $stmt->bindParam(':date', $request['date']);
-            $stmt->bindParam(':time', $request['time']);
-            $stmt->bindParam(':food_name', $request['food_name']);
-            $stmt->bindParam(':calories', $request['calories']);
-            $stmt->execute();
+            $session_token = $request['session_token'];
+            $date = $request['date'];
+            $time = $request['time'];
+            $food_name = $request['food_name'];
+            $calories = $request['calories'];
         
-            return ["success" => true, "message" => "Calorie entry added successfully."];
+            // Retrieve user ID based on session token
+            $userQuery = "SELECT id FROM accounts WHERE session_token = ?";
+            $stmt = $conn->prepare($userQuery);
+            $stmt->bind_param("s", $session_token);
+            $stmt->execute();
+            $result = $stmt->get_result();
+        
+            if ($result && $result->num_rows > 0) {
+                $row = $result->fetch_assoc();
+                $user_id = $row['id'];  // user_id is unsigned int
+        
+                // Insert the calorie entry
+                $insertQuery = "INSERT INTO calorie_tracker (user_id, date, time, food_name, calories)
+                                VALUES (?, ?, ?, ?, ?)";
+                $stmt = $conn->prepare($insertQuery);
+                $stmt->bind_param("isssi", $user_id, $date, $time, $food_name, $calories);
+        
+                if ($stmt->execute()) {
+                    return ["success" => true, "message" => "Calorie entry added successfully."];
+                } else {
+                    return ["success" => false, "message" => "Failed to add calorie entry."];
+                }
+            } else {
+                return ["success" => false, "message" => "Invalid session token."];
+            }
+        
+        
         
         case "getCalorieEntries":
             // Fetch all calorie entries for a user
