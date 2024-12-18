@@ -13,6 +13,15 @@ function requestProcessor($request) {
     }
 
     switch ($request['type']) {
+
+        case "logCalories":
+        case "updateCalorieGoal":
+        case "getDailyCalories":
+            $dbClient = new rabbitMQClient("testDB_RMQ.ini", "dbConnect");
+            $result = $dbClient->send_request($request);
+            return $result;
+
+
         // directs the login process
         case "getRandomMeal":
             // Forward the request to DMZ

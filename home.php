@@ -109,6 +109,7 @@ setcookie('session_token', $session_token, $expire_time, "/");
         <a href="review.php" class="button">Rate and Review</a>
         <a href="weeklyMealPlanner.php" class="button">Weekly Meal Planner </a>
         <a href="autoshopper.php" class="button">Autoshopper </a>
+        <a href="calorieTracker.php" class="button">Calorie Tracker</a>
         <a href="logout.php" class="button logout-button">Logout</a>
     </div>
 </div>

@@ -17,6 +17,55 @@ function databaseProcessor($request) {
 
     switch($request['type']) {
 
+        case "logCalories":
+            $user_id = $request['user_id'];
+            $calories = $request['calories'];
+            $date = date('Y-m-d'); // Assume the log is for today
+        
+            $sql = "INSERT INTO calorie_tracker (user_id, date, calories, goal) 
+                    VALUES (?, ?, ?, (SELECT goal FROM calorie_tracker WHERE user_id = ? ORDER BY date DESC LIMIT 1))
+                    ON DUPLICATE KEY UPDATE calories = calories + VALUES(calories)";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("isis", $user_id, $date, $calories, $user_id);
+        
+            if ($stmt->execute()) {
+                return ["success" => true, "message" => "Calories logged successfully."];
+            } else {
+                return ["success" => false, "message" => "Failed to log calories."];
+            }
+        
+        case "updateCalorieGoal":
+            $user_id = $request['user_id'];
+            $goal = $request['goal'];
+        
+            $sql = "INSERT INTO calorie_tracker (user_id, date, goal) 
+                    VALUES (?, CURDATE(), ?) 
+                    ON DUPLICATE KEY UPDATE goal = ?";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("iis", $user_id, $goal, $goal);
+        
+            if ($stmt->execute()) {
+                return ["success" => true, "message" => "Goal updated successfully."];
+            } else {
+                return ["success" => false, "message" => "Failed to update goal."];
+            }
+        
+        case "getDailyCalories":
+            $user_id = $request['user_id'];
+            $date = $request['date'] ?? date('Y-m-d');
+        
+            $sql = "SELECT calories, goal FROM calorie_tracker WHERE user_id = ? AND date = ?";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("is", $user_id, $date);
+        
+            if ($stmt->execute()) {
+                $result = $stmt->get_result()->fetch_assoc();
+                return ["success" => true, "data" => $result];
+            } else {
+                return ["success" => false, "message" => "Failed to retrieve data."];
+            }
+        
+
         case "logout":
             $session_token = $request['session_token'];
 
