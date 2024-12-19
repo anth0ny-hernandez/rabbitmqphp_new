@@ -4,6 +4,7 @@ ob_start();
 require_once('rabbitMQLib.inc');
 require_once('get_host_info.inc');
 require_once('path.inc');
+require_once('LogProd.php');
 
 function databaseProcessor($request) {
 
@@ -140,9 +141,11 @@ function databaseProcessor($request) {
                     $preferences = $prefResult->fetch_assoc();
                     return array_merge(["success" => true], $preferences);
                 } else {
+                    logErrorAndSend("No dietary preferences found for user ID $user_id.");
                     return ["success" => false, "message" => "No dietary preferences found."];
                 }
             } else {
+                logErrorAndSend("User not found for session token $session_token.");
                 return ["success" => false, "message" => "User not found."];
             }
         
@@ -244,7 +247,7 @@ function databaseProcessor($request) {
                     echo "Dietary restrictions saved successfully.\n";
                     return array("success" => true, "message" => "Dietary restrictions saved successfully.");
                 } else {
-                    error_log("Error saving dietary restrictions: " . $conn->error);
+                    logErrorAndSend("Error in dietRestrictions: " . $conn->error);
                     return array("success" => false, "message" => "Failed to save dietary restrictions.");
                 }
             } else {
@@ -263,12 +266,17 @@ function databaseProcessor($request) {
             if ($stmt->execute()) {
                 return ["success" => true];
             } else {
+                logErrorAndSend("Error in submitReview: " . $conn->error);
                 return ["success" => false, "message" => $conn->error];
             }
         
         case "fetchReviews":
             $query = "SELECT username, rating, feedback, created_at FROM reviews ORDER BY created_at DESC";
             $result = $conn->query($query);
+            if (!$result) {
+                logErrorAndSend("Error fetching reviews: " . $conn->error);
+                return ["success" => false, "message" => $conn->error];
+            }
             $reviews = [];
         
             while ($row = $result->fetch_assoc()) {
@@ -583,6 +591,7 @@ function databaseProcessor($request) {
             }
     
         default:
+            logErrorAndSend("Unhandled request type: " . $request['type']);
             return "Database Client-Server error";
     }
 }
