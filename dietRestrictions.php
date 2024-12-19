@@ -55,23 +55,65 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['setRestrictions'])) {
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Set Dietary Restrictions</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+
     <style>
-        /* Page styling */
+        /* Page Styling */
         body {
             font-family: Arial, sans-serif;
-            text-align: center;
-            margin-top: 20px;
             background-color: lightgrey;
+            padding-top: 80px; /* Adjusted for navbar spacing */
         }
-        .container {
+
+        .container-custom {
             max-width: 800px;
-            margin: auto;
+            margin: 30px auto; /* Centered and spaced */
             padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0px 0px 50px lightgreen;
+            text-align: center;
         }
+
+        h2 {
+            margin-bottom: 10px;
+            font-size: 25px;
+            text-align: center;
+        }
+
+        .examples {
+            font-size: 20px;
+            text-align: center;
+            margin-top: 10px;
+            padding-left: 20px;
+        }
+
+        .examples span {
+            display: block;
+            margin-top: 5px;
+        }
+
+        .form-section {
+            margin-bottom: 20px;
+            font-size: 20px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            font-size: 18px;
+            margin-top: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
         .button {
             display: inline-block;
-            margin: 5px;
+            margin-top: 15px;
             padding: 10px 20px;
             color: white;
             background-color: blue;
@@ -80,100 +122,115 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['setRestrictions'])) {
             font-size: 16px;
             cursor: pointer;
         }
+
         .button:hover {
             background-color: darkblue;
         }
-        h2 {
-            margin-top: 0;
+
+        .navbar-brand {
+            color: lightgreen !important;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
         }
-        .form-section {
-            margin-bottom: 20px;
-            font-size: 18px;
+
+        .nav-link {
+            color: white !important;
         }
-        select, input[type="text"], textarea {
-            font-size: 20px;
+
+        .nav-link:hover {
+            color: green !important;
         }
-        .result {
-            margin-top: 20px;
-            font-size: 18px;
-            background-color: white;
-            padding: 15px;
-            border: 1px solid #ccc;
+
+        .dropdown-menu a {
+            color: black !important;
+        }
+
+        .dropdown-menu a:hover {
+            background-color: green !important;
+            color: white !important;
+        }
+
+        .logout-button {
+            background-color: crimson !important;
+            color: white !important;
             border-radius: 4px;
+            padding: 5px 15px;
+            font-size: 14px;
         }
-        .highlight {
-            font-weight: bold;
-        }
-        .response-container {
-            margin-top: 20px;
-            font-size: 18px;
-            background-color: #f3f4f6;
-            padding: 15px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
+
+        .logout-button:hover {
+            background-color: darkred !important;
         }
     </style>
 </head>
 <body>
-    <h2>Set Your Dietary Restrictions and Concerns</h2>
 
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container-fluid">
+            <!-- Logout Button -->
+            <a class="btn logout-button" href="logout.php">Logout</a>
+
+            <!-- Navbar Brand -->
+            <a class="navbar-brand" href="#">ARAY</a>
+
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <!-- Navbar Links -->
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <!-- Dropdown Menu -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Features
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href="home.php">Home</a>
+                            <a class="dropdown-item" href="search.php">Recipe Search</a>
+                            <a class="dropdown-item" href="recommendations.php">Recommendations</a>
+                            <a class="dropdown-item" href="review.php">Rate and Review</a>
+                            <a class="dropdown-item" href="mealplannerform.php">Weekly Meal Planner Form</a>
+                            <a class="dropdown-item" href="weeklyMealPlanner.php">Weekly Meal Planner</a>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container container-custom">
+        <h2>Set Your Dietary Restrictions and Concerns</h2>
+        <h2>Examples:</h2>
+            <div class="examples">
+                <span>Vegetarian</span>
+                <span>Pescatarian</span>
+                <span>Pork-free</span>
+                <span>Alcohol-free</span>
+            </div>
+    <br>
+    
     <!-- Dietary Restrictions Form -->
     <form method="POST" action="">
-        <!-- Dietary Restrictions --> 
         <div class="form-section">
-            <label>Dietary Restrictions (select all that apply):</label><br>
-            <?php
-            $dietary_options = [
-                "kosher",
-                "vegetarian",
-                "vegan",
-                "pescatarian",
-                "keto-friendly",
-                "pork-free",
-                "alcohol-free"
-            ];
-            foreach ($dietary_options as $diet) {
-                $checked = in_array($diet, $dietaryRestrictions) ? "checked" : "";
-                echo "<input type='checkbox' name='dietaryRestrictions[]' value='$diet' $checked> $diet<br>";
-            }
-            ?>
+            <label for="dietRestrictions">Diet Restrictions (optional):</label><br>
+            <input type="text" id="dietRestrictions" name="dietRestrictions" placeholder="e.g., low sodium, low sugar" value="<?php echo htmlspecialchars($dietRestrictions); ?>">
         </div>
-
-        <!-- Other Restrictions Section -->
-        <div class="form-section">
-            <label for="otherRestrictions">Other Restrictions (optional):</label><br>
-            <input type="text" id="otherRestrictions" name="otherRestrictions" placeholder="e.g., low sodium, low sugar" value="<?php echo htmlspecialchars($otherRestrictions); ?>">
-        </div>
-
-        <input type="submit" name="setRestrictions" value="Save Restrictions" class="button">
+            <input type="submit" name="setRestrictions" value="Save Restrictions" class="button">
     </form>
 
-    <?php if (!empty($responseMessage)): ?>
-        <div class="response-container">
-            <p><?php echo $responseMessage; ?></p>
-        </div>
-    <?php endif; ?>
-</body>
-<footer>
-<div class="container">
-    <div class="button-group">
-        <a href="home.php" class="button">Home Page</a>
-        <a href="search.php" class="button">Recipe Search</a>
-        <a href="dietrestrictions.php" class="button">Diet Restrictions</a>
-        <a href="recommendations.php" class="button">Recommendations</a>
-        <a href="review.php" class="button">Rate and Review</a>
-        <a href="weeklyMealPlanner.php" class="button">Weekly Meal Planner </a>
-        <a href="autoshopper.php" class="button">Autoshopper </a>
-        <a href="logout.php" class="button logout-button">Logout</a>
+        <?php if (!empty($responseMessage)): ?>
+            <div class="response-container">
+                <p><?php echo $responseMessage; ?></p>
+            </div>
+        <?php endif; ?>
     </div>
-</footer>
 
-<script>
-    setTimeout(function() {
-        document.cookie = 'session_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-        window.location.href = 'login.php';
-    }, 90000); // 30 seconds
-</script>
-
-
+    <!-- Bootstrap JS, Popper.js, and jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.6.0/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
 </html>
