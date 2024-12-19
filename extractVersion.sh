@@ -44,6 +44,9 @@ extract_version() {
             server)
                 echo "Restarting RabbitMQ server for backend..."
                 sudo systemctl restart rabbitmq-server
+                sudo systemctl restart dbListener.service
+                sudo systemctl restart testRabbitMQServer.service
+                sudo systemctl restart mysql.service
                 echo "RabbitMQ server restarted successfully."
                 ;;
             dmz)
