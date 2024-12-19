@@ -19,42 +19,42 @@ function databaseProcessor($request) {
 
         case "addCalorieEntry":
             $session_token = $request['session_token'];
+            $date = $request['date'];
+            $time = $request['time'];
+            $food_name = $request['food_name'];
+            $calories = $request['calories'];
         
             // Retrieve user ID based on session token
             $userQuery = "SELECT id FROM accounts WHERE session_token = ?";
-            $userStmt = $conn->prepare($userQuery);
-            $userStmt->bind_param("s", $session_token);
-            $userStmt->execute();
-            $userResult = $userStmt->get_result();
+            $stmt = $conn->prepare($userQuery);
+            $stmt->bind_param("s", $session_token);
+            $stmt->execute();
+            $result = $stmt->get_result();
         
-            if ($userResult->num_rows > 0) {
-                $user = $userResult->fetch_assoc();
-                $user_id = $user['id'];
+            if ($result && $result->num_rows > 0) {
+                $row = $result->fetch_assoc();
+                $user_id = $row['id'];  // user_id is unsigned int
         
-                // Insert calorie entry into calorie_tracker table
-                $insertQuery = "INSERT INTO calorie_tracker (user_id, date, time, food_name, calories) VALUES (?, ?, ?, ?, ?)";
-                $insertStmt = $conn->prepare($insertQuery);
-                $insertStmt->bind_param(
-                    "isssi", 
-                    $user_id, 
-                    $request['date'], 
-                    $request['time'], 
-                    $request['food_name'], 
-                    $request['calories']
-                );
+                // Insert the calorie entry
+                $insertQuery = "INSERT INTO calorie_tracker (user_id, date, time, food_name, calories)
+                                VALUES (?, ?, ?, ?, ?)";
+                $stmt = $conn->prepare($insertQuery);
+                $stmt->bind_param("isssi", $user_id, $date, $time, $food_name, $calories);
         
-                if ($insertStmt->execute()) {
+                if ($stmt->execute()) {
                     return ["success" => true, "message" => "Calorie entry added successfully."];
                 } else {
                     return ["success" => false, "message" => "Failed to add calorie entry."];
                 }
             } else {
-                return ["success" => false, "message" => "Invalid session token or user not found."];
+                return ["success" => false, "message" => "Invalid session token."];
             }
         
-
         case "getCalorieEntries":
             $session_token = $request['session_token'];
+
+            // Debugging: Print session token
+            error_log("Session token received: " . $session_token);
 
             // Retrieve the user ID based on the session token
             $userQuery = "SELECT id FROM accounts WHERE session_token = ?";
@@ -67,7 +67,9 @@ function databaseProcessor($request) {
                 $row = $result->fetch_assoc();
                 $user_id = $row['id'];
 
-                // Fetch all calorie entries for the user
+                error_log("User ID found: " . $user_id); // Debugging line
+
+                // Fetch calorie entries
                 $calorieQuery = "SELECT date, time, food_name, calories 
                                 FROM calorie_tracker 
                                 WHERE user_id = ?
@@ -90,9 +92,11 @@ function databaseProcessor($request) {
 
                 $response = ["success" => true, "data" => $entries];
             } else {
+                error_log("Invalid session token: " . $session_token); // Debugging line
                 $response = ["success" => false, "message" => "Invalid session token."];
             }
             return $response;
+
 
         case "logout":
             $session_token = $request['session_token'];
