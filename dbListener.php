@@ -50,14 +50,15 @@ function databaseProcessor($request) {
                 return ["success" => false, "message" => "Invalid session token."];
             }
         
+        
         case "getCalorieEntries":
             $session_token = $request['session_token'];
 
-            // Debugging: Print session token
-            error_log("Session token received: " . $session_token);
+            // Debugging: Log the received session token
+            error_log("Received session token: " . $session_token);
 
-            // Retrieve the user ID based on the session token
-            $userQuery = "SELECT id FROM accounts WHERE session_token = ?";
+            // Retrieve user ID based on the session token
+            $userQuery = "SELECT id, session_token FROM accounts WHERE session_token = ?";
             $stmt = $conn->prepare($userQuery);
             $stmt->bind_param("s", $session_token);
             $stmt->execute();
@@ -65,9 +66,11 @@ function databaseProcessor($request) {
 
             if ($result->num_rows > 0) {
                 $row = $result->fetch_assoc();
-                $user_id = $row['id'];
 
-                error_log("User ID found: " . $user_id); // Debugging line
+                // Debugging: Log the database session token
+                error_log("Database session token: " . $row['session_token']);
+
+                $user_id = $row['id'];
 
                 // Fetch calorie entries
                 $calorieQuery = "SELECT date, time, food_name, calories 
@@ -92,10 +95,11 @@ function databaseProcessor($request) {
 
                 $response = ["success" => true, "data" => $entries];
             } else {
-                error_log("Invalid session token: " . $session_token); // Debugging line
+                error_log("No matching session token found for: " . $session_token); // Debugging line
                 $response = ["success" => false, "message" => "Invalid session token."];
             }
             return $response;
+
 
 
         case "logout":
