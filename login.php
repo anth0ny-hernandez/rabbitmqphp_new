@@ -1,5 +1,6 @@
 <?php
-unset($_COOKIE['session_token']);
+ob_start();
+//unset($_COOKIE['session_token']);
 require_once('rabbitMQLib.inc');
 require_once('get_host_info.inc');
 require_once('path.inc');
@@ -27,17 +28,32 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     // Send the request and get the response
     $response = $client->send_request($request);
+    var_dump($response);
 
     // Check the response from the RabbitMQ server
+    //if ($response['success']) 
     if ($response['success']) {
         // Login successful, set the session token cookie
         $session_token = $response['session_token'];
         $expire_time = time() + 30; // Cookie expires in 30 seconds
         setcookie('session_token', $session_token, $expire_time, "/");
 
+        // Consider also extracting boolean of whether user
+        // has opted in for 2FA
+        // If yes, redirect to home; else, redirect to enable2FA.php
+
         // Redirect to the home page
-        header("Location: home.php");
-        exit();
+        // Finals update: Redirects to 2FA Authorization
+        // OR Prompts user if they want to enable 2FA
+        ob_end_flush();
+        if($response['has2faEnabled']) {
+            header("Location: login2fa.php");
+            exit();
+        } else {
+            header("Location: enable2FA.php");
+            exit();
+        }
+        
     } else {
         // Login failed, set the error message
         $login_failed = true;
