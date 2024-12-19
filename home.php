@@ -22,20 +22,24 @@ setcookie('session_token', $session_token, $expire_time, "/");
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home Page</title>
     <style>
         /* Basic styling for the home page */
         body {
             font-family: Arial, sans-serif;
             text-align: center;
-            margin-top: 50px;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
         }
         .container {
             max-width: 600px;
-            margin: auto;
+            margin: 20px auto;
             padding: 20px;
             border: 1px solid #ddd;
             border-radius: 8px;
+            background-color: #fff;
             box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
         }
         h1 {
@@ -46,10 +50,13 @@ setcookie('session_token', $session_token, $expire_time, "/");
         }
         .button-group {
             margin-top: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
         }
         .button {
             display: inline-block;
-            margin: 5px;
             padding: 10px 20px;
             color: #fff;
             background-color: #007bff;
@@ -58,6 +65,15 @@ setcookie('session_token', $session_token, $expire_time, "/");
             text-decoration: none;
             font-size: 16px;
             cursor: pointer;
+        }
+        .button:hover {
+            background-color: #0056b3;
+        }
+        .logout-button {
+            background-color: #dc3545;
+        }
+        .logout-button:hover {
+            background-color: #c82333;
         }
         .notification {
             display: none;
@@ -74,14 +90,25 @@ setcookie('session_token', $session_token, $expire_time, "/");
             90% { opacity: 1; }
             100% { opacity: 0; display: none; }
         }
-        .button:hover {
-            background-color: #0056b3;
+
+        /* Responsive styling */
+        @media (max-width: 768px) {
+            .container {
+                width: 90%;
+                padding: 15px;
+            }
+            .button {
+                font-size: 14px;
+                padding: 8px 15px;
+            }
         }
-        .logout-button {
-            background-color: #dc3545;
-        }
-        .logout-button:hover {
-            background-color: #c82333;
+        @media (max-width: 480px) {
+            .button {
+                width: 100%;
+                text-align: center;
+                padding: 10px;
+                font-size: 14px;
+            }
         }
     </style>
     <script>
@@ -119,16 +146,16 @@ setcookie('session_token', $session_token, $expire_time, "/");
         <div id="notification" class="notification" onclick="window.location.href='<?php echo htmlspecialchars($randomMeal['url']); ?>'">
             🎉 <strong>Meal of the Day:</strong> <?php echo htmlspecialchars($randomMeal['recipe']); ?> (Click here for details!)
         </div>
-    <?php else: ?>
+<?php else: ?>
         <div>No meal available at the moment.</div>
-    <?php endif; ?>
+<?php endif; ?>
     
 <!-- JavaScript to handle automatic logout after session expiration -->
 <script>
     setTimeout(function() {
         document.cookie = 'session_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
         window.location.href = 'login.php';
-    }, 90000); // 30 seconds
+    }, 90000); // 90 seconds
 </script>
 
 </body>
