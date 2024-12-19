@@ -52,6 +52,7 @@ extract_version() {
             dmz)
                 echo "Restarting DMZ services (custom logic for your application)..."
                 # Replace with actual DMZ service restart commands if needed
+                sudo systemctl restart dmz.service
                 echo "DMZ services restarted successfully."
                 ;;
             *)
