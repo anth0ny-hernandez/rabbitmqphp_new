@@ -1,0 +1,12 @@
+[Unit]
+Description=DMZ PHP Service
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/php /home/rishibambhrolia/git/rabbitmqphp_new/dmz.php
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+
