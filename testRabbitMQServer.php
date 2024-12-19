@@ -55,6 +55,25 @@ function requestProcessor($request) {
             var_dump($result);
             return $result;
 
+        
+        // where user makes their choice on 2fa
+        case "enable2fa":
+            // creates new client to establish new connection to db's own server
+            $dbClient = new rabbitMQClient("testDB_RMQ.ini", "dbConnect");
+            $result = $dbClient->send_request($request);
+            echo "Sending back to Client...\n";
+            var_dump($result);
+            return $result;
+
+        // where user verifies OTP from 2FA
+        case "verify2fa":
+            // creates new client to establish new connection to db's own server
+            $dbClient = new rabbitMQClient("testDB_RMQ.ini", "dbConnect");
+            $result = $dbClient->send_request($request);
+            echo "Sending back to Client...\n";
+            var_dump($result);
+            return $result;
+
           // directs register process
         case "register":
             // creates new client to establish new connection to db's own server
