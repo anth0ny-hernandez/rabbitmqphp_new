@@ -77,6 +77,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <head>
     <meta charset="UTF-8">
     <title>Login</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+
     <style>
         /* Basic styling for a centered, clean login form */
         body {
@@ -86,57 +90,32 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             justify-content: center;
             height: 100vh;
             margin: 0;
-            background-color: #f3f4f6;  /* Light background color for a clean look */
+            background-color: #f3f4f6;
         }
         .login-container {
             background-color: #ffffff;
             padding: 30px;
-            width: 300px;
+            width: 100%;
+            max-width: 400px;
             border-radius: 10px;
             box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.2);
             text-align: center;
         }
         h2 {
             margin: 0 0 20px;
-            color: #333;  /* Darker font for the title */
         }
         label {
             display: block;
             font-weight: bold;
-            color: #555;
             margin-bottom: 5px;
             text-align: left;
         }
-        input[type="text"], input[type="password"] {
+        .form-group input {
             width: 100%;
             padding: 10px;
             margin-bottom: 15px;
-            border: 1px solid #ccc;
             border-radius: 5px;
             font-size: 14px;
-        }
-        input[type="submit"] {
-            width: 100%;
-            padding: 10px;
-            font-size: 16px;
-            color: #fff;
-            background-color: #007bff;  /* Primary color for the button */
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        input[type="submit"]:hover {
-            background-color: #0056b3;  /* Darker shade on hover */
-        }
-        .error-message {
-            color: #dc3545;  /* Red color for error */
-            background-color: #f8d7da;  /* Light red background */
-            padding: 10px;
-            border-radius: 5px;
-            margin-top: 10px;
-            font-size: 14px;
-            text-align: center;
         }
     </style>
 </head>
@@ -145,16 +124,23 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <h2>Login</h2>
         
         <?php if ($login_failed): ?>
-            <div class="error-message">
+            <div class="alert alert-danger">
                 <?php echo $login_message; ?>
             </div>
         <?php endif; ?>
         
         <form method="POST" action="login2fa.php">
-            <label for="otp">One-time Password:</label>
-            <input type="text" name="otp" id="otp" required>
-            <input type="submit" value="Login2FA">
+            <div class="form-group">
+                <label for="otp">One-time Password:</label>
+                <input type="text" name="otp" id="otp" class="form-control" required>
+            </div>
+            <input type="submit" value="Login2FA" class="btn btn-primary btn-block">
         </form>
     </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>

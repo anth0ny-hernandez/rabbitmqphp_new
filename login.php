@@ -66,87 +66,129 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+
     <style>
-        /* Basic styling for a centered, clean login form */
         body {
             font-family: Arial, sans-serif;
+            background: lightgrey;
             display: flex;
             align-items: center;
             justify-content: center;
-            height: 100vh;
+            min-height: 100vh;
             margin: 0;
-            background-color: #f3f4f6;  /* Light background color for a clean look */
+            padding-top: 56px; /* Space for navbar */
         }
+
         .login-container {
-            background-color: #ffffff;
-            padding: 30px;
-            width: 300px;
+            max-width: 400px;
+            width: 100%;
+            padding: 20px;
+            background-color: white;
             border-radius: 10px;
-            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.2);
+            box-shadow: 0px 0px 50px lightgreen;
             text-align: center;
         }
+
         h2 {
-            margin: 0 0 20px;
-            color: #333;  /* Darker font for the title */
+            color: black;
         }
-        label {
-            display: block;
-            font-weight: bold;
-            color: #555;
-            margin-bottom: 5px;
-            text-align: left;
+
+        .form-group label {
+            color: black;
         }
-        input[type="text"], input[type="password"] {
+
+        .btn-custom {
             width: 100%;
-            padding: 10px;
-            margin-bottom: 15px;
-            border: 1px solid #ccc;
+            color: white;
+            background-color: blue;
             border-radius: 5px;
-            font-size: 14px;
-        }
-        input[type="submit"] {
-            width: 100%;
-            padding: 10px;
-            font-size: 16px;
-            color: #fff;
-            background-color: #007bff;  /* Primary color for the button */
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
             transition: background-color 0.3s;
         }
-        input[type="submit"]:hover {
-            background-color: #0056b3;  /* Darker shade on hover */
+
+        .btn-custom:hover {
+            background-color: lightblue;
         }
+
         .error-message {
-            color: #dc3545;  /* Red color for error */
-            background-color: #f8d7da;  /* Light red background */
+            color: firebrick;
             padding: 10px;
             border-radius: 5px;
             margin-top: 10px;
             font-size: 14px;
-            text-align: center;
+        }
+
+        /*Navbar Brand Style*/
+        .navbar-brand {
+            color: lightgreen !important;
+        }
+
+        .navbar-brand {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%)
+        }
+
+        .nav-link {
+            color: white !important;
+        }
+
+        .nav-link:hover {
+            color: lightgreen !important;
         }
     </style>
 </head>
 <body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container-fluid d-flex justify-content-between">
+            <a class="navbar-brand mx-auto" href="#">ARAY</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="login.php">Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="registration.php">Register</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
     <div class="login-container">
         <h2>Login</h2>
-        
+
         <?php if ($login_failed): ?>
             <div class="error-message">
                 <?php echo $login_message; ?>
             </div>
         <?php endif; ?>
-        
+
         <form method="POST" action="login.php">
-            <label for="username">Username:</label>
-            <input type="text" name="username" id="username" required>
-            <label for="password">Password:</label>
-            <input type="password" name="password" id="password" required>
-            <input type="submit" value="Login">
+            <div class="form-group">
+                <label for="username">Username:</label>
+                <input type="text" class="form-control" name="username" id="username" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" class="form-control" name="password" id="password" required>
+            </div>
+            <button type="submit" class="btn btn-custom">Login</button>
         </form>
     </div>
+
+    <!-- Bootstrap JS, Popper.js, and jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.6.0/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>
