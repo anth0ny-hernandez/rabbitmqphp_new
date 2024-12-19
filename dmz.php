@@ -4,6 +4,10 @@ require_once('get_host_info.inc');
 require_once('path.inc');
 require_once 'LogProd.php';
 
+// Test an error and log it
+// $errorMessage = "Error occurred in dmz!";
+// logErrorAndSend($errorMessage);
+
 function getRandomMeal() {
     // Define API parameters
     $params = [
@@ -44,6 +48,11 @@ function getRandomMeal() {
 }
 
 function recommendRecipes($preferences) {
+    if (empty($preferences)) {
+        logErrorAndSend("Error in recommendRecipes: No preferences provided.");
+        return ["error" => "No preferences provided"];
+    }
+
     // Define parameters for the Edamam API request based on preferences
     $params = array(
         'type' => 'public',
@@ -88,6 +97,11 @@ function recommendRecipes($preferences) {
 
 
 function searchRecipe($request) {
+
+    if (!isset($request['label'])) {
+        logErrorAndSend("Error in searchRecipe: Missing label parameter.");
+        return ["error" => "Missing label parameter"];
+    }
     // Define parameters for the request, ensuring 'q' is present
     $params = array(
         'type' => 'public',
@@ -135,6 +149,7 @@ function requestProcessor($request) {
     var_dump($request);
 
     if (!isset($request['type'])) {
+        logErrorAndSend("Error in requestProcessor: Unsupported message type.");
         return ["error" => "Unsupported message type"];
     }
 
@@ -151,6 +166,7 @@ function requestProcessor($request) {
             return recommendRecipes($request['preferences']);
 
         default:
+            logErrorAndSend("Error in requestProcessor: Unsupported message type.");
             return ["error" => "Unsupported message type"];
     }
 }
