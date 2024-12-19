@@ -35,129 +35,203 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['searchRecipe'])) {
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Recipe Search</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+
     <style>
-        /* Basic styling */
         body {
             font-family: Arial, sans-serif;
-            text-align: center;
-            margin-top: 20px;
+            background-color: lightgray;
+            padding-top: 80px; /* Prevent overlap with the fixed navbar */
         }
-        .container {
+
+        .container-custom {
             max-width: 800px;
-            margin: auto;
+            margin: 30px auto;
             padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0px 0px 20px lightgreen;
         }
-        .nav-buttons {
+
+        h2, h3 {
+            text-align: center;
+            color: black;
             margin-bottom: 20px;
         }
-        .button {
+
+        .form-section {
+            margin-bottom: 20px;
+            font-size: 18px;
+        }
+
+        input[type="text"], input[type="number"], textarea {
+            font-size: 20px;
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid black;
+            border-radius: 4px;
+            width: 100%;
+        }
+
+        input[type="submit"] {
             display: inline-block;
             margin: 5px;
             padding: 10px 20px;
-            color: #fff;
-            background-color: #007bff;
+            color: white;
+            background-color: blue;
             border: none;
             border-radius: 4px;
             text-decoration: none;
             font-size: 16px;
             cursor: pointer;
         }
-        .button:hover {
-            background-color: #0056b3;
+
+        input[type="submit"]:hover {
+            background-color: darkblue;
         }
-        .logout-button {
-            background-color: #dc3545;
-        }
-        .logout-button:hover {
-            background-color: #c82333;
-        }
+
         .meal-item {
-            border: 1px solid #ddd;
+            border: 1px solid lightgrey;
             border-radius: 8px;
             padding: 10px;
             margin-top: 10px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0px 0px 50px lightgreen;
         }
-        h3 {
-            margin-top: 0;
+
+        .logout-button {
+            background-color: crimson;
+            color: white;
+            padding: 5px 15px;
+            font-size: 14px;
+            border-radius: 4px;
+        }
+
+        .logout-button:hover {
+            background-color: darkred;
+        }
+
+        .navbar-brand {
+            color: lightgreen !important;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .nav-link {
+            color: white !important;
+        }
+
+        .nav-link:hover {
+            color: green !important;
+        }
+
+        .dropdown-menu a {
+            color: black !important;
+        }
+
+        .dropdown-menu a:hover {
+            background-color: green !important;
+            color: white !important;
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="button-group">
-        <a href="home.php" class="button">Home Page</a>
-        <a href="search.php" class="button">Recipe Search</a>
-        <a href="dietrestrictions.php" class="button">Diet Restrictions</a>
-        <a href="recommendations.php" class="button">Recommendations</a>
-        <a href="review.php" class="button">Rate and Review</a>
-        <a href="weeklyMealPlanner.php" class="button">Weekly Meal Planner </a>
-        <a href="autoshopper.php" class="button">Autoshopper </a>
-        <a href="logout.php" class="button logout-button">Logout</a>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container-fluid">
+            <!-- Logout Button -->
+            <a class="btn logout-button" href="logout.php">Logout</a>
+
+            <a class="navbar-brand" href="#">ARAY</a>
+
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <!-- Navbar Links -->
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Features
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href="home.php">Home</a>
+                            <a class="dropdown-item" href="search.php">Recipe Search</a>
+                            <a class="dropdown-item" href="dietrestrictions.php">Diet Restrictions</a>
+                            <a class="dropdown-item" href="recommendations.php">Recommendations</a>
+                            <a class="dropdown-item" href="mealplannerform.php">Weekly Meal Planner Form</a>
+                            <a class="dropdown-item" href="weeklyMealPlanner.php">Weekly Meal Planner</a>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container container-custom">
+        <h2>Recipe Search</h2>
+
+        <!-- Recipe Search Form -->
+        <form method="POST" action="search_recipe.php">
+            <div class="form-section">
+                <label for="label">Search for Recipes:</label>
+                <input type="text" id="label" name="label" placeholder="e.g., pasta, salad" required>
+            </div>
+
+            <div class="form-section">
+                <label for="healthLabels">Health Labels (optional):</label>
+                <input type="text" id="healthLabels" name="healthLabels" placeholder="e.g., vegan, gluten-free">
+            </div>
+
+            <div class="form-section">
+                <label for="cuisineType">Cuisine Type (optional):</label>
+                <input type="text" id="cuisineType" name="cuisineType" placeholder="e.g., Italian, Indian">
+            </div>
+
+            <div class="form-section">
+                <label for="mealType">Meal Type (optional):</label>
+                <input type="text" id="mealType" name="mealType" placeholder="e.g., Breakfast, Dinner">
+            </div>
+
+            <div class="form-section">
+                <label for="ENERC_KCAL">Calories (optional):</label>
+                <input type="number" id="ENERC_KCAL" name="ENERC_KCAL" placeholder="Max Calories">
+            </div>
+
+            <div class="form-section">
+                <input type="submit" name="searchRecipe" value="Search">
+            </div>
+        </form>
+
+        <!-- Display Logic for Recipe Search Results -->
+        <?php if (isset($recipeSearchResponse['error'])): ?>
+            <p><?php echo htmlspecialchars($recipeSearchResponse['error']); ?></p>
+        <?php elseif (isset($recipeSearchResponse['hits']) && !empty($recipeSearchResponse['hits'])): ?>
+            <h3>Search Results:</h3>
+            <?php foreach ($recipeSearchResponse['hits'] as $hit): ?>
+                <div class="meal-item">
+                    <strong><?php echo htmlspecialchars($hit['recipe']['label']); ?></strong><br>
+                    <a href="<?php echo htmlspecialchars($hit['recipe']['url']); ?>" target="_blank">View Recipe</a><br>
+                    Calories: <?php echo round($hit['recipe']['calories']); ?><br>
+                    <?php if (!empty($hit['recipe']['image'])): ?>
+                        <img src="<?php echo htmlspecialchars($hit['recipe']['image']); ?>" alt="<?php echo htmlspecialchars($hit['recipe']['label']); ?>" width="100">
+                    <?php endif; ?>
+                </div>
+            <?php endforeach; ?>
+        <?php else: ?>
+            <p>No results found. Try adjusting your search criteria.</p>
+        <?php endif; ?>
     </div>
 
-    <h2>Recipe Search</h2>
-  
-    <!-- Recipe Search Form -->
-    <form method="POST" action="search.php">
-        <label for="label">Search for Recipes:</label>
-        <input type="text" id="label" name="label" placeholder="e.g., pasta, salad" required>
-        <br><br>
-
-        <label for="healthLabels">Health Labels (optional):</label>
-        <input type="text" id="healthLabels" name="healthLabels" placeholder="e.g., vegan, gluten-free">
-        <br><br>
-
-        <label for="cuisineType">Cuisine Type (optional):</label>
-        <input type="text" id="cuisineType" name="cuisineType" placeholder="e.g., Italian, Indian">
-        <br><br>
-
-        <label for="mealType">Meal Type (optional):</label>
-        <input type="text" id="mealType" name="mealType" placeholder="e.g., Breakfast, Dinner">
-        <br><br>
-
-        <label for="ENERC_KCAL">Calories (optional):</label>
-        <input type="number" id="ENERC_KCAL" name="ENERC_KCAL" placeholder="Max Calories">
-        <br><br>
-
-        <input type="submit" name="searchRecipe" value="Search">
-    </form>
-
-    <!-- Display Logic for Recipe Search Results -->
-    <form method="GET" action="weeklyMealPlanner.php"> 
-    <?php if (isset($recipeSearchResponse['error'])): ?>
-        <p><?php echo htmlspecialchars($recipeSearchResponse['error']); ?></p>
-    <?php elseif (isset($recipeSearchResponse['hits']) && !empty($recipeSearchResponse['hits'])): ?>
-        <h3>Search Results:</h3>
-        <?php foreach ($recipeSearchResponse['hits'] as $hit): ?>
-            <div class="meal-item">
-                <strong><?php echo htmlspecialchars($hit['recipe']['label']); ?></strong><br>
-                <a href="<?php echo htmlspecialchars($hit['recipe']['url']); ?>" target="_blank">View Recipe</a><br>
-                Calories: <?php echo round($hit['recipe']['calories']); ?><br>
-                <?php if (!empty($hit['recipe']['image'])): ?>
-                    <img src="<?php echo htmlspecialchars($hit['recipe']['image']); ?>" alt="<?php echo htmlspecialchars($hit['recipe']['label']); ?>" width="100"><br>
-                <?php endif; ?>
-                <input type = "checkbox" id="<?php echo $hit['recipe']['label']?>" name="foods[]" value="<?php echo $hit['recipe']['label']?>"> <label for ="add to meal plan"> Add to Meal Plan</label>
-            </div>
-            
-        <?php endforeach; ?>
-        <input type = "submit" value="Submit Meals for Planner">
-    </form>
-    <?php else: ?>
-        
-    <?php endif; ?>
-
-</div>
-
-<!-- JavaScript to handle automatic logout after session expiration -->
-<script>
-    setTimeout(function() {
-        document.cookie = 'session_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-        window.location.href = 'login.php';
-    }, 90000); // 30 seconds
-</script>
-
+    <!-- Bootstrap JS, Popper.js, and jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.6.0/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>
