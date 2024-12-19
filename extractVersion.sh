@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the path to the directory where bundles are stored
-BUNDLE_DIR="/home/yashmandal/git/deployment"
+BUNDLE_DIR="/home/rishibambhrolia/git/Deployment"
 
 # Function to determine the bundle type from the bundle name
 detect_bundle_type() {
@@ -62,7 +62,7 @@ extract_version() {
 
 # Get the latest version from the versionTracker file
 get_latest_version() {
-    local version_tracker="/home/yashmandal/test/rabbitmqphp_new/versionTracker.txt"
+    local version_tracker="/home/rishibambhrolia/git/rabbitmqphp_new/versionTracker.txt"
 
     # Check if the versionTracker file exists
     if [[ -f "$version_tracker" ]]; then

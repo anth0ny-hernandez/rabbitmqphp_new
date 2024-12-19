@@ -2,7 +2,7 @@
 require_once('rabbitMQLib.inc');
 
 // Path to the version tracker file
-$versionTrackerFile = "/home/yashmandal/test/rabbitmqphp_new/versionTracker.txt"; // Adjust path if necessary
+$versionTrackerFile = "/home/rishibambhrolia/git/rabbitmqphp_new/versionTracker.txt"; // Adjust path if necessary
 
 // Read the last line of the version tracker file to get the latest version
 $version_number = "";
@@ -18,7 +18,7 @@ if (empty($version_number)) {
 }
 
 // Define the directories
-$bundlingDir = "/home/yashmandal/test/bundling"; // Development machine's bundling directory
+$bundlingDir = "/home/rishibambhrolia/git/Bundler"; // Development machine's bundling directory
 $deploymentDir = "/home/yashmandal/git/deployment"; // Deployment machine's target directory
 
 // Find the tarball matching the latest version in the bundling directory

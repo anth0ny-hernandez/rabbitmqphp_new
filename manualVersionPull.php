@@ -2,7 +2,7 @@
 require_once('rabbitMQLib.inc');
 
 // Configuration
-$localPath = "/home/yashmandal/git/deployment"; // Update this to the environment's directory
+$localPath = "/home/rishibambhrolia/git/Deployment"; // Update this to the environment's directory
 $deploymentServerUser = "yashmandal";      // Deployment server username
 $deploymentServerIP = "172.22.217.86";    // Deployment server IP
 

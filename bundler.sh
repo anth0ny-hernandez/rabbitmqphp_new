@@ -25,7 +25,7 @@ case $bundleChoice in
 esac
 
 # Find the latest version number tracked and add 1 to it
-versionTrackerFile="/home/yashmandal/test/rabbitmqphp_new/versionTracker.txt"
+versionTrackerFile="/home/rishibambhrolia/git/rabbitmqphp_new/versionTracker.txt"
 latestVersionNum=$(tail -n 1 "$versionTrackerFile")
 
 # Convert string to number and increment
@@ -49,6 +49,6 @@ tar --transform='s|.*/||' -czf $bundleFileName "$@"  # Remove directory structur
 scp $bundleFileName yashmandal@172.22.217.86:/home/yashmandal/git/deployment
 
 # Trigger deployment script
-php "/home/yashmandal/test/rabbitmqphp_new/triggerDeployment2.php"
+php "/home/rishibambhrolia/git/rabbitmqphp_new/triggerDeployment2.php"
 
 echo "Bundling and deployment process completed for $bundleName (version $newVersionNum)."
