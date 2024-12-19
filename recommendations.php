@@ -32,125 +32,167 @@ if (isset($response['error'])) {
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Recipe Recommendations</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+
     <style>
-        /* Basic styling for the recommendations page to match the home page */
         body {
             font-family: Arial, sans-serif;
-            text-align: center;
-            margin-top: 50px;
+            background-color: lightgray;
+            padding-top: 80px; /* Prevent overlap with the fixed navbar */
         }
-        .container {
-            max-width: 600px;
-            margin: auto;
+
+        .container-custom {
+            max-width: 800px;
+            margin: 30px auto;
             padding: 20px;
-            border: 1px solid #ddd;
+            background-color: white;
             border-radius: 8px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0px 0px 20px lightgreen;
         }
+
         h2 {
-            color: #333;
+            text-align: center;
+            color: black;
+            margin-bottom: 20px;
         }
-        .button-group {
-            margin-top: 20px;
-        }
-        .button {
-            display: inline-block;
-            margin: 5px;
-            padding: 10px 20px;
-            color: #fff;
-            background-color: #007bff;
-            border: none;
-            border-radius: 4px;
-            text-decoration: none;
-            font-size: 16px;
-            cursor: pointer;
-        }
-        .button:hover {
-            background-color: #0056b3;
-        }
-        .logout-button {
-            background-color: #dc3545;
-        }
-        .logout-button:hover {
-            background-color: #c82333;
-        }
+
         .recipe-card {
             background-color: white;
-            border: 1px solid #ddd;
-            border-radius: 8px;
             padding: 15px;
-            margin-bottom: 20px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-            text-align: left;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border: 1px solid black;
         }
+
         .recipe-card img {
-            max-width: 100%;
+            width: 100%;
             border-radius: 8px;
         }
+
         .recipe-card h3 {
-            color: #007bff;
-            margin: 0;
+            font-size: 24px;
+            color: darkslategray;
         }
+
         .recipe-card p {
-            color: #555;
+            font-size: 16px;
         }
-        .recipe-card a {
-            color: #007bff;
-            text-decoration: none;
+
+        .btn-primary {
+            background-color: blue;
+            border: none;
         }
-        .recipe-card a:hover {
-            text-decoration: underline;
+
+        .btn-primary:hover {
+            background-color: darkblue;
         }
+
         .error-message {
-            color: #dc3545;
-            font-size: 18px;
-            margin-top: 20px;
+            color: crimson;
+        }
+
+        .navbar-brand {
+            color: lightgreen !important;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .nav-link {
+            color: white !important;
+        }
+
+        .nav-link:hover {
+            color: lightgreen !important;
+        }
+
+        .dropdown-menu a {
+            color: black !important;
+        }
+
+        .dropdown-menu a:hover {
+            background-color: green !important;
+            color: white !important;
+        }
+
+        .logout-button {
+            background-color: crimson !important;
+            color: white !important;
+            border-radius: 4px;
+            padding: 5px 15px;
+            font-size: 14px;
+        }
+
+        .logout-button:hover {
+            background-color: darkred !important;
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h2>Recipe Recommendations</h2>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container-fluid">
+            <!-- Logout Button -->
+            <a class="btn logout-button" href="logout.php">Logout</a>
 
-    <!-- Navigation Buttons -->
-    <div class="button-group">
-        <a href="home.php" class="button">Home Page</a>
-        <a href="search.php" class="button">Recipe Search</a>
-        <a href="dietrestrictions.php" class="button">Diet Restrictions</a>
-        <a href="recommendations.php" class="button">Recommendations</a>
-        <a href="review.php" class="button">Rate and Review</a>
-        <a href="weeklyMealPlanner.php" class="button">Weekly Meal Planner </a>
-        <a href="autoshopper.php" class="button">Autoshopper </a>
-        <a href="logout.php" class="button logout-button">Logout</a>
+            <a class="navbar-brand" href="#">ARAY</a>
+
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <!-- Navbar Links -->
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Features
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href="home.php">Home</a>
+                            <a class="dropdown-item" href="search.php">Recipe Search</a>
+                            <a class="dropdown-item" href="dietrestrictions.php">Diet Restrictions</a>
+                            <a class="dropdown-item" href="recommendations.php">Recommendations</a>
+                            <a class="dropdown-item" href="mealplannerform.php">Weekly Meal Planner Form</a>
+                            <a class="dropdown-item" href="weeklyMealPlanner.php">Weekly Meal Planner</a>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container container-custom">
+        <h2>Recipe Recommendations</h2>
+
+        <!-- Error Message -->
+        <?php if (isset($error_message)): ?>
+            <div class="alert alert-danger"><?php echo htmlspecialchars($error_message); ?></div>
+        <?php elseif (isset($recipes) && !empty($recipes)): ?>
+            <!-- Loop through recipes -->
+            <?php foreach ($recipes as $hit): ?>
+                <div class="recipe-card">
+                    <h3><?php echo htmlspecialchars($hit['recipe']['label']); ?></h3>
+                    <a href="<?php echo htmlspecialchars($hit['recipe']['url']); ?>" target="_blank">
+                        <img src="<?php echo htmlspecialchars($hit['recipe']['image']); ?>" alt="<?php echo htmlspecialchars($hit['recipe']['label']); ?>">
+                    </a>
+                    <p><strong>Calories:</strong> <?php echo round($hit['recipe']['calories']); ?></p>
+                    <p><a href="<?php echo htmlspecialchars($hit['recipe']['url']); ?>" target="_blank" class="btn btn-primary">View Recipe</a></p>
+                </div>
+            <?php endforeach; ?>
+        <?php else: ?>
+            <div class="alert alert-warning">No recipes found. Please try again later.</div>
+        <?php endif; ?>
     </div>
 
-    <?php if (isset($error_message)): ?>
-        <p class="error-message"><?php echo htmlspecialchars($error_message); ?></p>
-    <?php elseif (isset($recipes) && !empty($recipes)): ?>
-        <?php foreach ($recipes as $hit): ?>
-            <div class="recipe-card">
-                <h3><?php echo htmlspecialchars($hit['recipe']['label']); ?></h3>
-                <a href="<?php echo htmlspecialchars($hit['recipe']['url']); ?>" target="_blank">
-                    <img src="<?php echo htmlspecialchars($hit['recipe']['image']); ?>" alt="<?php echo htmlspecialchars($hit['recipe']['label']); ?>">
-                </a>
-                <p><strong>Calories:</strong> <?php echo round($hit['recipe']['calories']); ?></p>
-                <p><a href="<?php echo htmlspecialchars($hit['recipe']['url']); ?>" target="_blank">View Recipe</a></p>
-            </div>
-        <?php endforeach; ?>
-    <?php else: ?>
-        <p class="error-message">No recipes found. Please try again later.</p>
-    <?php endif; ?>
-</div>
-
-<!-- JavaScript to handle automatic logout after session expiration -->
-<script>
-    setTimeout(function() {
-        document.cookie = 'session_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-        window.location.href = 'login.php';
-    }, 90000); // 30 seconds
-</script>
-
+    <!-- Bootstrap JS, Popper.js, and jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.6.0/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>
