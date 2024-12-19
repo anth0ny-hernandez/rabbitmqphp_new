@@ -59,132 +59,176 @@ $reviews = $reviewsResponse['reviews'] ?? [];
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ratings and Reviews</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+
     <style>
-        /* Basic styling for the page */
         body {
             font-family: Arial, sans-serif;
-            background-color: #f9f9f9;
-            text-align: center;
-            padding: 20px;
+            background-color: lightgray;
+            padding-top: 80px; /* Prevent overlap with the fixed navbar */
         }
-        .container {
-            max-width: 600px;
-            margin: 20px auto;
+
+        .container-custom {
+            max-width: 800px;
+            margin: 30px auto;
             padding: 20px;
-            border: 1px solid #ddd;
+            background-color: white;
             border-radius: 8px;
-            background-color: #fff;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0px 0px 20px lightgreen;
         }
-        h2 {
-            color: #333;
-        }
-        .button-group {
+
+        h2, h3 {
+            text-align: center;
+            color: black;
             margin-bottom: 20px;
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            flex-wrap: wrap;
         }
-        .button {
-            background-color: #007bff;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            text-decoration: none;
-        }
-        .button:hover {
-            background-color: #0056b3;
-        }
-        .review-form input, .review-form select, .review-form textarea {
+
+        .review-form input,
+        .review-form select,
+        .review-form textarea {
             width: 100%;
             margin-bottom: 10px;
             padding: 10px;
-            border: 1px solid #ddd;
+            border: 1px solid black;
             border-radius: 4px;
         }
-        .review-list {
-            margin-top: 20px;
-            text-align: left;
-        }
+
         .review-item {
-            background-color: #f7f7f7;
+            background-color: white;
             padding: 15px;
             margin-bottom: 10px;
             border-radius: 5px;
-            border: 1px solid #ddd;
+            border: 1px solid black;
         }
+
         .error-message {
-            color: #dc3545;
+            color: crimson;
         }
+
         .success-message {
-            color: #28a745;
+            color: green;
+        }
+
+        .navbar-brand {
+            color: lightgreen !important;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .nav-link {
+            color: white !important;
+        }
+
+        .nav-link:hover {
+            color: lightgreen !important;
+        }
+
+        .dropdown-menu a {
+            color: black !important;
+        }
+
+        .dropdown-menu a:hover {
+            background-color: green !important;
+            color: white !important;
+        }
+
+        .logout-button {
+            background-color: crimson !important;
+            color: white !important;
+            border-radius: 4px;
+            padding: 5px 15px;
+            font-size: 14px;
+        }
+
+        .logout-button:hover {
+            background-color: darkred !important;
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h2>Ratings and Reviews</h2>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container-fluid">
+            <!-- Logout Button -->
+            <a class="btn logout-button" href="logout.php">Logout</a>
 
-    <!-- Navigation Buttons -->
-    <div class="button-group">
-        <a href="home.php" class="button">Home Page</a>
-        <a href="search.php" class="button">Recipe Search</a>
-        <a href="dietrestrictions.php" class="button">Diet Restrictions</a>
-        <a href="recommendations.php" class="button">Recommendations</a>
-        <a href="review.php" class="button">Rate and Review</a>
-        <a href="weeklyMealPlanner.php" class="button">Weekly Meal Planner </a>
-        <a href="autoshopper.php" class="button">Autoshopper </a>
-        <a href="logout.php" class="button logout-button">Logout</a>
-    </div>
+            <a class="navbar-brand" href="#">ARAY</a>
 
-    <!-- Success or Error Messages -->
-    <?php if ($successMessage): ?>
-        <p class="success-message"><?php echo $successMessage; ?></p>
-    <?php elseif ($errorMessage): ?>
-        <p class="error-message"><?php echo $errorMessage; ?></p>
-    <?php endif; ?>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
 
-    <!-- Review Submission Form -->
-    <form method="POST" class="review-form">
-        <input type="text" name="username" placeholder="Your Name" required value="<?php echo htmlspecialchars($username); ?>">
-        <select name="rating" required>
-            <option value="">Rate out of 5</option>
-            <?php for ($i = 1; $i <= 5; $i++): ?>
-                <option value="<?php echo $i; ?>" <?php echo ($i == $rating) ? "selected" : ""; ?>><?php echo $i; ?></option>
-            <?php endfor; ?>
-        </select>
-        <textarea name="feedback" placeholder="Write your review..." required><?php echo htmlspecialchars($feedback); ?></textarea>
-        <button type="submit" name="submitReview" class="button">Submit Review</button>
-    </form>
+            <!-- Navbar Links -->
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Features
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href="home.php">Home</a>
+                            <a class="dropdown-item" href="search.php">Recipe Search</a>
+                            <a class="dropdown-item" href="dietrestrictions.php">Diet Restrictions</a>
+                            <a class="dropdown-item" href="recommendations.php">Recommendations</a>
+                            <a class="dropdown-item" href="mealplannerform.php">Weekly Meal Planner Form</a>
+                            <a class="dropdown-item" href="weeklyMealPlanner.php">Weekly Meal Planner</a>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
 
-    <!-- Display All Reviews -->
-    <div class="review-list">
-        <h3>User Reviews</h3>
-        <?php if (!empty($reviews)): ?>
-            <?php foreach ($reviews as $review): ?>
-                <div class="review-item">
-                    <p><strong><?php echo htmlspecialchars($review['username']); ?></strong> (Rated: <?php echo $review['rating']; ?>/5)</p>
-                    <p><?php echo htmlspecialchars($review['feedback']); ?></p>
-                    <p><small>Posted on: <?php echo htmlspecialchars($review['created_at']); ?></small></p>
-                </div>
-            <?php endforeach; ?>
-        <?php else: ?>
-            <p>No reviews yet. Be the first to leave a review!</p>
+    <div class="container container-custom">
+        <h2>Ratings and Reviews</h2>
+        <!-- Success or Error Messages -->
+        <?php if ($successMessage): ?>
+            <p class="success-message"><?php echo $successMessage; ?></p>
+        <?php elseif ($errorMessage): ?>
+            <p class="error-message"><?php echo $errorMessage; ?></p>
         <?php endif; ?>
+
+        <!-- Review Submission Form -->
+        <form method="POST" class="review-form">
+            <input type="text" name="username" placeholder="Your Name" required value="<?php echo htmlspecialchars($username); ?>">
+            <br>
+            <select name="rating" required>
+                <option value="">Rate out of 5</option>
+                <?php for ($i = 1; $i <= 5; $i++): ?>
+                    <option value="<?php echo $i; ?>" <?php echo ($i == $rating) ? "selected" : ""; ?>><?php echo $i; ?></option>
+                <?php endfor; ?>
+            </select>
+            <textarea name="feedback" placeholder="Write your review..." required><?php echo htmlspecialchars($feedback); ?></textarea>
+            <br>
+            <button type="submit" name="submitReview" class="btn btn-primary btn-block" style="background-color: blue;">Submit Review</button>
+        </form>
+        <br>
+        
+        <div class="review-list">
+            <h3>User Reviews</h3>
+            <?php if (!empty($reviews)): ?>
+                <?php foreach ($reviews as $review): ?>
+                    <div class="review-item">
+                        <p><strong><?php echo htmlspecialchars($review['username']); ?></strong> (Rated: <?php echo $review['rating']; ?>/5)</p>
+                        <p><?php echo htmlspecialchars($review['feedback']); ?></p>
+                        <p><small>Posted on: <?php echo htmlspecialchars($review['created_at']); ?></small></p>
+                    </div>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <p>No reviews yet. Be the first to leave a review!</p>
+            <?php endif; ?>
+        </div>
     </div>
-</div>
 
-<script>
-    setTimeout(function() {
-        document.cookie = 'session_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-        window.location.href = 'login.php';
-    }, 90000); // 30 seconds
-</script>
-
+    <!-- Bootstrap JS, Popper.js, and jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.6.0/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>
