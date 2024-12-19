@@ -1,0 +1,16 @@
+[Unit]
+Description=Start the rabbitMQ Server
+#start after machine boots
+After=network.target
+
+[Service]
+#path to testRabbitMQServer file. run this file. 
+ExecStart=/home/alvee-jalal/git/rabbitmqphp_new/testRabbitMQServer.php
+#if it fails to start, restart it
+Restart=on-failure
+#how long system waits before restarting service
+RestartSec=10
+
+[Install]
+#start automatically when the system is in a state for multiple users to be abe to log in. 
+WantedBy=multi-user.target

@@ -1,0 +1,11 @@
+[Unit]
+Description=Start the database listener
+After=network.target
+
+[Service]
+ExecStart=/home/alvee-jalal/git/rabbitmqphp_new/dbListener.php
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
